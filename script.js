@@ -86,56 +86,77 @@ ideaBtn?.addEventListener("click", () => {
 const orbMount = document.getElementById("orbMount");
 let orbLoaded = false;
 async function loadOrb() {
-  if (orbLoaded) return;
-  orbLoaded = true;
-  // Dynamically import three from a CDN to keep initial bundle tiny
-  const THREE = await import("https://cdn.skypack.dev/three@0.161.0");
-  const { Scene, PerspectiveCamera, WebGLRenderer, Mesh, SphereGeometry, MeshStandardMaterial, AmbientLight, PointLight, Clock, Color } = THREE;
+  async function loadOrb() {
+    if (orbLoaded) return;
+    orbLoaded = true;
+    const THREE = await import("https://cdn.skypack.dev/three@0.161.0");
+    const { Scene, PerspectiveCamera, WebGLRenderer, Mesh, SphereGeometry, MeshStandardMaterial, AmbientLight, PointLight, Clock, Color, Vector2 } = THREE;
 
-  const width = orbMount.clientWidth;
-  const height = orbMount.clientHeight;
+    const width = orbMount.clientWidth;
+    const height = orbMount.clientHeight;
 
-  const scene = new Scene();
-  scene.background = new Color(0x050508);
+    const scene = new Scene();
+    scene.background = new Color(0x050508);
 
-  const camera = new PerspectiveCamera(50, width / height, 0.1, 100);
-  camera.position.z = 3;
+    const camera = new PerspectiveCamera(50, width / height, 0.1, 100);
+    camera.position.z = 3;
 
-  const renderer = new WebGLRenderer({ antialias: true, powerPreference: "low-power", alpha: true });
-  renderer.setSize(width, height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  orbMount.innerHTML = "";
-  orbMount.appendChild(renderer.domElement);
+    const renderer = new WebGLRenderer({ antialias: true, powerPreference: "low-power", alpha: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    orbMount.innerHTML = "";
+    orbMount.appendChild(renderer.domElement);
 
-  const geo = new SphereGeometry(0.9, 32, 32);
-  const mat = new MeshStandardMaterial({ color: 0x66ddff, emissive: 0x0b2233, roughness: 0.35, metalness: 0.2 });
-  const orb = new Mesh(geo, mat);
-  scene.add(orb);
+    // Time-of-day hue shift (morning=warm, night=cool)
+    const hrs = new Date().getHours();
+    const dayFactor = Math.cos(((hrs - 12) / 12) * Math.PI); // -1..1
+    const baseColor = new Color().setHSL(0.56 - 0.06 * dayFactor, 0.9, 0.6); // ~blue→teal drift
 
-  const amb = new AmbientLight(0x88ccff, 0.35);
-  const light = new PointLight(0x88ddff, 1.4, 8);
-  light.position.set(1.5, 1.2, 2.5);
-  scene.add(amb, light);
+    const geo = new SphereGeometry(0.9, 48, 48);
+    const mat = new MeshStandardMaterial({ color: baseColor, emissive: baseColor.clone().multiplyScalar(0.15), roughness: 0.35, metalness: 0.2 });
+    const orb = new Mesh(geo, mat);
+    scene.add(orb);
 
-  const clock = new Clock();
-  function tick() {
-    const t = clock.getElapsedTime();
-    orb.rotation.y = t * 0.3;
-    orb.position.y = Math.sin(t * 0.9) * 0.06;
-    light.intensity = 1.2 + Math.sin(t * 1.7) * 0.2;
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
+    const amb = new AmbientLight(0xffffff, 0.28);
+    const light = new PointLight(0x88ddff, 1.3, 8);
+    light.position.set(1.5, 1.2, 2.5);
+    scene.add(amb, light);
+
+    const mouse = new Vector2(0, 0);
+    const onPointer = (e) => {
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+    };
+    renderer.domElement.addEventListener("pointermove", onPointer, { passive: true });
+
+    const clock = new Clock();
+    function tick() {
+      const t = clock.getElapsedTime();
+      // Gentle idle motion
+      orb.rotation.y = t * 0.3;
+      orb.position.y = Math.sin(t * 0.9) * 0.06;
+
+      // Light follows cursor smoothly
+      light.position.x += ((mouse.x * 1.6) - light.position.x) * 0.08;
+      light.position.y += ((mouse.y * 1.0) - light.position.y) * 0.08;
+
+      // Soft pulsing intensity
+      light.intensity = 1.15 + Math.sin(t * 1.7) * 0.18;
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    const ro = new ResizeObserver(() => {
+      const w = orbMount.clientWidth, h = orbMount.clientHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
+    ro.observe(orbMount);
   }
-  tick();
-
-  // Resize handling
-  const ro = new ResizeObserver(() => {
-    const w = orbMount.clientWidth, h = orbMount.clientHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
-  });
-  ro.observe(orbMount);
 }
 
 if (orbMount) {
