@@ -1,198 +1,293 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <title>Declan — Creative Lab</title>
-  <meta name="description" content="Declan's AI x Creative Coding Lab — experiments, notes, and projects." />
-  <meta property="og:title" content="Declan — Creative Lab" />
-  <meta property="og:description" content="AI x Creative Coding experiments, notes, and projects." />
-  <meta name="theme-color" content="#0b0b0f" />
-
-  <!-- Tailwind (CDN for fast start; swap to local build later if you want) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { bg: "#0b0b0f", fg: "#e6e6ea", accent: "#8df" },
-          boxShadow: {
-            glow: "0 0 32px rgba(136, 221, 255, 0.25)",
-          }
-        }
-      },
-      darkMode: "class"
-    };
-  </script>
-
-  <link href="style.css" rel="stylesheet" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Declan — Portfolio</title>
+<meta name="theme-color" content="#0a0a0a" />
+<style>
+  /* ===== Tokens (no color-mix, widely supported) ===== */
+  :root{
+    --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
+    --line:#1d1e22; --accent:#ff7a18; --accent2:#ffb566;
+    --maxw:1160px; --header:68px; --r:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+  .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+  a{color:inherit}
+  /* Header */
+  header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
+  .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
+  .brand{text-decoration:none;font-weight:800}
+  .brand b{color:var(--accent)}
+  nav{display:flex;gap:22px}
+  nav a{color:var(--muted);text-decoration:none;font-size:15px;padding:8px 0}
+  nav a:hover{color:var(--fg)}
+  nav a.active{color:var(--accent);position:relative}
+  nav a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px}
+  .menu-btn{display:none}
+  @media (max-width:860px){ nav{display:none}.menu-btn{display:inline-flex;border:1px solid var(--line);padding:8px 10px;border-radius:10px} }
+  /* Sections */
+  section{scroll-margin-top:calc(var(--header) + 14px)}
+  .section{padding:60px 0;border-bottom:1px solid var(--line)}
+  .lead{color:var(--muted);max-width:68ch}
+  .title{font-size:clamp(28px,4.5vw,56px);line-height:1.1;margin:.3rem 0 1rem;font-weight:900}
+  .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  /* Grid + Cards */
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+  .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+  @media (max-width:860px){.col-4,.col-6{grid-column:span 12}}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+  .card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
+  .thumb{position:relative;aspect-ratio:16/9;background:#0e0f12;display:grid;place-items:center}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
+  .card-body{padding:16px}
+  .meta{display:flex;gap:12px;color:var(--muted);font-size:13px}
+  .title-sm{font-weight:700;font-size:18px;margin:6px 0}
+  .desc{color:#d7d9df;font-size:14px}
+  .actions{display:flex;gap:10px;margin-top:12px}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;font-size:14px;text-decoration:none}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
+  .btn.ghost{border:1px solid var(--line);color:var(--fg)}
+  /* Footer */
+  footer{padding:40px 0 70px;color:var(--muted)}
+  /* Simple reveal (no IntersectionObserver needed) */
+  .reveal{opacity:1;transform:none}
+</style>
 </head>
-<body class="bg-bg text-fg selection:bg-accent/30 antialiased">
-  <!-- Skip to content for a11y -->
-  <a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:m-4 focus:rounded focus:bg-black/70 focus:px-3 focus:py-2">Skip to content</a>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
 
-  <!-- Site header -->
-  <header class="sticky top-0 z-50 backdrop-blur supports-[backdrop-filter]:bg-bg/70 border-b border-white/5">
-    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-      <a class="font-semibold tracking-wide" href="/">DECLAN<span class="text-accent">.LAB</span></a>
-
-      <nav class="hidden md:flex gap-6 text-sm">
-        <a class="nav-link" href="#about">About</a>
-        <a class="nav-link" href="#lab">Lab</a>
-        <a class="nav-link" href="#notes">Notes</a>
-        <a class="nav-link" href="#contact">Contact</a>
+  <header>
+    <div class="container bar">
+      <a class="brand" href="#top">DECLAN<b>.</b></a>
+      <nav aria-label="Chapters">
+        <a href="#music">Music</a>
+        <a href="#acting">Acting</a>
+        <a href="#film">Film</a>
+        <a href="#web">Web&nbsp;Projects</a>
+        <a href="#writing">Writing</a>
+        <a href="#contact">Contact</a>
       </nav>
-
-      <button id="menuBtn" class="md:hidden px-3 py-2 rounded border border-white/10">Menu</button>
-    </div>
-
-    <!-- Mobile menu -->
-    <div id="mobileMenu" class="md:hidden hidden border-t border-white/5">
-      <nav class="mx-auto max-w-6xl px-4 py-3 flex flex-col gap-3 text-sm">
-        <a class="nav-link" href="#about">About</a>
-        <a class="nav-link" href="#lab">Lab</a>
-        <a class="nav-link" href="#notes">Notes</a>
-        <a class="nav-link" href="#contact">Contact</a>
-      </nav>
+      <button class="menu-btn" aria-label="Menu">Menu</button>
     </div>
   </header>
 
-  <!-- Hero -->
-  <section id="hero" class="relative overflow-hidden">
-		<div class="glow" aria-hidden="true"></div>
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-      <!-- subtle glow gradient -->
-      <div class="absolute -top-32 left-1/2 h-72 w-[60rem] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl"></div>
-    </div>
-
-    <div class="mx-auto max-w-6xl px-4 py-16 md:py-24">
-     <h1 class="scanlines text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-       AI × Creative Coding <span class="text-accent">Playground</span>
-     </h1>  
-      <p class="mt-4 max-w-2xl text-white/70">
-        A living portfolio of experiments, notes, and tools. Built with a growth mindset and a little chaos energy.
-      </p>
-
-      <div class="mt-8 flex gap-3">
-        <a href="#lab" class="btn-primary">Enter the Lab</a>
-        <a href="#notes" class="btn-ghost">Read the Notes</a>
-      </div>
-    </div>
-  </section>
-
-  <main id="main" class="mx-auto max-w-6xl px-4 space-y-24 md:space-y-32">
-    <!-- About -->
-    <section id="about" class="reveal">
-      <h2 class="section-title">About</h2>
-      <div class="prose-invert prose max-w-none">
-        <p>
-          I’m Declan. I build interactive things and systems that help me think. This site is my lab notebook and performance space.
-        </p>
-        <ul>
-          <li>Creative coding (three.js, motion, vibes)</li>
-          <li>AI fundamentals (reasoning, prompts, tools)</li>
-          <li>Personal systems (planning for early 2026)</li>
-        </ul>
-      </div>
+  <main id="main">
+    <section class="section container">
+      <h1 class="title">Creative works in <span class="accent">music</span>, <span class="accent">performance</span>, and <span class="accent">technology</span>.</h1>
+      <p class="lead">A curated selection. Chapters above; scroll to explore.</p>
     </section>
 
-    <!-- Lab: where experiments live -->
-    <section id="lab" class="reveal">
-      <div class="flex items-baseline justify-between">
-        <h2 class="section-title">Lab</h2>
-        <button id="togglePerf" class="text-xs px-2 py-1 rounded border border-white/10 hover:bg-white/5">Perf Stats</button>
-      </div>
-
-			<article class="card">
-      <header class="card-head">
-      <h3 class="card-title">[Title]: One-Line Vibe</h3>
-      <p class="card-sub">Tech: three.js, CSS, whatever</p>
-      </header>
-      <div class="card-body">
-        <p>Why it exists (1–2 sentences). What you were exploring. Link to a standalone demo if needed.</p>
-        <ul class="mt-2 list-disc list-inside text-white/70">
-        <li>What I learned</li>
-        <li>What surprised me</li>
-        <li>Next iteration idea</li>
-       </ul>
-      </div>
-  <footer class="card-foot">
-    <a href="#" class="hover:underline">Open demo</a>
-    <a href="#notes" class="hover:underline">Notes</a>
-  </footer>
-</article>
-
-      <!-- Card grid -->
-      <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        <!-- Placeholder experiment card -->
-        <article class="card">
-          <header class="card-head">
-            <h3 class="card-title">CRT Header Scanlines</h3>
-            <p class="card-sub">Subtle animation on headings</p>
-          </header>
-          <div class="card-body">
-            <p>This is a tiny UI animation demo living in <code>style.css</code> — no heavy JS required.</p>
+    <section id="music" class="section container">
+      <h2>Music</h2>
+      <p class="lead">Records, singles, and collaborations.</p>
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1600&auto=format&fit=crop" alt="Studio console with warm lights">
+            <span class="tag">Album</span>
           </div>
-          <footer class="card-foot">
-            <a href="#about" class="inline-flex items-center gap-2 hover:underline">View</a>
-          </footer>
-        </article>
-
-        <!-- Three.js lazy-load card -->
-        <article class="card">
-          <header class="card-head">
-            <h3 class="card-title">Three.js: Minimal Orb</h3>
-            <p class="card-sub">Lazy-loaded, low-cost scene</p>
-          </header>
           <div class="card-body">
-            <div id="orbMount" class="aspect-video w-full rounded-xl bg-black/40 ring-1 ring-white/10 grid place-items-center">
-              <p class="text-xs text-white/50">Scroll into view to load…</p>
+            <div class="meta"><span>2023</span><span>Producer, Vocals</span></div>
+            <h3 class="title-sm">Night Static</h3>
+            <p class="desc">Dream-leaning electronic album; analog synths, tape noise, and voice.</p>
+            <div class="actions">
+              <a class="btn primary" href="#" target="_blank" rel="noopener">Listen</a>
+              <a class="btn ghost" href="#" target="_blank" rel="noopener">Liner Notes</a>
             </div>
           </div>
-          <footer class="card-foot">
-            <button id="reloadOrb" class="inline-flex items-center gap-2 hover:underline">Reload</button>
-          </footer>
         </article>
 
-        <!-- Notes linker -->
-        <article class="card">
-          <header class="card-head">
-            <h3 class="card-title">Idea Randomizer</h3>
-            <p class="card-sub">Surface old ideas on click</p>
-          </header>
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?q=80&w=1600&auto=format&fit=crop" alt="Guitar on stage with orange lights">
+            <span class="tag">Live</span>
+          </div>
           <div class="card-body">
-            <button id="randomIdea" class="btn-primary w-full">Give me a spark</button>
-            <p id="ideaOut" class="mt-3 text-sm text-white/70"></p>
+            <div class="meta"><span>2024</span><span>Guitar, Vox</span></div>
+            <h3 class="title-sm">Kite Room Sessions</h3>
+            <p class="desc">Stripped-back one-take performances; focus on songcraft and feel.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://www.w3schools.com/html/mov_bbb.mp4" target="_blank" rel="noopener">Watch</a>
+              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Show Notes</a>
+            </div>
           </div>
         </article>
       </div>
     </section>
 
-    <!-- Notes -->
-    <section id="notes" class="reveal">
-      <h2 class="section-title">Notes</h2>
-      <div class="note">
-        <h3 class="text-lg font-semibold">Day 1.5 — Reset & Reboot</h3>
-        <p class="text-white/80">Today I cleared mental and emotional space — this project starts from clarity.</p>
+    <section id="acting" class="section container">
+      <h2>Acting</h2>
+      <p class="lead">Selected roles, reels, and stage work.</p>
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-4 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1464375117522-1311d6a5b81b?q=80&w=1600&auto=format&fit=crop" alt="Theatre stage">
+            <span class="tag">Scene</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>2022</span><span>Lead</span></div>
+            <h3 class="title-sm">Cold Open</h3>
+            <p class="desc">Two-hander overnight in a radio station. Long takes.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://www.w3schools.com/html/mov_bbb.mp4" target="_blank" rel="noopener">Watch</a>
+              <a class="btn ghost" href="https://www.imdb.com/" target="_blank" rel="noopener">IMDb</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card col-4 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1521337588300-1dbf066e7f65?q=80&w=1600&auto=format&fit=crop" alt="Film slate">
+            <span class="tag">Reel</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>2025</span><span>Compilation</span></div>
+            <h3 class="title-sm">Reel (2:10)</h3>
+            <p class="desc">Highlights from recent shorts and features.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://www.w3schools.com/html/movie.mp4" target="_blank" rel="noopener">Watch</a>
+              <a class="btn ghost" href="https://www.imdb.com/" target="_blank" rel="noopener">IMDb</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card col-4 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1600&auto=format&fit=crop" alt="Spotlight">
+            <span class="tag">Stage</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>2021</span><span>Monologue</span></div>
+            <h3 class="title-sm">Signal Loss</h3>
+            <p class="desc">One-act experimental piece with reactive lighting.</p>
+            <div class="actions">
+              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Program</a>
+            </div>
+          </div>
+        </article>
       </div>
-      <!-- TODO: Add more notes as you go -->
     </section>
 
-    <!-- Contact -->
-    <section id="contact" class="reveal">
-      <h2 class="section-title">Contact</h2>
-      <p class="text-white/70">DMs open. <a class="underline hover:text-accent" href="mailto:declxn@gmail.com">declxn@gmail.com</a></p>
+    <section id="film" class="section container">
+      <h2>Film</h2>
+      <p class="lead">Shorts, features, and direction.</p>
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-12 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?q=80&w=1600&auto=format&fit=crop" alt="Cinema screen with warm tone">
+            <span class="tag">Short</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>2020</span><span>Director</span></div>
+            <h3 class="title-sm">Orange City</h3>
+            <p class="desc">A quiet portrait of night-shift workers.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Trailer</a>
+              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Festival Notes</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="web" class="section container">
+      <h2>Web Projects</h2>
+      <p class="lead">Interfaces, interactive art, and tools.</p>
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
+            <span class="tag">Tool</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>2024</span><span>Vue + WebAudio</span></div>
+            <h3 class="title-sm">TapeGlow</h3>
+            <p class="desc">Tape-saturation simulator with wow & flutter.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Open</a>
+              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Source</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1600&auto=format&fit=crop" alt="Abstract 3D render">
+            <span class="tag">three.js</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>2025</span><span>Three.js</span></div>
+            <h3 class="title-sm">Nocturne Field</h3>
+            <p class="desc">Particle study with low-power defaults.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Demo</a>
+              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Writeup</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="writing" class="section container">
+      <h2>Writing</h2>
+      <p class="lead">Essays, liner notes, reflections.</p>
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-12 reveal">
+          <div class="card-body">
+            <div class="meta"><span>2025</span><span>Essay</span></div>
+            <h3 class="title-sm">The Warm Noise</h3>
+            <p class="desc">On tape hiss, breath sounds, and leaving edits visible.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Read</a>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section id="contact" class="section container">
+      <h2>Contact</h2>
+      <p class="lead">Bookings, collabs, or just to say hi.</p>
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-6 reveal">
+          <div class="card-body">
+            <h3 class="title-sm">Email</h3>
+            <p class="desc"><a href="mailto:hello@example.com" style="color:var(--accent);text-decoration:none;">hello@example.com</a></p>
+          </div>
+        </article>
+        <article class="card col-6 reveal">
+          <div class="card-body">
+            <h3 class="title-sm">Social</h3>
+            <p class="desc"><a href="https://instagram.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">Instagram</a> · <a href="https://bandcamp.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">Bandcamp</a> · <a href="https://www.imdb.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">IMDb</a></p>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
-<!--  -->
-  <footer class="mt-24 md:mt-32 border-t border-white/5">
-    <div class="mx-auto max-w-6xl px-4 py-10 text-xs text-white/50 flex items-center justify-between">
-      <span>© <span id="year"></span> Declan</span>
-      <a class="hover:underline" href="#top">Back to top</a>
-    </div>
+
+  <footer class="container">
+    <p>© <span id="year"></span> Declan</p>
   </footer>
 
-  <script type="module" src="script.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Tiny scrollspy (optional)
+  const secs=[...document.querySelectorAll('main section[id]')];
+  const links=[...document.querySelectorAll('header nav a')];
+  const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      const id=e.target.id, link=map(id); if(!link) return;
+      if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }
+    });
+  },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
+  secs.forEach(s=>io.observe(s));
+</script>
 </body>
 </html>
