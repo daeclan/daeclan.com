@@ -1,71 +1,83 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Declan — Portfolio</title>
-<meta name="theme-color" content="#0a0a0a" />
-<style>
-  /* ===== Tokens (no color-mix, widely supported) ===== */
-  :root{
-    --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
-    --line:#1d1e22; --accent:#ff7a18; --accent2:#ffb566;
-    --maxw:1160px; --header:68px; --r:14px;
-  }
-  *{box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
-  a{color:inherit}
-  /* Header */
-  header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
-  .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
-  .brand{text-decoration:none;font-weight:800}
-  .brand b{color:var(--accent)}
-  nav{display:flex;gap:22px}
-  nav a{color:var(--muted);text-decoration:none;font-size:15px;padding:8px 0}
-  nav a:hover{color:var(--fg)}
-  nav a.active{color:var(--accent);position:relative}
-  nav a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px}
-  .menu-btn{display:none}
-  @media (max-width:860px){ nav{display:none}.menu-btn{display:inline-flex;border:1px solid var(--line);padding:8px 10px;border-radius:10px} }
-  /* Sections */
-  section{scroll-margin-top:calc(var(--header) + 14px)}
-  .section{padding:60px 0;border-bottom:1px solid var(--line)}
-  .lead{color:var(--muted);max-width:68ch}
-  .title{font-size:clamp(28px,4.5vw,56px);line-height:1.1;margin:.3rem 0 1rem;font-weight:900}
-  .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
-  /* Grid + Cards */
-  .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
-  .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-  @media (max-width:860px){.col-4,.col-6{grid-column:span 12}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
-  .card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
-  .thumb{position:relative;aspect-ratio:16/9;background:#0e0f12;display:grid;place-items:center}
-  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-  .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
-  .card-body{padding:16px}
-  .meta{display:flex;gap:12px;color:var(--muted);font-size:13px}
-  .title-sm{font-weight:700;font-size:18px;margin:6px 0}
-  .desc{color:#d7d9df;font-size:14px}
-  .actions{display:flex;gap:10px;margin-top:12px}
-  .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;font-size:14px;text-decoration:none}
-  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
-  .btn.ghost{border:1px solid var(--line);color:var(--fg)}
-  /* Footer */
-  footer{padding:40px 0 70px;color:var(--muted)}
-  /* Simple reveal (no IntersectionObserver needed) */
-  .reveal{opacity:1;transform:none}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DAECLAN.COM — Portfolio</title>
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Creative visions expressed through music, performance, and technology. A collection of goofs, mystical odysseys, and more goofs." />
+
+  <style>
+    :root{
+      --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
+      --line:#1d1e22; --accent:#ff7a18; --accent2:#ffb566; --r:14px;
+      --maxw:1160px; --header:68px;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+    a{color:inherit}
+
+    /* Header */
+    header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
+    .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
+    .brand{text-decoration:none;font-weight:900;letter-spacing:.3px}
+    .brand b{color:var(--accent)}
+    nav{display:flex;gap:22px}
+    nav a{color:var(--muted);text-decoration:none;font-size:15px;padding:8px 0;position:relative}
+    nav a:hover{color:var(--fg)}
+    nav a.active{color:var(--accent)}
+    nav a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px}
+    .menu-btn{display:none}
+    @media (max-width:860px){ nav{display:none}.menu-btn{display:inline-flex;border:1px solid var(--line);padding:8px 10px;border-radius:10px} }
+
+    /* Sections */
+    section{scroll-margin-top:calc(var(--header) + 14px)}
+    .section{padding:60px 0;border-bottom:1px solid var(--line)}
+    .lead{color:var(--muted);max-width:68ch}
+    .title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px;overflow:visible}
+    .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+    /* Scene block */
+    #showcase{padding:28px 0 50px}
+    #heroScene{aspect-ratio:16/9;background:#0e0f12;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center}
+    #heroScene p{color:#8b8d94;font-size:14px}
+
+    /* Grid + Cards */
+    .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+    .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+    @media (max-width:860px){.col-4,.col-6{grid-column:span 12}}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+    .card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
+    .thumb{position:relative;aspect-ratio:16/9;background:#0e0f12;display:grid;place-items:center}
+    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
+    .card-body{padding:16px}
+    .meta{display:flex;gap:12px;color:var(--muted);font-size:13px}
+    .title-sm{font-weight:700;font-size:18px;margin:6px 0}
+    .desc{color:#d7d9df;font-size:14px}
+    .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-size:14px;text-decoration:none;border:1px solid transparent}
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
+    .btn.ghost{border:1px solid var(--line);color:var(--fg)}
+    .btn.orange{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
+
+    /* Footer */
+    footer{padding:40px 0 70px;color:var(--muted)}
+
+    /* Simple reveal baseline */
+    .reveal{opacity:1;transform:none}
+  </style>
 </head>
 <body>
   <header>
     <div class="container bar">
-      <a class="brand" href="#top">DECLAN<b>.</b></a>
+      <a class="brand" href="#top">DAECLAN<b>.COM</b></a>
       <nav aria-label="Chapters">
         <a href="#music">Music</a>
         <a href="#acting">Acting</a>
-        <a href="#film">Film</a>
         <a href="#web">Web&nbsp;Projects</a>
         <a href="#writing">Writing</a>
         <a href="#contact">Contact</a>
@@ -76,123 +88,153 @@
 
   <main id="main">
     <section class="section container">
-      <h1 class="title">Creative works in <span class="accent">music</span>, <span class="accent">performance</span>, and <span class="accent">technology</span>.</h1>
-      <p class="lead">A curated selection. Chapters above; scroll to explore.</p>
+      <h1 class="title">Creative visions expressed through <span class="accent">music</span>, <span class="accent">performance</span>, and <span class="accent">technology</span>.</h1>
+      <p class="lead">A collection of goofs, mystical odysseys, and more goofs.</p>
     </section>
 
+    <!-- THREE.JS SHOWCASE (lazy-loaded, mobile-safe) -->
+    <section id="showcase" class="container">
+      <div id="heroScene"><p>Scroll or tap to activate the scene…</p></div>
+    </section>
+
+    <!-- MUSIC -->
     <section id="music" class="section container">
       <h2>Music</h2>
-      <p class="lead">Records, singles, and collaborations.</p>
+      <p class="lead">Releases under <strong>DEGH</strong>.</p>
+
+      <!-- Trilogy grid -->
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-6 reveal">
+        <!-- Declan Emphasized A Movie -->
+        <article class="card col-4 reveal">
           <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1511379938547-c1f69419868d?q=80&w=1600&auto=format&fit=crop" alt="Studio console with warm lights">
+            <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Album cover: DECLAN EMPHASIZED A MOVIE"/>
             <span class="tag">Album</span>
           </div>
           <div class="card-body">
-            <div class="meta"><span>2023</span><span>Producer, Vocals</span></div>
-            <h3 class="title-sm">Night Static</h3>
-            <p class="desc">Dream-leaning electronic album; analog synths, tape noise, and voice.</p>
+            <div class="meta"><span>2025</span><span>DEGH</span></div>
+            <h3 class="title-sm">DECLAN EMPHASIZED A MOVIE</h3>
+            <p class="desc">Latest album. Listen on your platform of choice.</p>
             <div class="actions">
-              <a class="btn primary" href="#" target="_blank" rel="noopener">Listen</a>
-              <a class="btn ghost" href="#" target="_blank" rel="noopener">Liner Notes</a>
+              <a class="btn primary" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH" target="_blank" rel="noopener">Spotify</a>
+              <a class="btn ghost" href="#" target="_blank" rel="noopener" title="Add your all-platform link (e.g., songwhip/album.link)">All Platforms</a>
             </div>
           </div>
         </article>
 
-        <article class="card col-6 reveal">
+        <!-- Declan Questioned An Image -->
+        <article class="card col-4 reveal">
           <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1483412033650-1015ddeb83d1?q=80&w=1600&auto=format&fit=crop" alt="Guitar on stage with orange lights">
-            <span class="tag">Live</span>
+            <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Album cover: Declan Questioned An Image"/>
+            <span class="tag">Album</span>
           </div>
           <div class="card-body">
-            <div class="meta"><span>2024</span><span>Guitar, Vox</span></div>
-            <h3 class="title-sm">Kite Room Sessions</h3>
-            <p class="desc">Stripped-back one-take performances; focus on songcraft and feel.</p>
+            <div class="meta"><span>DEGH</span></div>
+            <h3 class="title-sm">Declan Questioned An Image</h3>
+            <p class="desc">Part of the trilogy.</p>
             <div class="actions">
-              <a class="btn primary" href="https://www.w3schools.com/html/mov_bbb.mp4" target="_blank" rel="noopener">Watch</a>
-              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Show Notes</a>
+              <a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- Declan Loved A Message -->
+        <article class="card col-4 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Album cover: Declan Loved A Message"/>
+            <span class="tag">Album</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>DEGH</span></div>
+            <h3 class="title-sm">Declan Loved A Message</h3>
+            <p class="desc">Part of the trilogy.</p>
+            <div class="actions">
+              <a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- Latest Music Video (YouTube embed) -->
+      <div class="grid" style="margin-top:28px;">
+        <article class="card col-12 reveal">
+          <div class="card-body">
+            <h3 class="title-sm" style="margin-bottom:10px;">Latest Music Video</h3>
+            <div class="embed" style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid var(--line);background:#0e0f12;">
+              <iframe 
+                title="YouTube video player"
+                src="https://www.youtube.com/embed/XBsp40jGAIk" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                allowfullscreen 
+                style="position:absolute;inset:0;width:100%;height:100%;border:0;">
+              </iframe>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- earlyera series (Spotify embeds show artwork automatically) -->
+      <div class="grid" style="margin-top:18px;">
+        <article class="card col-4 reveal">
+          <div class="card-body">
+            <h3 class="title-sm">earlyera vol. 1</h3>
+            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
+              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                src="https://open.spotify.com/embed/album/6tNvw5hMojUHmy3LIDzBkE?theme=0"></iframe>
+            </div>
+          </div>
+        </article>
+        <article class="card col-4 reveal">
+          <div class="card-body">
+            <h3 class="title-sm">earlyera vol. 2</h3>
+            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
+              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                src="https://open.spotify.com/embed/album/5pLgW31uG73lLzsLAhXhTN?theme=0"></iframe>
+            </div>
+          </div>
+        </article>
+        <article class="card col-4 reveal">
+          <div class="card-body">
+            <h3 class="title-sm">earlyera vol. 3</h3>
+            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
+              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                src="https://open.spotify.com/embed/album/3puC9dCxZRIpiZOGy6MBby?theme=0"></iframe>
             </div>
           </div>
         </article>
       </div>
     </section>
 
+    <!-- ACTING (resume + headshots/photos placeholders, no reels) -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
-      <p class="lead">Selected roles, reels, and stage work.</p>
+      <p class="lead">Resume, headshots, and production stills.</p>
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-4 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1464375117522-1311d6a5b81b?q=80&w=1600&auto=format&fit=crop" alt="Theatre stage">
-            <span class="tag">Scene</span>
-          </div>
+        <article class="card col-6 reveal">
           <div class="card-body">
-            <div class="meta"><span>2022</span><span>Lead</span></div>
-            <h3 class="title-sm">Cold Open</h3>
-            <p class="desc">Two-hander overnight in a radio station. Long takes.</p>
+            <h3 class="title-sm">Resume</h3>
+            <p class="desc">PDF download and web view.</p>
             <div class="actions">
-              <a class="btn primary" href="https://www.w3schools.com/html/mov_bbb.mp4" target="_blank" rel="noopener">Watch</a>
-              <a class="btn ghost" href="https://www.imdb.com/" target="_blank" rel="noopener">IMDb</a>
+              <a class="btn primary" href="#" target="_blank" rel="noopener">View Resume</a>
+              <a class="btn ghost" href="#" download>Download PDF</a>
             </div>
           </div>
         </article>
-
-        <article class="card col-4 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1521337588300-1dbf066e7f65?q=80&w=1600&auto=format&fit=crop" alt="Film slate">
-            <span class="tag">Reel</span>
-          </div>
+        <article class="card col-6 reveal">
           <div class="card-body">
-            <div class="meta"><span>2025</span><span>Compilation</span></div>
-            <h3 class="title-sm">Reel (2:10)</h3>
-            <p class="desc">Highlights from recent shorts and features.</p>
+            <h3 class="title-sm">Headshots & Photos</h3>
+            <p class="desc">A small gallery of select images.</p>
             <div class="actions">
-              <a class="btn primary" href="https://www.w3schools.com/html/movie.mp4" target="_blank" rel="noopener">Watch</a>
-              <a class="btn ghost" href="https://www.imdb.com/" target="_blank" rel="noopener">IMDb</a>
-            </div>
-          </div>
-        </article>
-
-        <article class="card col-4 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1600&auto=format&fit=crop" alt="Spotlight">
-            <span class="tag">Stage</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>2021</span><span>Monologue</span></div>
-            <h3 class="title-sm">Signal Loss</h3>
-            <p class="desc">One-act experimental piece with reactive lighting.</p>
-            <div class="actions">
-              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Program</a>
+              <a class="btn ghost" href="#" target="_blank" rel="noopener">Open Gallery</a>
             </div>
           </div>
         </article>
       </div>
     </section>
 
-    <section id="film" class="section container">
-      <h2>Film</h2>
-      <p class="lead">Shorts, features, and direction.</p>
-      <div class="grid" style="margin-top:18px;">
-        <article class="card col-12 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?q=80&w=1600&auto=format&fit=crop" alt="Cinema screen with warm tone">
-            <span class="tag">Short</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>2020</span><span>Director</span></div>
-            <h3 class="title-sm">Orange City</h3>
-            <p class="desc">A quiet portrait of night-shift workers.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Trailer</a>
-              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Festival Notes</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-
+    <!-- WEB PROJECTS -->
     <section id="web" class="section container">
       <h2>Web Projects</h2>
       <p class="lead">Interfaces, interactive art, and tools.</p>
@@ -200,68 +242,87 @@
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
-            <span class="tag">Tool</span>
+            <span class="tag">Site</span>
           </div>
           <div class="card-body">
-            <div class="meta"><span>2024</span><span>Vue + WebAudio</span></div>
-            <h3 class="title-sm">TapeGlow</h3>
-            <p class="desc">Tape-saturation simulator with wow & flutter.</p>
+            <div class="meta"><span>SLIME.SURF</span></div>
+            <h3 class="title-sm">SLIME.SURF</h3>
+            <p class="desc">(Summary coming soon.)</p>
             <div class="actions">
-              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Open</a>
-              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Source</a>
+              <a class="btn primary" href="https://www.slime.surf/" target="_blank" rel="noopener">Visit</a>
             </div>
           </div>
         </article>
-
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1600&auto=format&fit=crop" alt="Abstract 3D render">
-            <span class="tag">three.js</span>
+            <span class="tag">Site</span>
           </div>
           <div class="card-body">
-            <div class="meta"><span>2025</span><span>Three.js</span></div>
-            <h3 class="title-sm">Nocturne Field</h3>
-            <p class="desc">Particle study with low-power defaults.</p>
+            <div class="meta"><span>MIGOS ADLIBS</span></div>
+            <h3 class="title-sm">MIGOS ADLIBS</h3>
+            <p class="desc">(Summary coming soon.)</p>
             <div class="actions">
-              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Demo</a>
-              <a class="btn ghost" href="https://example.com" target="_blank" rel="noopener">Writeup</a>
+              <a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Visit</a>
+            </div>
+          </div>
+        </article>
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1497339100210-9e87df79c218?q=80&w=1600&auto=format&fit=crop" alt="Sound wave">
+            <span class="tag">Audio</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>SLAM HARRIS</span></div>
+            <h3 class="title-sm">SLAM HARRIS</h3>
+            <p class="desc">(Summary coming soon.)</p>
+            <div class="actions">
+              <a class="btn primary" href="https://soundcloud.com/slamharris" target="_blank" rel="noopener">SoundCloud</a>
+            </div>
+          </div>
+        </article>
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage">
+            <span class="tag">Site</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>XXXSENSATION</span></div>
+            <h3 class="title-sm">XXXSENSATION</h3>
+            <p class="desc">(Summary coming soon.)</p>
+            <div class="actions">
+              <a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Visit</a>
             </div>
           </div>
         </article>
       </div>
     </section>
 
+    <!-- WRITING: 4-up grid -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
-      <p class="lead">Essays, liner notes, reflections.</p>
+      <p class="lead">Poems, blurbs, fragments.</p>
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-12 reveal">
-          <div class="card-body">
-            <div class="meta"><span>2025</span><span>Essay</span></div>
-            <h3 class="title-sm">The Warm Noise</h3>
-            <p class="desc">On tape hiss, breath sounds, and leaving edits visible.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://example.com" target="_blank" rel="noopener">Read</a>
-            </div>
-          </div>
-        </article>
+        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #1</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
       </div>
     </section>
 
+    <!-- CONTACT with orange buttons -->
     <section id="contact" class="section container">
       <h2>Contact</h2>
       <p class="lead">Bookings, collabs, or just to say hi.</p>
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-6 reveal">
+        <article class="card col-12 reveal">
           <div class="card-body">
-            <h3 class="title-sm">Email</h3>
-            <p class="desc"><a href="mailto:hello@example.com" style="color:var(--accent);text-decoration:none;">hello@example.com</a></p>
-          </div>
-        </article>
-        <article class="card col-6 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">Social</h3>
-            <p class="desc"><a href="https://instagram.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">Instagram</a> · <a href="https://bandcamp.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">Bandcamp</a> · <a href="https://www.imdb.com/" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:none;">IMDb</a></p>
+            <div class="actions">
+              <a class="btn orange" href="mailto:hello@example.com">Email</a>
+              <a class="btn orange" href="https://www.facebook.com/declxn" target="_blank" rel="noopener">Facebook</a>
+              <a class="btn orange" href="https://twitter.com/daeclan" target="_blank" rel="noopener">Twitter</a>
+              <a class="btn orange" href="https://instagram.com/daeclan" target="_blank" rel="noopener">Instagram</a>
+            </div>
           </div>
         </article>
       </div>
@@ -269,23 +330,45 @@
   </main>
 
   <footer class="container">
-    <p>© <span id="year"></span> Declan</p>
+    <p>© <span id="year"></span> DAECLAN.COM</p>
   </footer>
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Tiny scrollspy (optional)
+  // Scrollspy
   const secs=[...document.querySelectorAll('main section[id]')];
   const links=[...document.querySelectorAll('header nav a')];
   const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
   const io=new IntersectionObserver(es=>{
-    es.forEach(e=>{
-      const id=e.target.id, link=map(id); if(!link) return;
-      if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }
-    });
+    es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return; if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }});
   },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
   secs.forEach(s=>io.observe(s));
+
+  // THREE: lazy-load minimal scene (mobile friendly)
+  const mount = document.getElementById('heroScene');
+  let mounted=false;
+  async function loadScene(){
+    if(mounted) return; mounted=true;
+    const THREE = await import('https://cdn.skypack.dev/three@0.161.0');
+    const {Scene, PerspectiveCamera, WebGLRenderer, Mesh, SphereGeometry, MeshStandardMaterial, AmbientLight, PointLight, Color, Clock} = THREE;
+    const w = mount.clientWidth, h = mount.clientHeight;
+    const scene = new Scene();
+    scene.background = new Color(0x0a0a0a);
+    const camera = new PerspectiveCamera(50, w/h, 0.1, 100); camera.position.z = 3;
+    const renderer = new WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});
+    renderer.setSize(w,h); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    mount.innerHTML=''; mount.appendChild(renderer.domElement);
+
+    const orb = new Mesh(new SphereGeometry(.9,48,48), new MeshStandardMaterial({ color: 0xff8a2a, emissive: 0x2a1200, roughness:.4, metalness:.15 }));
+    scene.add(orb);
+    const amb = new AmbientLight(0xffffff,.25), key = new PointLight(0xffb566,1.2,8); key.position.set(1.6,1.2,2.2); scene.add(amb,key);
+    const clock = new Clock();
+    function tick(){ const t=clock.getElapsedTime(); orb.rotation.y=t*.35; orb.position.y=Math.sin(t*.9)*.06; key.intensity=1.05+Math.sin(t*1.6)*.18; renderer.render(scene,camera); requestAnimationFrame(tick);} tick();
+    const ro = new ResizeObserver(()=>{ const W=mount.clientWidth,H=mount.clientHeight; camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); }); ro.observe(mount);
+  }
+  const ob = new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting) loadScene(); }); },{threshold:.2});
+  ob.observe(mount);
 </script>
 </body>
 </html>
