@@ -1,0 +1,119 @@
+/* Base refinements */
+:root {
+  --scanline-opacity: 0.09;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scanlines {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .scanlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      repeating-linear-gradient(to bottom,
+        rgba(255, 255, 255, var(--scanline-opacity)) 0,
+        rgba(255, 255, 255, var(--scanline-opacity)) 1px,
+        transparent 2px,
+        transparent 4px);
+    animation: flicker 6s linear infinite;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  }
+
+  @keyframes flicker {
+
+    0%,
+    100% {
+      opacity: 0.5;
+    }
+
+    10% {
+      opacity: 0.35;
+    }
+
+    20% {
+      opacity: 0.55;
+    }
+
+    40% {
+      opacity: 0.45;
+    }
+
+    60% {
+      opacity: 0.6;
+    }
+
+    80% {
+      opacity: 0.4;
+    }
+  }
+}
+
+/* Reusable pieces */
+.nav-link {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.nav-link:hover {
+  color: #8ddfff;
+}
+
+.section-title {
+  @apply text-2xl md:text-3xl font-semibold tracking-tight scanlines;
+}
+
+.card {
+  @apply rounded-2xl border border-white/10 bg-white/5 p-4 hover:shadow-glow transition;
+}
+
+.card-head {
+  @apply mb-2;
+}
+
+.card-title {
+  @apply text-lg font-semibold;
+}
+
+.card-sub {
+  @apply text-xs text-white/60;
+}
+
+.card-body {
+  @apply text-sm text-white/80;
+}
+
+.card-foot {
+  @apply mt-3 flex items-center justify-between;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium bg-accent/20 ring-1 ring-accent/40 hover:bg-accent/30 transition;
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium border border-white/10 hover:bg-white/5 transition;
+}
+
+/* Reveal on scroll (JS toggles .reveal-in) */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .5s, transform .5s;
+}
+
+.reveal.reveal-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Prose tweaks */
+.prose-invert :where(code) {
+  background: rgba(255, 255, 255, .06);
+  padding: 0 .25rem;
+  border-radius: .25rem;
+}
