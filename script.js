@@ -1,6 +1,25 @@
 /* Utility: current year */
 document.getElementById("year").textContent = new Date().getFullYear();
 
+/* Hero parallax glow: reacts to scroll and mouse (lightweight) */
+const hero = document.getElementById("hero");
+const glow = hero?.querySelector(".glow");
+if (hero && glow) {
+  const onScroll = () => {
+    const rect = hero.getBoundingClientRect();
+    const vis = Math.max(0, Math.min(1, 1 - rect.top / (window.innerHeight * 0.9)));
+    glow.style.opacity = String(0.6 * vis + 0.15);
+    glow.style.setProperty("--hy", `${10 + vis * 15}%`);
+  };
+  const onMove = (e) => {
+    const x = (e.clientX / window.innerWidth) * 100;
+    glow.style.setProperty("--hx", `${x}%`);
+  };
+  onScroll();
+  document.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("mousemove", onMove, { passive: true });
+}
+
 /* Mobile menu */
 const menuBtn = document.getElementById("menuBtn");
 const mobileMenu = document.getElementById("mobileMenu");

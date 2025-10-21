@@ -117,3 +117,36 @@
   padding: 0 .25rem;
   border-radius: .25rem;
 }
+
+/* Hero glow gradient that shifts as you scroll */
+#hero .glow {
+  position: absolute;
+  inset: -20% -10% auto -10%;
+  height: 38rem;
+  pointer-events: none;
+  background: radial-gradient(60rem 24rem at var(--hx, 50%) var(--hy, 10%),
+      rgba(141, 223, 255, 0.18), transparent 60%);
+  filter: blur(40px);
+  transition: opacity .3s ease;
+}
+
+@media (prefers-reduced-motion:no-preference) {
+  .shimmer {
+    background: linear-gradient(90deg, rgba(255, 255, 255, .0), rgba(255, 255, 255, .08), rgba(255, 255, 255, .0));
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 4.5s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+}
