@@ -239,6 +239,7 @@
       <h2>Web Projects</h2>
       <p class="lead">Interfaces, interactive art, and tools.</p>
       <div class="grid" style="margin-top:18px;">
+        <!-- SLIME.SURF -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
@@ -253,6 +254,8 @@
             </div>
           </div>
         </article>
+
+        <!-- MIGOS ADLIBS -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1556157382-97eda2d62296?q=80&w=1600&auto=format&fit=crop" alt="Abstract 3D render">
@@ -264,9 +267,12 @@
             <p class="desc">(Summary coming soon.)</p>
             <div class="actions">
               <a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Visit</a>
+              <a class="btn ghost" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Coverage</a>
             </div>
           </div>
         </article>
+
+        <!-- SLAM HARRIS -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1497339100210-9e87df79c218?q=80&w=1600&auto=format&fit=crop" alt="Sound wave">
@@ -281,6 +287,8 @@
             </div>
           </div>
         </article>
+
+        <!-- XXXSENSATION -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage">
@@ -292,6 +300,38 @@
             <p class="desc">(Summary coming soon.)</p>
             <div class="actions">
               <a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Visit</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- SLIME NO B (Young Thug-only remake) -->
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1521369909029-2afed882baee?q=80&w=1600&auto=format&fit=crop" alt="Orange-tinted audio UI">
+            <span class="tag">Editorial</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>SLIME NO B</span></div>
+            <h3 class="title-sm">SLIME NO B</h3>
+            <p class="desc">Young Thug–only remake — coverage link.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a>
+            </div>
+          </div>
+        </article>
+
+        <!-- MORE LIFE (without Aubrey) -->
+        <article class="card col-6 reveal">
+          <div class="thumb">
+            <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="Cassette and headphones">
+            <span class="tag">Gallery</span>
+          </div>
+          <div class="card-body">
+            <div class="meta"><span>MORE LIFE (without Aubrey)</span></div>
+            <h3 class="title-sm">MORE LIFE — Without Aubrey "Drake" Graham</h3>
+            <p class="desc">Alt-sequenced listening experience — image/gallery link.</p>
+            <div class="actions">
+              <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open Gallery</a>
             </div>
           </div>
         </article>
@@ -345,30 +385,83 @@
   },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
   secs.forEach(s=>io.observe(s));
 
-  // THREE: lazy-load minimal scene (mobile friendly)
+  // THREE: lazy-load minimal scene (mobile friendly) + robust triggers
   const mount = document.getElementById('heroScene');
-  let mounted=false;
+  let mounted = false;
+
   async function loadScene(){
-    if(mounted) return; mounted=true;
-    const THREE = await import('https://cdn.skypack.dev/three@0.161.0');
-    const {Scene, PerspectiveCamera, WebGLRenderer, Mesh, SphereGeometry, MeshStandardMaterial, AmbientLight, PointLight, Color, Clock} = THREE;
-    const w = mount.clientWidth, h = mount.clientHeight;
+    if (mounted || !mount) return;
+    mounted = true;
+    // Remove placeholder text
+    mount.textContent = '';
+
+    // Try Skypack, then unpkg as fallback
+    let THREE;
+    try {
+      THREE = await import('https://cdn.skypack.dev/three@0.161.0');
+    } catch (e) {
+      console.warn('Skypack failed, falling back to unpkg', e);
+      THREE = await import('https://unpkg.com/three@0.161.0/build/three.module.js');
+    }
+
+    const { Scene, PerspectiveCamera, WebGLRenderer, Mesh, SphereGeometry, MeshStandardMaterial, AmbientLight, PointLight, Color, Clock } = THREE;
+    const w = mount.clientWidth, h = mount.clientHeight || Math.round(mount.clientWidth / (16/9));
+
     const scene = new Scene();
     scene.background = new Color(0x0a0a0a);
-    const camera = new PerspectiveCamera(50, w/h, 0.1, 100); camera.position.z = 3;
-    const renderer = new WebGLRenderer({antialias:true,alpha:true,powerPreference:'low-power'});
-    renderer.setSize(w,h); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    mount.innerHTML=''; mount.appendChild(renderer.domElement);
+    const camera = new PerspectiveCamera(50, w/h, 0.1, 100);
+    camera.position.z = 3;
 
-    const orb = new Mesh(new SphereGeometry(.9,48,48), new MeshStandardMaterial({ color: 0xff8a2a, emissive: 0x2a1200, roughness:.4, metalness:.15 }));
+    const renderer = new WebGLRenderer({ antialias:true, alpha:true, powerPreference:'low-power' });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    mount.appendChild(renderer.domElement);
+
+    const orb = new Mesh(
+      new SphereGeometry(.9, 48, 48),
+      new MeshStandardMaterial({ color: 0xff8a2a, emissive: 0x2a1200, roughness:.4, metalness:.15 })
+    );
     scene.add(orb);
-    const amb = new AmbientLight(0xffffff,.25), key = new PointLight(0xffb566,1.2,8); key.position.set(1.6,1.2,2.2); scene.add(amb,key);
+
+    const amb = new AmbientLight(0xffffff, .25);
+    const key = new PointLight(0xffb566, 1.2, 8);
+    key.position.set(1.6, 1.2, 2.2);
+    scene.add(amb, key);
+
     const clock = new Clock();
-    function tick(){ const t=clock.getElapsedTime(); orb.rotation.y=t*.35; orb.position.y=Math.sin(t*.9)*.06; key.intensity=1.05+Math.sin(t*1.6)*.18; renderer.render(scene,camera); requestAnimationFrame(tick);} tick();
-    const ro = new ResizeObserver(()=>{ const W=mount.clientWidth,H=mount.clientHeight; camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); }); ro.observe(mount);
+    function tick(){
+      const t = clock.getElapsedTime();
+      orb.rotation.y = t * .35;
+      orb.position.y = Math.sin(t * .9) * .06;
+      key.intensity = 1.05 + Math.sin(t * 1.6) * .18;
+      renderer.render(scene, camera);
+      requestAnimationFrame(tick);
+    }
+    tick();
+
+    const ro = new ResizeObserver(() => {
+      const W = mount.clientWidth, H = mount.clientHeight || Math.round(mount.clientWidth / (16/9));
+      camera.aspect = W / H;
+      camera.updateProjectionMatrix();
+      renderer.setSize(W, H);
+    });
+    ro.observe(mount);
   }
-  const ob = new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting) loadScene(); }); },{threshold:.2});
-  ob.observe(mount);
-</script>
-</body>
-</html>
+
+  // Multiple activation paths to avoid IO edge cases
+  function armObservers(){
+    if (!('IntersectionObserver' in window)) { loadScene(); return; }
+    const ob = new IntersectionObserver((entries)=>{
+      entries.forEach((e)=>{ if (e.isIntersecting) loadScene(); });
+    }, { threshold: .05, rootMargin: '0px 0px -10% 0px' });
+    ob.observe(mount);
+  }
+
+  // Kickers: user gesture, scroll, or timeout as last resort
+  mount?.addEventListener('pointerdown', loadScene, { passive: true });
+  window.addEventListener('scroll', ()=>{ if (!mounted) loadScene(); }, { passive: true });
+  document.addEventListener('visibilitychange', ()=>{ if (!mounted && !document.hidden) loadScene(); });
+  // In case the element starts in view and IO never fires
+  setTimeout(()=>{ if (!mounted) loadScene(); }, 1200);
+
+  armObservers();
