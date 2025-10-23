@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>DAECLAN.COM — Portfolio</title>
   <meta name="theme-color" content="#0a0a0a" />
-  <meta name="description" content="Creative visions expressed through music, performance, and technology. A collection of goofs, mystical odysseys, and more goofs." />
+  <meta name="description" content="DAECLAN.COM — music, performance, technology." />
 
   <style>
     :root{
@@ -40,21 +40,21 @@
     .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 
     /* Scene block */
-    #showcase{padding:28px 0 50px}
+    #showcase{padding:16px 0 50px}
     #heroScene{aspect-ratio:16/9;background:#0e0f12;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center}
     #heroScene p{color:#8b8d94;font-size:14px}
 
     /* Grid + Cards */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
-    .col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-    @media (max-width:860px){.col-4,.col-6{grid-column:span 12}}
+    .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+    @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
     .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
     .card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
     .thumb{position:relative;aspect-ratio:16/9;background:#0e0f12;display:grid;place-items:center}
     .thumb img{width:100%;height:100%;object-fit:cover;display:block}
     .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
     .card-body{padding:16px}
-    .meta{display:flex;gap:12px;color:var(--muted);font-size:13px}
+    .meta{display:flex;gap:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
     .title-sm{font-weight:700;font-size:18px;margin:6px 0}
     .desc{color:#d7d9df;font-size:14px}
     .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
@@ -69,6 +69,9 @@
 
     /* Simple reveal baseline */
     .reveal{opacity:1;transform:none}
+
+    /* Hide landing copy entirely */
+    .landing-copy{display:none}
   </style>
 </head>
 <body>
@@ -87,14 +90,15 @@
   </header>
 
   <main id="main">
-    <section class="section container">
-      <h1 class="title">Creative visions expressed through <span class="accent">music</span>, <span class="accent">performance</span>, and <span class="accent">technology</span>.</h1>
-      <p class="lead">A collection of goofs, mystical odysseys, and more goofs.</p>
+    <!-- Landing copy intentionally removed -->
+    <section class="section container landing-copy">
+      <h1 class="title">(hidden)</h1>
+      <p class="lead">(hidden)</p>
     </section>
 
-    <!-- THREE.JS SHOWCASE (lazy-loaded, mobile-safe) -->
+    <!-- THREE.JS SHOWCASE (auto-load, also responds to tap/scroll) -->
     <section id="showcase" class="container">
-      <div id="heroScene"><p>Scroll or tap to activate the scene…</p></div>
+      <div id="heroScene"><p>Initializing…</p></div>
     </section>
 
     <!-- MUSIC -->
@@ -116,7 +120,7 @@
             <p class="desc">Latest album. Listen on your platform of choice.</p>
             <div class="actions">
               <a class="btn primary" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH" target="_blank" rel="noopener">Spotify</a>
-              <a class="btn ghost" href="#" target="_blank" rel="noopener" title="Add your all-platform link (e.g., songwhip/album.link)">All Platforms</a>
+              <a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a>
             </div>
           </div>
         </article>
@@ -172,7 +176,7 @@
         </article>
       </div>
 
-      <!-- earlyera series (Spotify embeds show artwork automatically) -->
+      <!-- earlyera series (Spotify embeds) -->
       <div class="grid" style="margin-top:18px;">
         <article class="card col-4 reveal">
           <div class="card-body">
@@ -207,7 +211,7 @@
       </div>
     </section>
 
-    <!-- ACTING (resume + headshots/photos placeholders, no reels) -->
+    <!-- ACTING (resume + headshots/photos placeholders) -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
       <p class="lead">Resume, headshots, and production stills.</p>
@@ -235,7 +239,7 @@
     </section>
 
     <!-- WEB PROJECTS -->
-   <section id="web" class="section container">
+    <section id="web" class="section container">
       <h2>Web Projects</h2>
       <p class="lead">Interfaces, interactive art, and tools.</p>
       <div class="grid" style="margin-top:18px;">
@@ -277,15 +281,17 @@
         <!-- SLAM HARRIS -->
         <article class="card col-6 reveal">
           <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1497339100210-9e87df79c218?q=80&w=1600&auto=format&fit=crop" alt="Sound wave">
+            <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
             <span class="tag">Audio</span>
           </div>
           <div class="card-body">
             <div class="meta"><span>SLAM HARRIS</span></div>
             <h3 class="title-sm">SLAM HARRIS</h3>
-            <p class="desc">(Summary coming soon.)</p>
+            <p class="desc">a parody of sam harris' intro theme & guided meditations</p>
             <div class="actions">
-              <a class="btn primary" href="https://soundcloud.com/slamharris" target="_blank" rel="noopener">SoundCloud</a>
+              <a class="btn primary" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank" rel="noopener">waking yall up (parody)</a>
+              <a class="btn ghost" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank" rel="noopener">instrumental</a>
+              <a class="btn ghost" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank" rel="noopener">guided meditation (4:20)</a>
             </div>
           </div>
         </article>
@@ -315,7 +321,7 @@
           <div class="card-body">
             <div class="meta"><span>SLIME NO B</span></div>
             <h3 class="title-sm">SLIME NO B</h3>
-            <p class="desc">A Young Thug-Only Remake Of ‘Slime & B’ That Cuts Chris Brown Off The Project.</p>
+            <p class="desc">A Young Thug-Only Remake Of Slime & B That Cuts Chris Brown Off The Project.</p>
             <div class="actions">
               <a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a>
             </div>
@@ -325,31 +331,31 @@
         <!-- MORE LIFE (without Aubrey) -->
         <article class="card col-6 reveal">
           <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="Cassette and headphones">
-            <span class="tag">Gallery</span>
+            <!-- TODO: replace with the direct image/video URL from the Imgur gallery when provided -->
+            <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
+            <span class="tag">Project</span>
           </div>
           <div class="card-body">
             <div class="meta"><span>MORE LIFE (without Aubrey)</span></div>
-            <h3 class="title-sm">MORE LIFE — Without Aubrey \"Drake\" Graham</h3>
-            <p class="desc">Alt-sequenced listening experience — image/gallery link.</p>
+            <h3 class="title-sm">MORE LIFE — Without Aubrey Drake Graham</h3>
+            <p class="desc">Alt-sequenced listening experience.</p>
             <div class="actions">
-              <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open Gallery</a>
+              <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open</a>
             </div>
           </div>
         </article>
       </div>
     </section>
 
-
     <!-- WRITING: 4-up grid -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
       <p class="lead">Poems, blurbs, fragments.</p>
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #1</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-4 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #1</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
       </div>
     </section>
 
@@ -388,83 +394,39 @@
   },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
   secs.forEach(s=>io.observe(s));
 
-  // THREE: lazy-load minimal scene (mobile friendly) + robust triggers
-  const mount = document.getElementById('heroScene');
-  let mounted = false;
-
-  async function loadScene(){
-    if (mounted || !mount) return;
-    mounted = true;
-    // Remove placeholder text
-    mount.textContent = '';
-
-    // Try Skypack, then unpkg as fallback
-    let THREE;
-    try {
-      THREE = await import('https://cdn.skypack.dev/three@0.161.0');
-    } catch (e) {
-      console.warn('Skypack failed, falling back to unpkg', e);
-      THREE = await import('https://unpkg.com/three@0.161.0/build/three.module.js');
+  // THREE: auto-load + also on tap/scroll; module fallback
+  (function(){
+    const mount = document.getElementById('heroScene');
+    let mounted = false;
+    async function loadScene(){
+      if (mounted || !mount) return; mounted = true; mount.textContent='';
+      let THREE; try { THREE = await import('https://cdn.skypack.dev/three@0.161.0'); }
+      catch { THREE = await import('https://unpkg.com/three@0.161.0/build/three.module.js'); }
+      const { Scene, PerspectiveCamera, WebGLRenderer, Mesh, TorusKnotGeometry, MeshStandardMaterial, AmbientLight, PointLight, Color, Clock } = THREE;
+      const w = mount.clientWidth, h = mount.clientHeight || Math.round(mount.clientWidth/(16/9));
+      const scene = new Scene(); scene.background = new Color(0x0a0a0a);
+      const camera = new PerspectiveCamera(50, w/h, 0.1, 100); camera.position.z = 4;
+      const renderer = new WebGLRenderer({ antialias:true, alpha:true, powerPreference:'low-power' });
+      renderer.setSize(w,h); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+      mount.appendChild(renderer.domElement);
+      const geo = new TorusKnotGeometry(0.9, 0.28, 200, 32);
+      const mat = new MeshStandardMaterial({ color: 0xff7a18, emissive: 0x2a1200, roughness: 0.35, metalness: 0.35 });
+      const knot = new Mesh(geo, mat); scene.add(knot);
+      const amb = new AmbientLight(0xffffff, .25);
+      const key = new PointLight(0xffb566, 1.3, 8); key.position.set(1.6, 1.2, 2.4);
+      const rim = new PointLight(0xff6a00, 0.6, 10); rim.position.set(-2.0, -1.2, -1.5);
+      scene.add(amb, key, rim);
+      const clock = new Clock();
+      function tick(){ const t = clock.getElapsedTime(); knot.rotation.x = t*.25; knot.rotation.y = t*.35; key.intensity = 1.1 + Math.sin(t*1.6)*.2; mat.color.setHSL(0.06 + 0.02*Math.sin(t*0.3), 1.0, 0.55); renderer.render(scene, camera); requestAnimationFrame(tick);} tick();
+      const ro = new ResizeObserver(()=>{ const W=mount.clientWidth, H=mount.clientHeight || Math.round(mount.clientWidth/(16/9)); camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); }); ro.observe(mount);
     }
-
-    const { Scene, PerspectiveCamera, WebGLRenderer, Mesh, SphereGeometry, MeshStandardMaterial, AmbientLight, PointLight, Color, Clock } = THREE;
-    const w = mount.clientWidth, h = mount.clientHeight || Math.round(mount.clientWidth / (16/9));
-
-    const scene = new Scene();
-    scene.background = new Color(0x0a0a0a);
-    const camera = new PerspectiveCamera(50, w/h, 0.1, 100);
-    camera.position.z = 3;
-
-    const renderer = new WebGLRenderer({ antialias:true, alpha:true, powerPreference:'low-power' });
-    renderer.setSize(w, h);
-    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-    mount.appendChild(renderer.domElement);
-
-    const orb = new Mesh(
-      new SphereGeometry(.9, 48, 48),
-      new MeshStandardMaterial({ color: 0xff8a2a, emissive: 0x2a1200, roughness:.4, metalness:.15 })
-    );
-    scene.add(orb);
-
-    const amb = new AmbientLight(0xffffff, .25);
-    const key = new PointLight(0xffb566, 1.2, 8);
-    key.position.set(1.6, 1.2, 2.2);
-    scene.add(amb, key);
-
-    const clock = new Clock();
-    function tick(){
-      const t = clock.getElapsedTime();
-      orb.rotation.y = t * .35;
-      orb.position.y = Math.sin(t * .9) * .06;
-      key.intensity = 1.05 + Math.sin(t * 1.6) * .18;
-      renderer.render(scene, camera);
-      requestAnimationFrame(tick);
-    }
-    tick();
-
-    const ro = new ResizeObserver(() => {
-      const W = mount.clientWidth, H = mount.clientHeight || Math.round(mount.clientWidth / (16/9));
-      camera.aspect = W / H;
-      camera.updateProjectionMatrix();
-      renderer.setSize(W, H);
-    });
-    ro.observe(mount);
-  }
-
-  // Multiple activation paths to avoid IO edge cases
-  function armObservers(){
-    if (!('IntersectionObserver' in window)) { loadScene(); return; }
-    const ob = new IntersectionObserver((entries)=>{
-      entries.forEach((e)=>{ if (e.isIntersecting) loadScene(); });
-    }, { threshold: .05, rootMargin: '0px 0px -10% 0px' });
-    ob.observe(mount);
-  }
-
-  // Kickers: user gesture, scroll, or timeout as last resort
-  mount?.addEventListener('pointerdown', loadScene, { passive: true });
-  window.addEventListener('scroll', ()=>{ if (!mounted) loadScene(); }, { passive: true });
-  document.addEventListener('visibilitychange', ()=>{ if (!mounted && !document.hidden) loadScene(); });
-  // In case the element starts in view and IO never fires
-  setTimeout(()=>{ if (!mounted) loadScene(); }, 1200);
-
-  armObservers();
+    // multiple triggers + immediate DOM-ready load
+    document.addEventListener('DOMContentLoaded', loadScene);
+    mount?.addEventListener('pointerdown', loadScene, { passive:true });
+    window.addEventListener('scroll', ()=>{ if(!mounted) loadScene(); }, { passive:true });
+    document.addEventListener('visibilitychange', ()=>{ if(!mounted && !document.hidden) loadScene(); });
+    if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(loadScene,0);
+  })();
+</script>
+</body>
+</html>
