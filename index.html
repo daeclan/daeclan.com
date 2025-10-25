@@ -402,297 +402,196 @@ import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
 const mount = document.getElementById('heroScene');
 if (mount) mount.textContent = 'Initializing…';
 
-// -------- Look & Motion (dialed in) --------
-const LOOK = {
-  exposure: 1.0,
-  fogCol:   new THREE.Color(0x0a0a0a),
-  fogNear:  5.0,
-  fogFar:   28.0,
-  floorCol: new THREE.Color(0x0e0f12),
-  warm:     new THREE.Color(0xffa258),
-  cool:     new THREE.Color(0x9fb8ff)
-};
-const MOTION = {
-  baseZ: 7.0, minZ: 5.2, maxZ: 12.5,
-  scrollScale: 0.0032,
-  parallax: 0.08,      // subtle; won’t wobble
-  yawSpeed: 0.12,      // slow turn
-  breathe: 0.05        // very subtle
-};
-
-// -------- Renderer (reliable WebGL) --------
+// ---------------- Renderer ----------------
 const w = mount.clientWidth;
 const h = mount.clientHeight || Math.round(w/(16/9));
-const renderer = new THREE.WebGLRenderer({ antialias:false, alpha:true, powerPreference:'high-performance' });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
 renderer.setSize(w, h);
-renderer.setClearColor(LOOK.fogCol, 1);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
 mount.textContent = '';
 mount.appendChild(renderer.domElement);
 
-// -------- Fullscreen pass pipeline --------
+// ---------------- Scene / Camera ----------------
 const scene = new THREE.Scene();
-const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+// subtle warm-black grade, real fog for depth separation
+scene.background = new THREE.Color(0x0a0a0a);
+scene.fog = new THREE.FogExp2(0x0a0a0a, 0.065);
 
-const uniforms = {
-  iTime:       { value: 0 },
-  iResolution: { value: new THREE.Vector3(w, h, 1) },
-  iPointer:    { value: new THREE.Vector2(0.5,0.5) },
-  uCamZ:       { value: MOTION.baseZ },
-  uExposure:   { value: LOOK.exposure },
-  uFogNear:    { value: LOOK.fogNear },
-  uFogFar:     { value: LOOK.fogFar },
-  uFogCol:     { value: new THREE.Vector3(LOOK.fogCol.r, LOOK.fogCol.g, LOOK.fogCol.b) },
-  uFloorCol:   { value: new THREE.Vector3(LOOK.floorCol.r, LOOK.floorCol.g, LOOK.floorCol.b) },
-  uWarm:       { value: new THREE.Vector3(LOOK.warm.r, LOOK.warm.g, LOOK.warm.b) },
-  uCool:       { value: new THREE.Vector3(LOOK.cool.r, LOOK.cool.g, LOOK.cool.b) }
+const camera = new THREE.PerspectiveCamera(60, w/h, 0.1, 200);
+camera.position.set(0, 0.55, 7.5);
+
+// ---------------- Palette ----------------
+const COLORS = {
+  wall:    0x0c0d10,
+  floor:   0x0b0c0f,
+  trim:    0x151821,
+  frameEm: 0xff7a18, // warm neon-amber
+  frameEm2:0x9fb8ff, // cool lift
+  fill:    0x232634
 };
 
-const mat = new THREE.ShaderMaterial({
-  uniforms,
-  vertexShader: `
-    varying vec2 vUv;
-    void main(){ vUv=uv; gl_Position=vec4(position,1.0); }
-  `,
-  fragmentShader: `
-    precision highp float;
-    varying vec2 vUv;
-    uniform vec3  iResolution;
-    uniform float iTime;
-    uniform vec2  iPointer;
-    uniform float uCamZ;
-    uniform float uExposure;
-    uniform float uFogNear, uFogFar;
-    uniform vec3  uFogCol, uFloorCol, uWarm, uCool;
+// ---------------- Lights ----------------
+// soft ambient mix so PBR looks alive without going neon
+const hemi = new THREE.HemisphereLight(0x677089, 0x0a0a0a, 0.6);
+scene.add(hemi);
 
-    #define MAX_STEPS 128
-    #define SURF_EPS  0.0014
-    #define FAR_CLIP  80.0
+const key = new THREE.PointLight(0xffb566, 10, 20, 2.0); key.position.set(1.7, 1.1, 3.2);
+const rim = new THREE.PointLight(0x7aa6ff, 6, 20, 2.0); rim.position.set(-1.8, 0.2, -2.0);
+scene.add(key, rim);
 
-    mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+// ---------------- Room Geometry ----------------
+const room = new THREE.Group(); scene.add(room);
 
-    // Signed distances
-    float sdSphere(vec3 p, float r){ return length(p)-r; }
-    float sdRoundedBox(vec3 p, vec3 b, float r){
-      vec3 q = abs(p)-b; return length(max(q,0.)) + min(max(q.x,max(q.y,q.z)),0.) - r;
-    }
-    float sdTorus(vec3 p, vec2 t){ vec2 q=vec2(length(p.xz)-t.x,p.y); return length(q)-t.y; }
-    float opSmoothUnion(float d1, float d2, float k){
-      float h = clamp(0.5+0.5*(d2-d1)/k, 0., 1.);
-      return mix(d2, d1, h) - k*h*(1.-h);
-    }
+const phys = (color, rough=0.85, metal=0.1, emissive=0x000000, emInt=0) =>
+  new THREE.MeshStandardMaterial({ color, roughness:rough, metalness:metal, emissive, emissiveIntensity:emInt });
 
-    // “Portal monolith”: stone frame + glass heart + halo rings
-    float mapPortal(vec3 p, float t){
-      // composed transforms (calm)
-      float yaw = ${MOTION.yawSpeed.toFixed(2)} * t;
-      p.xz = rot(yaw) * p.xz;
-      float breathe = 1.0 + ${MOTION.breathe.toFixed(2)} * sin(t*0.6);
-      p *= breathe;
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 200), phys(COLORS.floor, 0.95, 0.05));
+floor.rotation.x = -Math.PI/2; floor.position.z = -50; room.add(floor);
 
-      // frame (rounded box)
-      float frame = sdRoundedBox(p, vec3(0.9,1.3,0.2), 0.12);
-      float voidCavity = sdRoundedBox(p, vec3(0.55,0.95,0.07), 0.10);
-      float stone = max(frame, -voidCavity); // carve interior
+const ceiling = new THREE.Mesh(new THREE.PlaneGeometry(20, 200), phys(COLORS.trim, 0.8, 0.15));
+ceiling.rotation.x = Math.PI/2; ceiling.position.set(0, 3.0, -50); room.add(ceiling);
 
-      // inner “glass” core (smooth sphere stretched)
-      float glass = sdSphere(p*vec3(0.85,0.95,0.85), 0.68);
+const wallL = new THREE.Mesh(new THREE.PlaneGeometry(200, 200), phys(COLORS.wall, 0.9, 0.05));
+wallL.rotation.y =  Math.PI/2; wallL.position.set(-4.0, 1.5, -50); room.add(wallL);
 
-      // halo rings (thin torus braces)
-      float ring1 = sdTorus(p+vec3(0.,0.64,0.), vec2(1.22,0.05));
-      float ring2 = sdTorus(p+vec3(0.,0.15,0.), vec2(1.32,0.04));
-      float rings = min(ring1, ring2);
+const wallR = wallL.clone(); wallR.rotation.y = -Math.PI/2; wallR.position.x = 4.0; room.add(wallR);
 
-      float shape = opSmoothUnion(stone, rings, 0.08);
-      shape = min(shape, glass);
-      return shape;
-    }
+// a soft horizon “cap” so the space never looks like a void
+const endCap = new THREE.Mesh(new THREE.PlaneGeometry(8, 3), phys(COLORS.fill, 0.7, 0.2));
+endCap.position.set(0, 1.5, -90); room.add(endCap);
 
-    float mapFloor(vec3 p){ return p.y + 0.001; }
-
-    // Scene: 0=portal, 1=floor
-    float mapScene(vec3 p, float t, out int id){
-      float a = mapPortal(p, t);
-      float f = mapFloor(p);
-      if (a < f){ id=0; return a; } id=1; return f;
-    }
-
-    vec3 calcNormal(vec3 p, float t){
-      vec2 e=vec2(0.0012,0.0); int k;
-      float d = mapScene(p,t,k);
-      vec3 n = d - vec3(
-        mapScene(p-vec3(e.x,0,0),t,k),
-        mapScene(p-vec3(0,e.x,0),t,k),
-        mapScene(p-vec3(0,0,e.x),t,k)
-      );
-      return normalize(n);
-    }
-
-    float march(vec3 ro, vec3 rd, float t, out vec3 p, out int id){
-      float d=0.0;
-      for(int i=0;i<MAX_STEPS;i++){
-        p = ro + rd*d;
-        float h = mapScene(p,t,id);
-        if (h<SURF_EPS) return d;
-        d += h*0.9;
-        if (d>FAR_CLIP) break;
-      }
-      return -1.0;
-    }
-
-    float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k, float t){
-      float res=1.0, ph=1e10, d=mint;
-      for(int i=0;i<64;i++){
-        vec3 pos = ro + rd*d; int id; float h = mapScene(pos,t,id);
-        if(h<0.0008) return 0.0;
-        float y=h*h/(2.0*ph);
-        float m=sqrt(max(h*h - y*y,0.));
-        res = min(res, k*m/max(0., d-y));
-        ph=h; d+=clamp(h,0.02,0.12);
-        if(d>maxt) break;
-      }
-      return clamp(res,0.,1.);
-    }
-
-    // simple plane reflection
-    vec3 reflectFloor(vec3 ro, vec3 rd, float t, vec3 fogCol){
-      if (rd.y>=-1e-4) return vec3(0.);
-      float hit = -ro.y/rd.y;
-      if (hit<=0.) return vec3(0.);
-      vec3 pos = ro + rd*hit;
-      // only reflect “above” the floor horizon
-      vec3 rro = pos + vec3(0.,0.002,0.);
-      vec3 rrd = vec3(rd.x, -rd.y, rd.z);
-
-      vec3 rp; int id; float d = march(rro, rrd, t, rp, id);
-      if (d<0.0) return vec3(0.);
-      vec3 rn = calcNormal(rp,t);
-      vec3 L = normalize(vec3(0.6,1.0,-0.35));
-      float diff = max(dot(rn,L),0.0);
-      float sh = softShadow(rp+rn*0.01, L, 0.02, 8.0, 10.0, t);
-      float spec = pow(max(dot(reflect(-L, rn), normalize(-rrd)), 0.0), 36.0);
-      vec3 base = mix(uWarm, uCool, 0.5 + 0.5*sin(t*0.1));
-      vec3 col = base*(0.12 + 0.88*diff*sh) + spec*0.25;
-      float fog = smoothstep(uFogNear, uFogFar, length(rp - rro));
-      return mix(col, fogCol, fog*0.6);
-    }
-
-    vec3 grade(vec3 c){
-      c = max(vec3(0.0), c - 0.004);
-      c = (c*(6.2*c + .5)) / (c*(6.2*c + 1.7) + 0.06);
-      return pow(c, vec3(0.95));
-    }
-
-    void main(){
-      vec2 uv = vUv*2.0 - 1.0;
-      uv.x *= iResolution.x / iResolution.y;
-
-      // calm camera parallax
-      vec2 pxy = (iPointer - 0.5)*2.0;
-      float yaw = pxy.x * ${MOTION.parallax.toFixed(2)};
-      float pit = pxy.y * ${MOTION.parallax.toFixed(2)};
-
-      vec3 ro = vec3(0.0, 0.28, -uCamZ);
-      ro.xz = rot(yaw)*ro.xz; ro.yz = rot(pit)*ro.yz;
-      vec3 ta = vec3(0.0, 0.22, 0.0);
-      vec3 ww = normalize(ta-ro);
-      vec3 uu = normalize(cross(vec3(0,1,0), ww));
-      vec3 vv = cross(ww, uu);
-      vec3 rd = normalize(uv.x*uu + uv.y*vv + 1.65*ww);
-
-      // march
-      vec3 pos; int id;
-      float d = march(ro, rd, iTime, pos, id);
-      vec3 col = uFogCol;
-
-      if (d>0.0){
-        vec3 n = calcNormal(pos,iTime);
-        vec3 L = normalize(vec3(0.6, 1.0, -0.35));
-        float diff = max(dot(n,L),0.0);
-        float sh = softShadow(pos+n*0.01, L, 0.02, 8.0, 10.0, iTime);
-        float spec = pow(max(dot(reflect(-L,n), -rd), 0.0), 28.0);
-
-        vec3 base = mix(uWarm, uCool, 0.5 + 0.5*sin(iTime*0.1));
-
-        // material tweak: floor vs portal
-        if (id==1) base = mix(uFloorCol, base*0.5, 0.12);
-
-        vec3 lit = base*(0.15 + 0.85*diff*sh) + spec*0.22;
-
-        // floor reflection contribution if we hit the plane
-        vec3 refl = vec3(0.0);
-        if (id==1) refl = reflectFloor(ro, rd, iTime, uFogCol) * 0.55;
-
-        col = lit + refl;
-
-        // fog
-        float fog = smoothstep(uFogNear, uFogFar, length(pos-ro));
-        col = mix(col, uFogCol, fog);
-      }
-
-      // filmic tonemap
-      col = grade(col * uExposure);
-      gl_FragColor = vec4(col, 1.0);
-    }
-  `,
-  depthTest: false,
-  depthWrite: false,
-  transparent: false
+// ---------------- Emissive Portal Frames (Instanced) ----------------
+const frameW = 6.2, frameH = 2.6, frameD = 0.08;
+const frameShape = new THREE.BoxGeometry(frameW, frameH, frameD);
+const frameMat = new THREE.MeshStandardMaterial({
+  color: 0x111319, roughness: 0.55, metalness: 0.35,
+  emissive: COLORS.frameEm, emissiveIntensity: 0.0
 });
+const FRAMES = 48;
+const frames = new THREE.InstancedMesh(frameShape, frameMat, FRAMES);
+frames.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+room.add(frames);
 
-const quad = new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat);
-scene.add(quad);
+// thin inner glow strip (instanced) for that premium “fixture” look
+const stripGeo = new THREE.BoxGeometry(frameW*0.98, 0.05, 0.02);
+const stripMat = new THREE.MeshStandardMaterial({
+  color: 0x0f1014, roughness:0.4, metalness:0.6,
+  emissive: COLORS.frameEm, emissiveIntensity: 2.0
+});
+const strips = new THREE.InstancedMesh(stripGeo, stripMat, FRAMES*3);
+strips.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+room.add(strips);
 
-// -------- Interaction (stable) --------
-const state = {
-  pointer: new THREE.Vector2(0.5,0.5),
-  targetZ: MOTION.baseZ
-};
-function setPointer(e){
+// position frames down the tunnel with slight non-linear spacing
+const m = new THREE.Matrix4();
+let si = 0;
+for (let i=0; i<FRAMES; i++){
+  const z = -i*2.2 - 2.0 - Math.pow(i/FRAMES, 2.0)*10.0;  // denser near camera, faster falloff
+  m.makeRotationFromEuler(new THREE.Euler(0, 0, 0));
+  m.setPosition(0, 1.5, z);
+  frames.setMatrixAt(i, m);
+
+  // three strips: top + sides (interrupted for asymmetry)
+  const top = m.clone().multiply(new THREE.Matrix4().makeTranslation(0, frameH*0.5-0.06, 0.06));
+  strips.setMatrixAt(si++, top);
+  const left = m.clone().multiply(new THREE.Matrix4().makeRotationZ( Math.PI/2))
+                       .multiply(new THREE.Matrix4().makeTranslation(0, frameW*0.5-0.06, 0.06));
+  strips.setMatrixAt(si++, left);
+  const right = m.clone().multiply(new THREE.Matrix4().makeRotationZ( Math.PI/2))
+                        .multiply(new THREE.Matrix4().makeTranslation(0, -frameW*0.5+0.06, 0.06));
+  strips.setMatrixAt(si++, right);
+}
+frames.instanceMatrix.needsUpdate = true;
+strips.instanceMatrix.needsUpdate = true;
+
+// ---------------- Subtle Accent Props ----------------
+const plinthMat = phys(0x14161c, 0.6, 0.2);
+for (let k=0; k<6; k++){
+  const z = -k*8 - 6;
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.6, 24), plinthMat);
+  p.position.set((k%2===0)?-2.2:2.2, 0.3, z);
+  room.add(p);
+}
+
+// ---------------- Camera Rig (smooth + safe) ----------------
+const rig = new THREE.Group();
+rig.add(camera);
+scene.add(rig);
+
+let targetZ = camera.position.z;
+let yaw = 0, pitch = 0;
+const pointer = new THREE.Vector2(0.5, 0.5);
+
+function onPointer(e){
   const rect = mount.getBoundingClientRect();
   const x = ('touches' in e) ? e.touches[0].clientX : e.clientX;
   const y = ('touches' in e) ? e.touches[0].clientY : e.clientY;
-  state.pointer.set(
+  pointer.set(
     THREE.MathUtils.clamp((x-rect.left)/rect.width, 0, 1),
     THREE.MathUtils.clamp((y-rect.top)/rect.height, 0, 1)
   );
 }
-mount.addEventListener('pointermove', setPointer, { passive:true });
-mount.addEventListener('touchmove',   setPointer, { passive:true });
-mount.addEventListener('pointerdown', setPointer, { passive:true });
-mount.addEventListener('touchstart',  setPointer, { passive:true });
+['pointermove','pointerdown','touchstart','touchmove'].forEach(ev =>
+  mount.addEventListener(ev, onPointer, { passive:true })
+);
 
 mount.addEventListener('wheel', (e)=>{
-  state.targetZ += e.deltaY * MOTION.scrollScale;
-  state.targetZ = THREE.MathUtils.clamp(state.targetZ, MOTION.minZ, MOTION.maxZ);
+  targetZ += e.deltaY * 0.0032;
+  targetZ = THREE.MathUtils.clamp(targetZ, 4.8, 12.5);
 }, { passive:true });
 
-// -------- Resize --------
+// ---------------- Resize ----------------
 const ro = new ResizeObserver(()=>{
   const W = mount.clientWidth, H = mount.clientHeight || Math.round(W/(16/9));
   renderer.setSize(W, H);
-  uniforms.iResolution.value.set(W,H,1);
+  camera.aspect = W/H; camera.updateProjectionMatrix();
+
+  // match fog density to visual size
+  scene.fog.density = THREE.MathUtils.clamp(0.045*(1920/W), 0.045, 0.085);
 });
 ro.observe(mount);
 
-// -------- Animate (ease everything) --------
+// ---------------- Animation ----------------
 const clock = new THREE.Clock();
+
 function tick(){
   const t = clock.getElapsedTime();
-  uniforms.iTime.value = t;
 
-  // ease dolly
-  const z = uniforms.uCamZ.value;
-  uniforms.uCamZ.value = z + (state.targetZ - z)*0.08;
+  // smooth parallax (tiny, clamped — will NOT flip or “disappear”)
+  const targetYaw = (pointer.x - 0.5) * 0.18;
+  const targetPitch = (pointer.y - 0.5) * 0.08;
+  // framerate-safe smoothing:
+  const dt = Math.min(clock.getDelta(), 0.033); // cap dt to avoid big jumps
+  const s = 1.0 - Math.pow(0.001, dt); // exponential smoothing
+  yaw += (targetYaw - yaw) * s;
+  pitch += (targetPitch - pitch) * s;
+  pitch = THREE.MathUtils.clamp(pitch, -0.2, 0.2); // never tilt too far
 
-  // pointer
-  uniforms.iPointer.value.copy(state.pointer);
+  rig.rotation.y = yaw;
+  rig.rotation.x = pitch;
+  camera.position.z += (targetZ - camera.position.z) * 0.08;
+  camera.lookAt(0, 1.3, -10);
+
+  // living light: sweep down the tunnel, never harsh
+  const sweep = Math.sin(t*0.6)*0.5 + 0.5;
+  key.intensity = 6.5 + sweep*3.0;
+  rim.intensity = 4.0 + (1.0-sweep)*2.0;
+
+  // emissive pulse along strips (premium “fixture fade”)
+  const emPhase = (t*0.15) % 1.0;
+  const warm = new THREE.Color(COLORS.frameEm);
+  const cool = new THREE.Color(COLORS.frameEm2);
+  const pulse = warm.lerp(cool, 0.5 + 0.5*Math.sin(t*0.5));
+  stripMat.emissive = pulse;
+  stripMat.needsUpdate = true;
 
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
 }
 tick();
 </script>
-
 </body>
 </html>
