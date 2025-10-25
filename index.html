@@ -354,7 +354,7 @@
       <div class="grid" style="margin-top:18px;">
         <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #1</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
         <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+        <article class="card col-3 reveal"><div class="card-body"><div the="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
         <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
       </div>
     </section>
@@ -382,28 +382,31 @@
     <p>© <span id="year"></span> DAECLAN.COM</p>
   </footer>
 
-<script>
-  // Update the year in the footer
-  document.getElementById('year').textContent = new Date().getFullYear();
+  <!--
+    We separate the scrollspy/year code from the scene initialization.  The
+    Three.js/WebGPU scene is now loaded via an external module script (scene.js)
+    rather than being inlined here.  Remove the former inline Three.js code.
+  -->
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-  // Scrollspy: highlights navigation links as you scroll
-  const secs = [...document.querySelectorAll('main section[id]')];
-  const links = [...document.querySelectorAll('header nav a')];
-  const map = id => links.find(a => a.getAttribute('href') === '#' + id);
-  const io = new IntersectionObserver(es => {
-    es.forEach(e => {
-      const id = e.target.id, link = map(id);
-      if (!link) return;
-      if (e.isIntersecting) {
-        links.forEach(a => a.classList.remove('active'));
-        link.classList.add('active');
-      }
-    });
-  }, { rootMargin: '-45% 0px -50% 0px', threshold: 0.01 });
-  secs.forEach(s => io.observe(s));
-</script>
-
-<!-- Load your custom WebGPU / Three.js scene module -->
-<script type="module" src="scene.js"></script>
+    // Scrollspy
+    const secs = [...document.querySelectorAll('main section[id]')];
+    const links = [...document.querySelectorAll('header nav a')];
+    const map = id => links.find(a => a.getAttribute('href') === '#' + id);
+    const io = new IntersectionObserver(es => {
+      es.forEach(e => {
+        const id = e.target.id, link = map(id);
+        if (!link) return;
+        if (e.isIntersecting) {
+          links.forEach(a => a.classList.remove('active'));
+          link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px', threshold: 0.01 });
+    secs.forEach(s => io.observe(s));
+  </script>
+  <!-- Load the WebGPU/Three.js scene module -->
+  <script type="module" src="scene.js"></script>
 </body>
 </html>
