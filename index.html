@@ -96,7 +96,7 @@
       <p class="lead">(hidden)</p>
     </section>
 
-    <!-- THREE.JS SHOWCASE -->
+    <!-- THREE.JS SHOWCASE (auto-load, also responds to tap/scroll) -->
     <section id="showcase" class="container">
       <div id="heroScene"><p>Initializing…</p></div>
     </section>
@@ -106,7 +106,9 @@
       <h2>Music</h2>
       <p class="lead">Releases under <strong>DEGH</strong>.</p>
 
+      <!-- Trilogy grid -->
       <div class="grid" style="margin-top:18px;">
+        <!-- Declan Emphasized A Movie -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Album cover: DECLAN EMPHASIZED A MOVIE"/>
@@ -123,6 +125,7 @@
           </div>
         </article>
 
+        <!-- Declan Questioned An Image -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Album cover: Declan Questioned An Image"/>
@@ -138,6 +141,7 @@
           </div>
         </article>
 
+        <!-- Declan Loved A Message -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Album cover: Declan Loved A Message"/>
@@ -154,7 +158,7 @@
         </article>
       </div>
 
-      <!-- Latest Music Video -->
+      <!-- Latest Music Video (YouTube embed) -->
       <div class="grid" style="margin-top:28px;">
         <article class="card col-12 reveal">
           <div class="card-body">
@@ -207,7 +211,7 @@
       </div>
     </section>
 
-    <!-- ACTING -->
+    <!-- ACTING (resume + headshots/photos placeholders) -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
       <p class="lead">Resume, headshots, and production stills.</p>
@@ -239,6 +243,7 @@
       <h2>Web Projects</h2>
       <p class="lead">Interfaces, interactive art, and tools.</p>
       <div class="grid" style="margin-top:18px;">
+        <!-- SLIME.SURF -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
@@ -254,6 +259,7 @@
           </div>
         </article>
 
+        <!-- MIGOS ADLIBS -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork">
@@ -272,6 +278,7 @@
           </div>
         </article>
 
+        <!-- SLAM HARRIS -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
@@ -289,6 +296,7 @@
           </div>
         </article>
 
+        <!-- XXXSENSATION -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage">
@@ -304,6 +312,7 @@
           </div>
         </article>
 
+        <!-- SLIME NO B (Young Thug-only remake) -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
@@ -319,8 +328,10 @@
           </div>
         </article>
 
+        <!-- MORE LIFE (without Aubrey) -->
         <article class="card col-6 reveal">
           <div class="thumb">
+            <!-- TODO: replace with the direct image/video URL from the Imgur gallery when provided -->
             <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
             <span class="tag">Project</span>
           </div>
@@ -336,7 +347,7 @@
       </div>
     </section>
 
-    <!-- WRITING -->
+    <!-- WRITING: 4-up grid -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
       <p class="lead">Poems, blurbs, fragments.</p>
@@ -348,7 +359,7 @@
       </div>
     </section>
 
-    <!-- CONTACT -->
+    <!-- CONTACT with orange buttons -->
     <section id="contact" class="section container">
       <h2>Contact</h2>
       <p class="lead">Bookings, collabs, or just to say hi.</p>
@@ -374,6 +385,8 @@
   <!-- Year + Scrollspy (unchanged) -->
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scrollspy
     const secs=[...document.querySelectorAll('main section[id]')];
     const links=[...document.querySelectorAll('header nav a')];
     const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
@@ -392,7 +405,6 @@
     const mount = document.getElementById('heroScene');
     if (!mount) return;
 
-    // Boot once the DOM is ready (THREE already loaded above)
     let booted = false;
     function start(){
       if (booted) return; booted = true;
@@ -489,12 +501,12 @@
       animate();
     }
 
-    // Same boot pattern as your original (plus immediate)
+    // multiple triggers + immediate DOM-ready load (no duplicate 'mount' declarations)
     document.addEventListener('DOMContentLoaded', start);
-    const mount = document.getElementById('heroScene');
-    mount?.addEventListener('pointerdown', start, { passive:true });
-    window.addEventListener('scroll', start, { passive:true });
+    const _once = () => { start(); window.removeEventListener('scroll', _once); };
+    window.addEventListener('scroll', _once, { passive:true });
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) start(); });
+    // immediate
     if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(start,0);
   })();
   </script>
