@@ -96,7 +96,7 @@
       <p class="lead">(hidden)</p>
     </section>
 
-    <!-- SHOWCASE -->
+    <!-- THREE.JS SHOWCASE -->
     <section id="showcase" class="container">
       <div id="heroScene"><p>Initializing…</p></div>
     </section>
@@ -106,9 +106,7 @@
       <h2>Music</h2>
       <p class="lead">Releases under <strong>DEGH</strong>.</p>
 
-      <!-- Trilogy grid -->
       <div class="grid" style="margin-top:18px;">
-        <!-- Declan Emphasized A Movie -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Album cover: DECLAN EMPHASIZED A MOVIE"/>
@@ -125,7 +123,6 @@
           </div>
         </article>
 
-        <!-- Declan Questioned An Image -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Album cover: Declan Questioned An Image"/>
@@ -141,7 +138,6 @@
           </div>
         </article>
 
-        <!-- Declan Loved A Message -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Album cover: Declan Loved A Message"/>
@@ -158,7 +154,7 @@
         </article>
       </div>
 
-      <!-- Latest Music Video (YouTube embed) -->
+      <!-- Latest Music Video -->
       <div class="grid" style="margin-top:28px;">
         <article class="card col-12 reveal">
           <div class="card-body">
@@ -211,7 +207,7 @@
       </div>
     </section>
 
-    <!-- ACTING (resume + headshots/photos placeholders) -->
+    <!-- ACTING -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
       <p class="lead">Resume, headshots, and production stills.</p>
@@ -243,7 +239,6 @@
       <h2>Web Projects</h2>
       <p class="lead">Interfaces, interactive art, and tools.</p>
       <div class="grid" style="margin-top:18px;">
-        <!-- SLIME.SURF -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
@@ -259,7 +254,6 @@
           </div>
         </article>
 
-        <!-- MIGOS ADLIBS -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork">
@@ -278,7 +272,6 @@
           </div>
         </article>
 
-        <!-- SLAM HARRIS -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
@@ -296,7 +289,6 @@
           </div>
         </article>
 
-        <!-- XXXSENSATION -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage">
@@ -312,7 +304,6 @@
           </div>
         </article>
 
-        <!-- SLIME NO B (Young Thug-only remake) -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
@@ -328,10 +319,8 @@
           </div>
         </article>
 
-        <!-- MORE LIFE (without Aubrey) -->
         <article class="card col-6 reveal">
           <div class="thumb">
-            <!-- TODO: replace with the direct image/video URL from the Imgur gallery when provided -->
             <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
             <span class="tag">Project</span>
           </div>
@@ -347,7 +336,7 @@
       </div>
     </section>
 
-    <!-- WRITING: 4-up grid -->
+    <!-- WRITING -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
       <p class="lead">Poems, blurbs, fragments.</p>
@@ -394,15 +383,16 @@
     secs.forEach(s=>io.observe(s));
   </script>
 
-  <!-- Three.js (UMD, reliable) -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js" defer></script>
+  <!-- THREE MUST LOAD FIRST -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
 
-  <!-- Wormhole: neon ROYGBIV rings, forward-only, spin on click -->
+  <!-- Wormhole: ROYGBIV neon rings, forward-only, spin on click -->
   <script>
   (function(){
     const mount = document.getElementById('heroScene');
     if (!mount) return;
 
+    // Boot once the DOM is ready (THREE already loaded above)
     let booted = false;
     function start(){
       if (booted) return; booted = true;
@@ -430,6 +420,7 @@
       const GROUP = new THREE.Group();
       scene.add(GROUP);
 
+      // Tunnel geometry
       const RINGS=420, SPACING=0.58, RADIUS=3.2, THICK=0.075, SPEED=14.0;
       const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
       const mat = new THREE.MeshStandardMaterial({
@@ -440,6 +431,7 @@
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       GROUP.add(mesh);
 
+      // Strict ROYGBIV palette repeating
       const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
       const PAL=HEX.map(h=> new THREE.Color(h));
       const M = new THREE.Matrix4(), tmp = new THREE.Vector3();
@@ -450,17 +442,18 @@
       for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
       mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
 
+      // Lights
       scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
       const core = new THREE.PointLight(0xffffff, 0.5, 14, 2.0); core.position.set(0,0,-2); scene.add(core);
 
-      // Spin on click/tap
+      // Click/tap -> one axial spin
       let spinVel=0, spinRemain=0;
       const SPIN_TARGET = Math.PI*2;
       function spinOnce(){ spinRemain += SPIN_TARGET; }
       mount.addEventListener('click', spinOnce, { passive:true });
       mount.addEventListener('touchstart', spinOnce, { passive:true });
 
-      // Resize handling
+      // Resize
       const ro = new ResizeObserver(()=>{
         const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
         renderer.setSize(w,h);
@@ -496,10 +489,11 @@
       animate();
     }
 
-    // Boot conditions (same pattern you used before)
+    // Same boot pattern as your original (plus immediate)
     document.addEventListener('DOMContentLoaded', start);
+    const mount = document.getElementById('heroScene');
     mount?.addEventListener('pointerdown', start, { passive:true });
-    window.addEventListener('scroll', ()=>{ start(); }, { passive:true });
+    window.addEventListener('scroll', start, { passive:true });
     document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) start(); });
     if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(start,0);
   })();
