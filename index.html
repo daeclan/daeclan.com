@@ -400,115 +400,104 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
 
   <!-- Wormhole: ROYGBIV neon rings, forward-only, spin on click -->
-  <script>
-  (function(){
-    const mount = document.getElementById('heroScene');
-    if (!mount) return;
+ <script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
 
-    let booted = false;
-    function start(){
-      if (booted) return; booted = true;
-      mount.textContent = '';
+const mount = document.getElementById('heroScene');
+if (!mount) throw new Error('heroScene not found');
 
-      const W = mount.clientWidth;
-      const H = mount.clientHeight || Math.round(W/(16/9));
+let booted = false;
+function start(){
+  if (booted) return; booted = true;
+  mount.textContent = '';
 
-      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      renderer.setSize(W, H);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.08;
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      mount.appendChild(renderer.domElement);
+  const W = mount.clientWidth;
+  const H = mount.clientHeight || Math.round(W/(16/9));
 
-      const scene = new THREE.Scene();
-      const bg = new THREE.Color(0x05060a);
-      scene.background = bg;
-      scene.fog = new THREE.FogExp2(bg.getHex(), 0.02);
+  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(W, H);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.08;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  mount.appendChild(renderer.domElement);
 
-      const camera = new THREE.PerspectiveCamera(72, W/H, 0.03, 1000);
-      camera.position.set(0,0,0);
+  const scene = new THREE.Scene();
+  const bg = new THREE.Color(0x05060a);
+  scene.background = bg;
+  scene.fog = new THREE.FogExp2(bg.getHex(), 0.02);
 
-      const GROUP = new THREE.Group();
-      scene.add(GROUP);
+  const camera = new THREE.PerspectiveCamera(72, W/H, 0.03, 1000);
+  camera.position.set(0,0,0);
 
-      // Tunnel geometry
-      const RINGS=420, SPACING=0.58, RADIUS=3.2, THICK=0.075, SPEED=14.0;
-      const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
-      const mat = new THREE.MeshStandardMaterial({
-        color:0x0b0c12, roughness:0.25, metalness:0.65,
-        emissive:0x000000, emissiveIntensity:2.4, vertexColors:true
-      });
-      const mesh = new THREE.InstancedMesh(geo, mat, RINGS);
-      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      GROUP.add(mesh);
+  const GROUP = new THREE.Group();
+  scene.add(GROUP);
 
-      // Strict ROYGBIV palette repeating
-      const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
-      const PAL=HEX.map(h=> new THREE.Color(h));
-      const M = new THREE.Matrix4(), tmp = new THREE.Vector3();
+  const RINGS=420, SPACING=0.58, RADIUS=3.2, THICK=0.075, SPEED=14.0;
+  const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
+  const mat = new THREE.MeshStandardMaterial({
+    color:0x0b0c12, roughness:0.25, metalness:0.65,
+    emissive:0x000000, emissiveIntensity:2.4, vertexColors:true
+  });
+  const mesh = new THREE.InstancedMesh(geo, mat, RINGS);
+  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+  GROUP.add(mesh);
 
-      function place(i,z){ M.identity(); M.setPosition(0,0,z); mesh.setMatrixAt(i,M); }
-      function colorAtDepth(i,z){ const step=Math.floor((-z)/SPACING); const idx=((step%PAL.length)+PAL.length)%PAL.length; mesh.setColorAt(i,PAL[idx]); }
+  const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
+  const PAL=HEX.map(h=> new THREE.Color(h));
+  const M = new THREE.Matrix4(), tmp = new THREE.Vector3();
 
-      for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
-      mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  function place(i,z){ M.identity(); M.setPosition(0,0,z); mesh.setMatrixAt(i,M); }
+  function colorAtDepth(i,z){ const step=Math.floor((-z)/SPACING); const idx=((step%PAL.length)+PAL.length)%PAL.length; mesh.setColorAt(i,PAL[idx]); }
 
-      // Lights
-      scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
-      const core = new THREE.PointLight(0xffffff, 0.5, 14, 2.0); core.position.set(0,0,-2); scene.add(core);
+  for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
+  mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
 
-      // Click/tap -> one axial spin
-      let spinVel=0, spinRemain=0;
-      const SPIN_TARGET = Math.PI*2;
-      function spinOnce(){ spinRemain += SPIN_TARGET; }
-      mount.addEventListener('click', spinOnce, { passive:true });
-      mount.addEventListener('touchstart', spinOnce, { passive:true });
+  scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
+  const core = new THREE.PointLight(0xffffff, 0.5, 14, 2.0); core.position.set(0,0,-2); scene.add(core);
 
-      // Resize
-      const ro = new ResizeObserver(()=>{
-        const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
-        renderer.setSize(w,h);
-        camera.aspect = w/h; camera.updateProjectionMatrix();
-        scene.fog.density = THREE.MathUtils.clamp(0.02*(1920/w), 0.018, 0.035);
-      });
-      ro.observe(mount);
+  let spinVel=0, spinRemain=0;
+  const SPIN_TARGET = Math.PI*2;
+  function spinOnce(){ spinRemain += SPIN_TARGET; }
+  mount.addEventListener('click', spinOnce, { passive:true });
+  mount.addEventListener('touchstart', spinOnce, { passive:true });
 
-      // Animate
-      let last = performance.now();
-      function advance(dt){
-        const dz = SPEED*dt; GROUP.position.z += dz;
-        for(let i=0;i<RINGS;i++){
-          mesh.getMatrixAt(i,M); tmp.setFromMatrixPosition(M); tmp.z += dz;
-          if (tmp.z > SPACING){ tmp.z -= RINGS*SPACING; place(i,tmp.z); colorAtDepth(i,tmp.z); }
-          else { M.setPosition(0,0,tmp.z); mesh.setMatrixAt(i,M); }
-        }
-        mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-      }
-      function updateSpin(dt){
-        if (spinRemain>0){ const accel=6, maxVel=4; const desired=Math.min(maxVel, Math.sqrt(2*accel*spinRemain));
-          spinVel += (desired - spinVel) * Math.min(1, dt*6);
-          const step = Math.min(spinVel*dt, spinRemain);
-          GROUP.rotation.z += step; spinRemain -= step;
-        } else { spinVel *= Math.pow(0.001, dt); }
-      }
-      function animate(){
-        requestAnimationFrame(animate);
-        const now = performance.now(); const dt = Math.min((now-last)/1000, 0.033); last=now;
-        advance(dt); updateSpin(dt);
-        renderer.render(scene, camera);
-      }
-      animate();
+  const ro = new ResizeObserver(()=>{
+    const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
+    renderer.setSize(w,h);
+    camera.aspect = w/h; camera.updateProjectionMatrix();
+    scene.fog.density = THREE.MathUtils.clamp(0.02*(1920/w), 0.018, 0.035);
+  });
+  ro.observe(mount);
+
+  let last = performance.now();
+  function advance(dt){
+    const dz = SPEED*dt; GROUP.position.z += dz;
+    for(let i=0;i<RINGS;i++){
+      mesh.getMatrixAt(i,M); tmp.setFromMatrixPosition(M); tmp.z += dz;
+      if (tmp.z > SPACING){ tmp.z -= RINGS*SPACING; place(i,tmp.z); colorAtDepth(i,tmp.z); }
+      else { M.setPosition(0,0,tmp.z); mesh.setMatrixAt(i,M); }
     }
+    mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+  }
+  function updateSpin(dt){
+    if (spinRemain>0){ const accel=6, maxVel=4; const desired=Math.min(maxVel, Math.sqrt(2*accel*spinRemain));
+      spinVel += (desired - spinVel) * Math.min(1, dt*6);
+      const step = Math.min(spinVel*dt, spinRemain);
+      GROUP.rotation.z += step; spinRemain -= step;
+    } else { spinVel *= Math.pow(0.001, dt); }
+  }
+  function animate(){
+    requestAnimationFrame(animate);
+    const now = performance.now(); const dt = Math.min((now-last)/1000, 0.033); last=now;
+    advance(dt); updateSpin(dt);
+    renderer.render(scene, camera);
+  }
+  animate();
+}
 
-    // multiple triggers + immediate DOM-ready load (no duplicate 'mount' declarations)
-    document.addEventListener('DOMContentLoaded', start);
-    const _once = () => { start(); window.removeEventListener('scroll', _once); };
-    window.addEventListener('scroll', _once, { passive:true });
-    document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) start(); });
-    // immediate
-    if (document.readyState === 'complete' || document.readyState === 'interactive') setTimeout(start,0);
-  })();
-  </script>
+document.addEventListener('DOMContentLoaded', start);
+</script>
+
 </body>
 </html>
