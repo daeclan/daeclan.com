@@ -397,32 +397,30 @@
 
   <!-- NEW: working scene loader (same-origin imports, no CORS) -->
 <script type="module">
-import * as THREE from 'https://esm.sh/three@0.161.0/build/three.module.js';
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
 
 const mount = document.getElementById('heroScene');
 if (mount) mount.textContent = 'Initializing…';
 
-// ---------- Tunables (tasteful defaults) ----------
+// -------- Look & Motion (dialed in) --------
 const LOOK = {
-  exposure: 1.0,         // 0.85..1.2
-  fogNear:  3.0,
-  fogFar:   20.0,
+  exposure: 1.0,
   fogCol:   new THREE.Color(0x0a0a0a),
-  accentA:  new THREE.Color(0xff7a18), // warm orange
-  accentB:  new THREE.Color(0xbac2ff), // cool lift
-  floorCol: new THREE.Color(0x0d0e12)
+  fogNear:  5.0,
+  fogFar:   28.0,
+  floorCol: new THREE.Color(0x0e0f12),
+  warm:     new THREE.Color(0xffa258),
+  cool:     new THREE.Color(0x9fb8ff)
 };
 const MOTION = {
-  cameraBaseZ: 5.6,
-  cameraMinZ:  3.8,
-  cameraMaxZ:  9.0,
-  scrollScale: 0.0035,   // scroll sensitivity
-  parallax:    0.12,     // pointer parallax
-  turn:        0.18,     // global slow yaw
-  breathe:     0.25      // very subtle “breathing” deform
+  baseZ: 7.0, minZ: 5.2, maxZ: 12.5,
+  scrollScale: 0.0032,
+  parallax: 0.08,      // subtle; won’t wobble
+  yawSpeed: 0.12,      // slow turn
+  breathe: 0.05        // very subtle
 };
 
-// ---------- Renderer ----------
+// -------- Renderer (reliable WebGL) --------
 const w = mount.clientWidth;
 const h = mount.clientHeight || Math.round(w/(16/9));
 const renderer = new THREE.WebGLRenderer({ antialias:false, alpha:true, powerPreference:'high-performance' });
@@ -432,296 +430,263 @@ renderer.setClearColor(LOOK.fogCol, 1);
 mount.textContent = '';
 mount.appendChild(renderer.domElement);
 
-// ---------- Fullscreen quad pipeline ----------
+// -------- Fullscreen pass pipeline --------
 const scene = new THREE.Scene();
 const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 
-const quad = new THREE.Mesh(
-  new THREE.PlaneGeometry(2,2),
-  new THREE.ShaderMaterial({
-    uniforms: {
-      iTime:       { value: 0 },
-      iResolution: { value: new THREE.Vector3(w, h, 1) },
-      iPointer:    { value: new THREE.Vector2(0.5,0.5) },
-      uCamZ:       { value: MOTION.cameraBaseZ },
-      uExposure:   { value: LOOK.exposure },
-      uFogNear:    { value: LOOK.fogNear },
-      uFogFar:     { value: LOOK.fogFar },
-      uFogCol:     { value: new THREE.Vector3(LOOK.fogCol.r, LOOK.fogCol.g, LOOK.fogCol.b) },
-      uAccentA:    { value: new THREE.Vector3(LOOK.accentA.r, LOOK.accentA.g, LOOK.accentA.b) },
-      uAccentB:    { value: new THREE.Vector3(LOOK.accentB.r, LOOK.accentB.g, LOOK.accentB.b) },
-      uFloorCol:   { value: new THREE.Vector3(LOOK.floorCol.r, LOOK.floorCol.g, LOOK.floorCol.b) }
-    },
-    vertexShader: `
-      varying vec2 vUv;
-      void main(){ vUv=uv; gl_Position=vec4(position,1.0); }
-    `,
-    fragmentShader: `
-      precision highp float;
-      varying vec2 vUv;
-      uniform vec3  iResolution;
-      uniform float iTime;
-      uniform vec2  iPointer;  // 0..1
-      uniform float uCamZ;
-      uniform float uExposure;
-      uniform float uFogNear, uFogFar;
-      uniform vec3  uFogCol, uAccentA, uAccentB, uFloorCol;
+const uniforms = {
+  iTime:       { value: 0 },
+  iResolution: { value: new THREE.Vector3(w, h, 1) },
+  iPointer:    { value: new THREE.Vector2(0.5,0.5) },
+  uCamZ:       { value: MOTION.baseZ },
+  uExposure:   { value: LOOK.exposure },
+  uFogNear:    { value: LOOK.fogNear },
+  uFogFar:     { value: LOOK.fogFar },
+  uFogCol:     { value: new THREE.Vector3(LOOK.fogCol.r, LOOK.fogCol.g, LOOK.fogCol.b) },
+  uFloorCol:   { value: new THREE.Vector3(LOOK.floorCol.r, LOOK.floorCol.g, LOOK.floorCol.b) },
+  uWarm:       { value: new THREE.Vector3(LOOK.warm.r, LOOK.warm.g, LOOK.warm.b) },
+  uCool:       { value: new THREE.Vector3(LOOK.cool.r, LOOK.cool.g, LOOK.cool.b) }
+};
 
-      #define MAX_STEPS 128
-      #define SURF_EPS  0.0015
-      #define FAR_CLIP  60.0
+const mat = new THREE.ShaderMaterial({
+  uniforms,
+  vertexShader: `
+    varying vec2 vUv;
+    void main(){ vUv=uv; gl_Position=vec4(position,1.0); }
+  `,
+  fragmentShader: `
+    precision highp float;
+    varying vec2 vUv;
+    uniform vec3  iResolution;
+    uniform float iTime;
+    uniform vec2  iPointer;
+    uniform float uCamZ;
+    uniform float uExposure;
+    uniform float uFogNear, uFogFar;
+    uniform vec3  uFogCol, uFloorCol, uWarm, uCool;
 
-      // rotate helper
-      mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+    #define MAX_STEPS 128
+    #define SURF_EPS  0.0014
+    #define FAR_CLIP  80.0
 
-      // palette (filmic, muted)
-      vec3 grade(vec3 c){
-        // simple filmic-ish tone curve
-        c = max(vec3(0.0), c - 0.004);
-        c = (c*(6.2*c + .5)) / (c*(6.2*c + 1.7) + 0.06);
-        return pow(c, vec3(0.95));
+    mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+
+    // Signed distances
+    float sdSphere(vec3 p, float r){ return length(p)-r; }
+    float sdRoundedBox(vec3 p, vec3 b, float r){
+      vec3 q = abs(p)-b; return length(max(q,0.)) + min(max(q.x,max(q.y,q.z)),0.) - r;
+    }
+    float sdTorus(vec3 p, vec2 t){ vec2 q=vec2(length(p.xz)-t.x,p.y); return length(q)-t.y; }
+    float opSmoothUnion(float d1, float d2, float k){
+      float h = clamp(0.5+0.5*(d2-d1)/k, 0., 1.);
+      return mix(d2, d1, h) - k*h*(1.-h);
+    }
+
+    // “Portal monolith”: stone frame + glass heart + halo rings
+    float mapPortal(vec3 p, float t){
+      // composed transforms (calm)
+      float yaw = ${MOTION.yawSpeed.toFixed(2)} * t;
+      p.xz = rot(yaw) * p.xz;
+      float breathe = 1.0 + ${MOTION.breathe.toFixed(2)} * sin(t*0.6);
+      p *= breathe;
+
+      // frame (rounded box)
+      float frame = sdRoundedBox(p, vec3(0.9,1.3,0.2), 0.12);
+      float voidCavity = sdRoundedBox(p, vec3(0.55,0.95,0.07), 0.10);
+      float stone = max(frame, -voidCavity); // carve interior
+
+      // inner “glass” core (smooth sphere stretched)
+      float glass = sdSphere(p*vec3(0.85,0.95,0.85), 0.68);
+
+      // halo rings (thin torus braces)
+      float ring1 = sdTorus(p+vec3(0.,0.64,0.), vec2(1.22,0.05));
+      float ring2 = sdTorus(p+vec3(0.,0.15,0.), vec2(1.32,0.04));
+      float rings = min(ring1, ring2);
+
+      float shape = opSmoothUnion(stone, rings, 0.08);
+      shape = min(shape, glass);
+      return shape;
+    }
+
+    float mapFloor(vec3 p){ return p.y + 0.001; }
+
+    // Scene: 0=portal, 1=floor
+    float mapScene(vec3 p, float t, out int id){
+      float a = mapPortal(p, t);
+      float f = mapFloor(p);
+      if (a < f){ id=0; return a; } id=1; return f;
+    }
+
+    vec3 calcNormal(vec3 p, float t){
+      vec2 e=vec2(0.0012,0.0); int k;
+      float d = mapScene(p,t,k);
+      vec3 n = d - vec3(
+        mapScene(p-vec3(e.x,0,0),t,k),
+        mapScene(p-vec3(0,e.x,0),t,k),
+        mapScene(p-vec3(0,0,e.x),t,k)
+      );
+      return normalize(n);
+    }
+
+    float march(vec3 ro, vec3 rd, float t, out vec3 p, out int id){
+      float d=0.0;
+      for(int i=0;i<MAX_STEPS;i++){
+        p = ro + rd*d;
+        float h = mapScene(p,t,id);
+        if (h<SURF_EPS) return d;
+        d += h*0.9;
+        if (d>FAR_CLIP) break;
+      }
+      return -1.0;
+    }
+
+    float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k, float t){
+      float res=1.0, ph=1e10, d=mint;
+      for(int i=0;i<64;i++){
+        vec3 pos = ro + rd*d; int id; float h = mapScene(pos,t,id);
+        if(h<0.0008) return 0.0;
+        float y=h*h/(2.0*ph);
+        float m=sqrt(max(h*h - y*y,0.));
+        res = min(res, k*m/max(0., d-y));
+        ph=h; d+=clamp(h,0.02,0.12);
+        if(d>maxt) break;
+      }
+      return clamp(res,0.,1.);
+    }
+
+    // simple plane reflection
+    vec3 reflectFloor(vec3 ro, vec3 rd, float t, vec3 fogCol){
+      if (rd.y>=-1e-4) return vec3(0.);
+      float hit = -ro.y/rd.y;
+      if (hit<=0.) return vec3(0.);
+      vec3 pos = ro + rd*hit;
+      // only reflect “above” the floor horizon
+      vec3 rro = pos + vec3(0.,0.002,0.);
+      vec3 rrd = vec3(rd.x, -rd.y, rd.z);
+
+      vec3 rp; int id; float d = march(rro, rrd, t, rp, id);
+      if (d<0.0) return vec3(0.);
+      vec3 rn = calcNormal(rp,t);
+      vec3 L = normalize(vec3(0.6,1.0,-0.35));
+      float diff = max(dot(rn,L),0.0);
+      float sh = softShadow(rp+rn*0.01, L, 0.02, 8.0, 10.0, t);
+      float spec = pow(max(dot(reflect(-L, rn), normalize(-rrd)), 0.0), 36.0);
+      vec3 base = mix(uWarm, uCool, 0.5 + 0.5*sin(t*0.1));
+      vec3 col = base*(0.12 + 0.88*diff*sh) + spec*0.25;
+      float fog = smoothstep(uFogNear, uFogFar, length(rp - rro));
+      return mix(col, fogCol, fog*0.6);
+    }
+
+    vec3 grade(vec3 c){
+      c = max(vec3(0.0), c - 0.004);
+      c = (c*(6.2*c + .5)) / (c*(6.2*c + 1.7) + 0.06);
+      return pow(c, vec3(0.95));
+    }
+
+    void main(){
+      vec2 uv = vUv*2.0 - 1.0;
+      uv.x *= iResolution.x / iResolution.y;
+
+      // calm camera parallax
+      vec2 pxy = (iPointer - 0.5)*2.0;
+      float yaw = pxy.x * ${MOTION.parallax.toFixed(2)};
+      float pit = pxy.y * ${MOTION.parallax.toFixed(2)};
+
+      vec3 ro = vec3(0.0, 0.28, -uCamZ);
+      ro.xz = rot(yaw)*ro.xz; ro.yz = rot(pit)*ro.yz;
+      vec3 ta = vec3(0.0, 0.22, 0.0);
+      vec3 ww = normalize(ta-ro);
+      vec3 uu = normalize(cross(vec3(0,1,0), ww));
+      vec3 vv = cross(ww, uu);
+      vec3 rd = normalize(uv.x*uu + uv.y*vv + 1.65*ww);
+
+      // march
+      vec3 pos; int id;
+      float d = march(ro, rd, iTime, pos, id);
+      vec3 col = uFogCol;
+
+      if (d>0.0){
+        vec3 n = calcNormal(pos,iTime);
+        vec3 L = normalize(vec3(0.6, 1.0, -0.35));
+        float diff = max(dot(n,L),0.0);
+        float sh = softShadow(pos+n*0.01, L, 0.02, 8.0, 10.0, iTime);
+        float spec = pow(max(dot(reflect(-L,n), -rd), 0.0), 28.0);
+
+        vec3 base = mix(uWarm, uCool, 0.5 + 0.5*sin(iTime*0.1));
+
+        // material tweak: floor vs portal
+        if (id==1) base = mix(uFloorCol, base*0.5, 0.12);
+
+        vec3 lit = base*(0.15 + 0.85*diff*sh) + spec*0.22;
+
+        // floor reflection contribution if we hit the plane
+        vec3 refl = vec3(0.0);
+        if (id==1) refl = reflectFloor(ro, rd, iTime, uFogCol) * 0.55;
+
+        col = lit + refl;
+
+        // fog
+        float fog = smoothstep(uFogNear, uFogFar, length(pos-ro));
+        col = mix(col, uFogCol, fog);
       }
 
-      // Signed distance primitives
-      float sdSphere(vec3 p, float r){ return length(p)-r; }
-      float sdTorus(vec3 p, vec2 t){
-        vec2 q = vec2(length(p.xz)-t.x, p.y);
-        return length(q)-t.y;
-      }
-      float sdCapsule(vec3 p, vec3 a, vec3 b, float r){
-        vec3 pa = p-a, ba = b-a;
-        float h = clamp(dot(pa,ba)/dot(ba,ba), 0.0, 1.0);
-        return length(pa - ba*h) - r;
-      }
-      float opSmoothUnion( float d1, float d2, float k ){
-        float h = clamp(0.5 + 0.5*(d2-d1)/k, 0.0, 1.0);
-        return mix( d2, d1, h ) - k*h*(1.0-h);
-      }
+      // filmic tonemap
+      col = grade(col * uExposure);
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `,
+  depthTest: false,
+  depthWrite: false,
+  transparent: false
+});
 
-      // “Sculptural arch”: a capsule arc blended with torus rings
-      float mapArch(vec3 p, float t){
-        // slow ambience
-        float yaw   = ${MOTION.turn.toFixed(3)} * t;
-        p.xz = rot(yaw) * p.xz;
-
-        // subtle “breathe” deformation
-        float b = 1.0 + ${MOTION.breathe.toFixed(3)} * 0.07 * sin(t*0.7);
-        p *= b;
-
-        // main arc (capsule chain)
-        float c1 = sdCapsule(p, vec3(-1.2,0.6,0.0), vec3(1.2,0.6,0.0), 0.28);
-        float c2 = sdCapsule(p, vec3(-1.2,0.0,0.0), vec3(-1.2,0.6,0.0), 0.22);
-        float c3 = sdCapsule(p, vec3( 1.2,0.0,0.0), vec3( 1.2,0.6,0.0), 0.22);
-        float arch = min(min(c1,c2),c3);
-
-        // decorative rings (torus “bracelets”)
-        float ring1 = sdTorus(p + vec3(0.0,0.42,0.0), vec2(1.35, 0.07));
-        float ring2 = sdTorus(p + vec3(0.0,0.18,0.0), vec2(1.46, 0.05));
-        float ring  = opSmoothUnion(ring1, ring2, 0.08);
-
-        // inner stone (sphere)
-        float gem = sdSphere(p + vec3(0.0,0.28,0.0), 0.36);
-
-        // combine
-        float shape = opSmoothUnion(arch, ring, 0.12);
-        shape = min(shape, gem);
-
-        return shape;
-      }
-
-      float mapFloor(vec3 p){ return p.y + 0.001; } // plane at y = -0.001 (slight lift)
-
-      // Scene SDF
-      float mapScene(vec3 p, float t, out int mID){
-        // 0: arch, 1: floor
-        float dArch = mapArch(p, t);
-        float dFloor = mapFloor(p);
-        if (dArch < dFloor){ mID = 0; return dArch; }
-        mID = 1; return dFloor;
-      }
-
-      vec3 calcNormal(vec3 p, float t){
-        vec2 e = vec2(0.001, 0.0);
-        int junk;
-        float d = mapScene(p, t, junk);
-        vec3 n = d - vec3(
-          mapScene(p - vec3(e.x, e.y, e.y), t, junk),
-          mapScene(p - vec3(e.y, e.x, e.y), t, junk),
-          mapScene(p - vec3(e.y, e.y, e.x), t, junk)
-        );
-        return normalize(n);
-      }
-
-      float march(vec3 ro, vec3 rd, float t, out vec3 p, out int mID){
-        float dist = 0.0;
-        for (int i=0; i<MAX_STEPS; i++){
-          p = ro + rd*dist;
-          float d = mapScene(p, t, mID);
-          if (d < SURF_EPS) return dist;
-          dist += d * 0.85;
-          if (dist > FAR_CLIP) break;
-        }
-        return -1.0;
-      }
-
-      float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k, float t){
-        float res = 1.0;
-        float ph = 1e10;
-        float dist = mint;
-        for (int i=0; i<64; i++){
-          vec3 pos = ro + rd*dist;
-          int m; float h = mapScene(pos, t, m);
-          if (h < 0.0008) return 0.0;
-          float y = h*h/(2.0*ph);
-          float d = sqrt(max(h*h - y*y, 0.0));
-          res = min(res, k*d/max(0.0, dist-y));
-          ph = h;
-          dist += clamp(h, 0.02, 0.12);
-          if (dist > maxt) break;
-        }
-        return clamp(res, 0.0, 1.0);
-      }
-
-      // Simple plane reflection for the floor
-      vec3 reflectFloor(vec3 ro, vec3 rd, float t){
-        // intersect plane y=0
-        float denom = rd.y;
-        if (abs(denom) < 1e-3) return vec3(0.0);
-        float hit = -(ro.y)/denom;
-        if (hit <= 0.0) return vec3(0.0);
-
-        vec3 pos = ro + rd*hit;
-        if (pos.y > 0.001) return vec3(0.0); // only below horizon
-        // reflect ray about plane normal (0,1,0)
-        vec3 rro = pos + vec3(0.0, 0.001, 0.0);
-        vec3 rrd = vec3(rd.x, -rd.y, rd.z);
-
-        vec3 rp; int rm;
-        float d = march(rro, rrd, t, rp, rm);
-        if (d<0.0) return vec3(0.0);
-
-        vec3 rn = calcNormal(rp, t);
-        vec3 L  = normalize(vec3(0.6,1.0,-0.4));
-        float diff = clamp(dot(rn, L), 0.0, 1.0);
-        float sh = softShadow(rp + rn*0.01, L, 0.02, 8.0, 10.0, t);
-        float spec = pow(clamp(dot(reflect(-L, rn), normalize(-rrd)), 0.0, 1.0), 32.0);
-
-        vec3 base = mix(uAccentA, uAccentB, 0.5 + 0.5*sin(t*0.15));
-        vec3 col  = (base * (0.15 + 0.85*diff*sh)) + spec*0.35;
-        // a touch of distance fog in reflection
-        float f = smoothstep(uFogNear, uFogFar, length(rp - rro));
-        col = mix(col, uFogCol, f*0.6);
-        return col;
-      }
-
-      void main(){
-        // pixel coords & aspect
-        vec2 uv = vUv*2.0 - 1.0;
-        uv.x *= iResolution.x / iResolution.y;
-
-        // camera from pointer (subtle parallax)
-        vec2 pxy = (iPointer - 0.5)*2.0;
-        float camYaw = pxy.x * ${MOTION.parallax.toFixed(2)};
-        float camPitch = pxy.y * ${MOTION.parallax.toFixed(2)};
-
-        // camera basis
-        vec3 ro = vec3(0.0, 0.25, -uCamZ);
-        // rotate camera
-        ro.xz = rot(camYaw) * ro.xz;
-        ro.yz = rot(camPitch) * ro.yz;
-
-        vec3 ta = vec3(0.0, 0.2, 0.0);
-        vec3 ww = normalize(ta - ro);
-        vec3 uu = normalize(cross(vec3(0,1,0), ww));
-        vec3 vv = cross(ww, uu);
-        vec3 rd = normalize(uv.x*uu + uv.y*vv + 1.7*ww);
-
-        // main march
-        vec3 pos; int mID;
-        float t = march(ro, rd, iTime, pos, mID);
-
-        vec3 col = uFogCol;
-        if (t>0.0){
-          vec3 n = calcNormal(pos, iTime);
-          vec3 L = normalize(vec3(0.6,1.0,-0.4));
-          float diff = clamp(dot(n, L), 0.0, 1.0);
-          float sh = softShadow(pos + n*0.01, L, 0.02, 8.0, 10.0, iTime);
-          float spec = pow(clamp(dot(reflect(-L, n), -rd), 0.0, 1.0), 24.0);
-
-          // base albedo: warm/cool blend
-          vec3 base = mix(uAccentA, uAccentB, 0.5 + 0.5*sin(iTime*0.15));
-          // different material response for floor vs arch
-          if (mID == 1){
-            base = mix(uFloorCol, base*0.6, 0.16); // mostly floor color
-          }
-
-          vec3 lit = base * (0.15 + 0.85*diff*sh) + spec*0.25;
-
-          // mirror floor contribution
-          vec3 refl = vec3(0.0);
-          if (mID == 1){
-            refl = reflectFloor(ro, rd, iTime) * 0.55;
-          }
-
-          col = lit + refl;
-
-          // distance fog
-          float fog = smoothstep(uFogNear, uFogFar, length(pos - ro));
-          col = mix(col, uFogCol, fog);
-        }
-
-        // tone map
-        col = grade(col * uExposure);
-        gl_FragColor = vec4(col, 1.0);
-      }
-    `,
-    depthTest: false,
-    depthWrite: false
-  })
-);
+const quad = new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat);
 scene.add(quad);
 
-// ---------- Interaction ----------
+// -------- Interaction (stable) --------
 const state = {
   pointer: new THREE.Vector2(0.5,0.5),
-  targetCamZ: MOTION.cameraBaseZ
+  targetZ: MOTION.baseZ
 };
-function onPointer(e){
+function setPointer(e){
   const rect = mount.getBoundingClientRect();
   const x = ('touches' in e) ? e.touches[0].clientX : e.clientX;
   const y = ('touches' in e) ? e.touches[0].clientY : e.clientY;
-  state.pointer.set((x-rect.left)/rect.width, (y-rect.top)/rect.height);
+  state.pointer.set(
+    THREE.MathUtils.clamp((x-rect.left)/rect.width, 0, 1),
+    THREE.MathUtils.clamp((y-rect.top)/rect.height, 0, 1)
+  );
 }
-mount.addEventListener('pointermove', onPointer, { passive:true });
-mount.addEventListener('touchmove', onPointer,   { passive:true });
-mount.addEventListener('pointerdown', onPointer, { passive:true });
-mount.addEventListener('touchstart', onPointer,  { passive:true });
+mount.addEventListener('pointermove', setPointer, { passive:true });
+mount.addEventListener('touchmove',   setPointer, { passive:true });
+mount.addEventListener('pointerdown', setPointer, { passive:true });
+mount.addEventListener('touchstart',  setPointer, { passive:true });
 
 mount.addEventListener('wheel', (e)=>{
-  state.targetCamZ += e.deltaY * MOTION.scrollScale;
-  state.targetCamZ = THREE.MathUtils.clamp(state.targetCamZ, MOTION.cameraMinZ, MOTION.cameraMaxZ);
+  state.targetZ += e.deltaY * MOTION.scrollScale;
+  state.targetZ = THREE.MathUtils.clamp(state.targetZ, MOTION.minZ, MOTION.maxZ);
 }, { passive:true });
 
-// ---------- Resize ----------
+// -------- Resize --------
 const ro = new ResizeObserver(()=>{
   const W = mount.clientWidth, H = mount.clientHeight || Math.round(W/(16/9));
-  renderer.setSize(W,H);
-  quad.material.uniforms.iResolution.value.set(W,H,1);
+  renderer.setSize(W, H);
+  uniforms.iResolution.value.set(W,H,1);
 });
 ro.observe(mount);
 
-// ---------- Animate ----------
+// -------- Animate (ease everything) --------
 const clock = new THREE.Clock();
 function tick(){
   const t = clock.getElapsedTime();
-  quad.material.uniforms.iTime.value = t;
+  uniforms.iTime.value = t;
 
-  // smooth camera dolly
-  const z = quad.material.uniforms.uCamZ.value;
-  quad.material.uniforms.uCamZ.value = z + (state.targetCamZ - z) * 0.08;
+  // ease dolly
+  const z = uniforms.uCamZ.value;
+  uniforms.uCamZ.value = z + (state.targetZ - z)*0.08;
 
   // pointer
-  quad.material.uniforms.iPointer.value.copy(state.pointer);
+  uniforms.iPointer.value.copy(state.pointer);
 
   renderer.render(scene, camera);
   requestAnimationFrame(tick);
