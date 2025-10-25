@@ -41,7 +41,12 @@
 
     /* Scene block */
     #showcase{padding:16px 0 50px}
-    #heroScene{aspect-ratio:16/9;background:#0e0f12;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center;overflow:hidden}
+    #heroScene{
+      aspect-ratio:16/9; /* modern browsers */
+      background:#0e0f12;border:1px solid var(--line);border-radius:16px;
+      display:grid;place-items:center;overflow:hidden;
+      min-height: 260px; /* fallback so it’s never 0px tall */
+    }
     #heroScene p{color:#8b8d94;font-size:14px}
 
     /* Grid + Cards */
@@ -96,7 +101,7 @@
       <p class="lead">(hidden)</p>
     </section>
 
-    <!-- THREE.JS SHOWCASE (auto-load, also responds to tap/scroll) -->
+    <!-- THREE.JS SHOWCASE -->
     <section id="showcase" class="container">
       <div id="heroScene"><p>Initializing…</p></div>
     </section>
@@ -106,7 +111,6 @@
       <h2>Music</h2>
       <p class="lead">Releases under <strong>DEGH</strong>.</p>
 
-      <!-- Trilogy grid -->
       <div class="grid" style="margin-top:18px;">
         <!-- Declan Emphasized A Movie -->
         <article class="card col-4 reveal">
@@ -158,7 +162,7 @@
         </article>
       </div>
 
-      <!-- Latest Music Video (YouTube embed) -->
+      <!-- Latest Music Video -->
       <div class="grid" style="margin-top:28px;">
         <article class="card col-12 reveal">
           <div class="card-body">
@@ -211,7 +215,7 @@
       </div>
     </section>
 
-    <!-- ACTING (resume + headshots/photos placeholders) -->
+    <!-- ACTING -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
       <p class="lead">Resume, headshots, and production stills.</p>
@@ -312,7 +316,7 @@
           </div>
         </article>
 
-        <!-- SLIME NO B (Young Thug-only remake) -->
+        <!-- SLIME NO B -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
@@ -328,10 +332,9 @@
           </div>
         </article>
 
-        <!-- MORE LIFE (without Aubrey) -->
+        <!-- MORE LIFE -->
         <article class="card col-6 reveal">
           <div class="thumb">
-            <!-- TODO: replace with the direct image/video URL from the Imgur gallery when provided -->
             <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
             <span class="tag">Project</span>
           </div>
@@ -347,7 +350,7 @@
       </div>
     </section>
 
-    <!-- WRITING: 4-up grid -->
+    <!-- WRITING -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
       <p class="lead">Poems, blurbs, fragments.</p>
@@ -359,7 +362,7 @@
       </div>
     </section>
 
-    <!-- CONTACT with orange buttons -->
+    <!-- CONTACT -->
     <section id="contact" class="section container">
       <h2>Contact</h2>
       <p class="lead">Bookings, collabs, or just to say hi.</p>
@@ -382,11 +385,9 @@
     <p>© <span id="year"></span> DAECLAN.COM</p>
   </footer>
 
-  <!-- Year + Scrollspy (unchanged) -->
+  <!-- Year + Scrollspy -->
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-
-    // Scrollspy
     const secs=[...document.querySelectorAll('main section[id]')];
     const links=[...document.querySelectorAll('header nav a')];
     const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
@@ -396,108 +397,150 @@
     secs.forEach(s=>io.observe(s));
   </script>
 
-  <!-- THREE MUST LOAD FIRST -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
+  <!-- Robust Three.js loader + scene bootstrap -->
+  <script>
+  (function(){
+    const mount = document.getElementById('heroScene');
+    if (!mount) return;
 
-  <!-- Wormhole: ROYGBIV neon rings, forward-only, spin on click -->
- <script type="module">
-import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js';
+    // 1) Try local paths first (edit these to match your repo structure)
+    const localPaths = [
+      '/vendor/three/0.161.0/build/three.min.js',
+      '/vendor/three/build/three.min.js',
+      '/three/three.min.js'
+    ];
+    // 2) CDN fallbacks
+    const cdnPaths = [
+      'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js',
+      'https://unpkg.com/three@0.161.0/build/three.min.js'
+    ];
+    const sources = [...localPaths, ...cdnPaths];
 
-const mount = document.getElementById('heroScene');
-if (!mount) throw new Error('heroScene not found');
-
-let booted = false;
-function start(){
-  if (booted) return; booted = true;
-  mount.textContent = '';
-
-  const W = mount.clientWidth;
-  const H = mount.clientHeight || Math.round(W/(16/9));
-
-  const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.setSize(W, H);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.08;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  mount.appendChild(renderer.domElement);
-
-  const scene = new THREE.Scene();
-  const bg = new THREE.Color(0x05060a);
-  scene.background = bg;
-  scene.fog = new THREE.FogExp2(bg.getHex(), 0.02);
-
-  const camera = new THREE.PerspectiveCamera(72, W/H, 0.03, 1000);
-  camera.position.set(0,0,0);
-
-  const GROUP = new THREE.Group();
-  scene.add(GROUP);
-
-  const RINGS=420, SPACING=0.58, RADIUS=3.2, THICK=0.075, SPEED=14.0;
-  const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
-  const mat = new THREE.MeshStandardMaterial({
-    color:0x0b0c12, roughness:0.25, metalness:0.65,
-    emissive:0x000000, emissiveIntensity:2.4, vertexColors:true
-  });
-  const mesh = new THREE.InstancedMesh(geo, mat, RINGS);
-  mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  GROUP.add(mesh);
-
-  const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
-  const PAL=HEX.map(h=> new THREE.Color(h));
-  const M = new THREE.Matrix4(), tmp = new THREE.Vector3();
-
-  function place(i,z){ M.identity(); M.setPosition(0,0,z); mesh.setMatrixAt(i,M); }
-  function colorAtDepth(i,z){ const step=Math.floor((-z)/SPACING); const idx=((step%PAL.length)+PAL.length)%PAL.length; mesh.setColorAt(i,PAL[idx]); }
-
-  for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
-  mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-
-  scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
-  const core = new THREE.PointLight(0xffffff, 0.5, 14, 2.0); core.position.set(0,0,-2); scene.add(core);
-
-  let spinVel=0, spinRemain=0;
-  const SPIN_TARGET = Math.PI*2;
-  function spinOnce(){ spinRemain += SPIN_TARGET; }
-  mount.addEventListener('click', spinOnce, { passive:true });
-  mount.addEventListener('touchstart', spinOnce, { passive:true });
-
-  const ro = new ResizeObserver(()=>{
-    const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
-    renderer.setSize(w,h);
-    camera.aspect = w/h; camera.updateProjectionMatrix();
-    scene.fog.density = THREE.MathUtils.clamp(0.02*(1920/w), 0.018, 0.035);
-  });
-  ro.observe(mount);
-
-  let last = performance.now();
-  function advance(dt){
-    const dz = SPEED*dt; GROUP.position.z += dz;
-    for(let i=0;i<RINGS;i++){
-      mesh.getMatrixAt(i,M); tmp.setFromMatrixPosition(M); tmp.z += dz;
-      if (tmp.z > SPACING){ tmp.z -= RINGS*SPACING; place(i,tmp.z); colorAtDepth(i,tmp.z); }
-      else { M.setPosition(0,0,tmp.z); mesh.setMatrixAt(i,M); }
+    function loadThree(i=0){
+      if (window.THREE) return boot();
+      if (i >= sources.length){
+        mount.innerHTML = '<p style="color:#f99">Failed to load Three.js</p>';
+        return;
+      }
+      const s = document.createElement('script');
+      s.src = sources[i];
+      s.onload = () => { window.THREE ? boot() : loadThree(i+1); };
+      s.onerror = () => { s.remove(); loadThree(i+1); };
+      document.head.appendChild(s);
     }
-    mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-  }
-  function updateSpin(dt){
-    if (spinRemain>0){ const accel=6, maxVel=4; const desired=Math.min(maxVel, Math.sqrt(2*accel*spinRemain));
-      spinVel += (desired - spinVel) * Math.min(1, dt*6);
-      const step = Math.min(spinVel*dt, spinRemain);
-      GROUP.rotation.z += step; spinRemain -= step;
-    } else { spinVel *= Math.pow(0.001, dt); }
-  }
-  function animate(){
-    requestAnimationFrame(animate);
-    const now = performance.now(); const dt = Math.min((now-last)/1000, 0.033); last=now;
-    advance(dt); updateSpin(dt);
-    renderer.render(scene, camera);
-  }
-  animate();
-}
 
-document.addEventListener('DOMContentLoaded', start);
-</script>
+    function boot(){
+      // Avoid double-boot
+      if (boot.started) return; boot.started = true;
+      startScene();
+    }
 
+    function startScene(){
+      mount.textContent = '';
+
+      const W = mount.clientWidth;
+      const H = mount.clientHeight || Math.round(W/(16/9));
+
+      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+      renderer.setSize(W, H);
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.12;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      mount.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      const bg = new THREE.Color(0x05060a);
+      scene.background = bg;
+      scene.fog = new THREE.FogExp2(bg.getHex(), 0.018);
+
+      const camera = new THREE.PerspectiveCamera(72, W/H, 0.03, 1000);
+      camera.position.set(0,0,0);
+
+      const GROUP = new THREE.Group(); scene.add(GROUP);
+
+      // Tunnel params
+      const RINGS=500, SPACING=0.58, RADIUS=3.3, THICK=0.08, SPEED=14.0;
+
+      // Geometry + material
+      const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
+      const mat = new THREE.MeshStandardMaterial({
+        color:0x0b0c12, roughness:0.25, metalness:0.65,
+        emissive:0x000000, emissiveIntensity:2.7, vertexColors:true
+      });
+      const mesh = new THREE.InstancedMesh(geo, mat, RINGS);
+      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+      GROUP.add(mesh);
+
+      // ROYGBIV palette repeat
+      const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
+      const PAL=HEX.map(h=> new THREE.Color(h));
+      const M = new THREE.Matrix4(), TMP = new THREE.Vector3();
+      function place(i,z){ M.identity(); M.setPosition(0,0,z); mesh.setMatrixAt(i,M); }
+      function colorAtDepth(i,z){
+        const step=Math.floor((-z)/SPACING);
+        const idx=((step%PAL.length)+PAL.length)%PAL.length;
+        mesh.setColorAt(i, PAL[idx]);
+      }
+      for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
+      mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+
+      // Lighting
+      scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
+      const core = new THREE.PointLight(0xffffff, 0.55, 16, 2.0);
+      core.position.set(0,0,-2);
+      scene.add(core);
+
+      // Click/tap -> one axial spin with easing
+      let spinVel=0, spinRemain=0; const SPIN_TARGET=Math.PI*2;
+      function spinOnce(){ spinRemain += SPIN_TARGET; }
+      mount.addEventListener('click',  spinOnce, {passive:true});
+      mount.addEventListener('touchstart', spinOnce, {passive:true});
+
+      // Resize
+      const ro = new ResizeObserver(()=>{
+        const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
+        renderer.setSize(w,h);
+        camera.aspect = w/h; camera.updateProjectionMatrix();
+        scene.fog.density = THREE.MathUtils.clamp(0.018*(1920/w), 0.016, 0.03);
+      });
+      ro.observe(mount);
+
+      // Animate
+      let last = performance.now();
+      function advance(dt){
+        const dz = SPEED*dt; GROUP.position.z += dz;
+        for(let i=0;i<RINGS;i++){
+          mesh.getMatrixAt(i,M); TMP.setFromMatrixPosition(M); TMP.z += dz;
+          if (TMP.z > SPACING){ TMP.z -= RINGS*SPACING; place(i,TMP.z); colorAtDepth(i,TMP.z); }
+          else { M.setPosition(0,0,TMP.z); mesh.setMatrixAt(i,M); }
+        }
+        mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      }
+      function updateSpin(dt){
+        if (spinRemain>0){
+          const accel=6, maxVel=4;
+          const desired=Math.min(maxVel, Math.sqrt(2*accel*spinRemain));
+          spinVel += (desired - spinVel) * Math.min(1, dt*6);
+          const step = Math.min(spinVel*dt, spinRemain);
+          GROUP.rotation.z += step; spinRemain -= step;
+        } else {
+          spinVel *= Math.pow(0.001, dt);
+        }
+      }
+      function animate(){
+        requestAnimationFrame(animate);
+        const now = performance.now(); const dt = Math.min((now-last)/1000, 0.033); last=now;
+        advance(dt); updateSpin(dt);
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    // Start after DOM ready
+    if (document.readyState === 'complete' || document.readyState === 'interactive') loadThree();
+    else document.addEventListener('DOMContentLoaded', loadThree);
+  })();
+  </script>
 </body>
 </html>
