@@ -396,95 +396,89 @@
   </script>
 
   <!-- NEW: working scene loader (same-origin imports, no CORS) -->
-  <script type="module">
-    const mount = document.getElementById('heroScene');
-    // Change this to wherever you uploaded the Three.js files on YOUR domain:
-    const BASE = '/vendor/three/0.161.0';
+ <script type="module">
+  // Pull modules from esm.sh (serves correct CORS + MIME)
+  import * as THREE from 'https://esm.sh/three@0.161.0/build/three.module.js';
+  import { WebGPURenderer } from 'https://esm.sh/three@0.161.0/examples/jsm/renderers/webgpu/WebGPURenderer.js';
+  import * as Nodes from 'https://esm.sh/three@0.161.0/examples/jsm/nodes/Nodes.js';
 
-    let THREE, WebGPURenderer, Nodes;
+  const mount = document.getElementById('heroScene');
+  mount.textContent = 'Initializing…';
+
+  // Basic scene that ALWAYS renders (WebGPU if possible, else WebGL)
+  const w = mount.clientWidth, h = mount.clientHeight || Math.round(mount.clientWidth/(16/9));
+  let renderer;
+  const canWebGPU = typeof navigator !== 'undefined' && 'gpu' in navigator;
+
+  if (canWebGPU) {
     try {
-      THREE = await import(`${BASE}/build/three.module.js`);
-      const [wgpu, nodes] = await Promise.allSettled([
-        import(`${BASE}/examples/jsm/renderers/webgpu/WebGPURenderer.js`),
-        import(`${BASE}/examples/jsm/nodes/Nodes.js`)
-      ]);
-      WebGPURenderer = wgpu.status === 'fulfilled' ? wgpu.value.WebGPURenderer : null;
-      Nodes = nodes.status === 'fulfilled' ? nodes.value : null;
-    } catch (e) {
-      mount.innerHTML = `<p>Failed to load modules. Check /vendor/three paths.</p>`;
-      throw e;
-    }
-
-    const w = mount.clientWidth, h = mount.clientHeight || Math.round(mount.clientWidth/(16/9));
-
-    // Prefer WebGPU, fall back to WebGL
-    let renderer;
-    const canWebGPU = WebGPURenderer && 'gpu' in navigator;
-    if (canWebGPU) {
-      try {
-        renderer = new WebGPURenderer({ antialias:true, alpha:true });
-        if (renderer.init) await renderer.init();
-      } catch {
-        renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
-      }
-    } else {
+      renderer = new WebGPURenderer({ antialias:true, alpha:true });
+      if (renderer.init) await renderer.init(); // WebGPU requires init()
+    } catch {
       renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
     }
+  } else {
+    renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
+  }
 
-    renderer.setSize(w,h);
-    renderer.setPixelRatio(Math.min(devicePixelRatio,2));
-    mount.textContent = '';
-    mount.appendChild(renderer.domElement);
+  renderer.setSize(w,h);
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  mount.textContent = '';
+  mount.appendChild(renderer.domElement);
 
-    // Basic scene that always renders (so it never looks blank)
-    const scene = new THREE.Scene(); scene.background = new THREE.Color(0x0a0a0a);
-    const camera = new THREE.PerspectiveCamera(50, w/h, 0.1, 100); camera.position.set(0,0.4,3.8);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a0a0a);
+  const camera = new THREE.PerspectiveCamera(50, w/h, 0.1, 100);
+  camera.position.set(0,0.4,3.8);
 
-    // Lights
-    const amb = new THREE.AmbientLight(0xffffff,.3);
-    const key = new THREE.PointLight(0xffb566,1.3,8); key.position.set(1.6,1.2,2.4);
-    const rim = new THREE.PointLight(0xff6a00,0.6,10); rim.position.set(-2.0,-1.2,-1.5);
-    scene.add(amb,key,rim);
+  // Lights
+  const amb = new THREE.AmbientLight(0xffffff, .3);
+  const key = new THREE.PointLight(0xffb566, 1.3, 8); key.position.set(1.6, 1.2, 2.4);
+  const rim = new THREE.PointLight(0xff6a00, 0.6, 10); rim.position.set(-2.0, -1.2, -1.5);
+  scene.add(amb, key, rim);
 
-    // Geometry
-    const geo = new THREE.TorusKnotGeometry(0.9,0.28,320,48);
-    const mat = new THREE.MeshStandardMaterial({ color:0xff7a18, emissive:0x2a1200, roughness:0.35, metalness:0.35 });
-    const knot = new THREE.Mesh(geo, mat); scene.add(knot);
+  // Geometry
+  const geo = new THREE.TorusKnotGeometry(0.9, 0.28, 320, 48);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xff7a18, emissive: 0x2a1200, roughness: 0.35, metalness: 0.35 });
+  const knot = new THREE.Mesh(geo, mat);
+  scene.add(knot);
 
-    // Optional: small node-based color shift if nodes + WebGPU are available
-    if (Nodes && renderer.constructor.name === 'WebGPURenderer') {
-      try {
-        const { float, sin, add, MeshStandardNodeMaterial } = Nodes;
-        const t = float(0);
-        const nodeMat = new MeshStandardNodeMaterial();
-        // safe playful shift; if it misbehaves we fall back silently
-        nodeMat.colorNode = add(0.06, sin(t.mul(0.3)));
-        knot.material = nodeMat;
-        knot.userData._nodeTime = t;
-      } catch {}
+  // Optional: tiny node-based hue wiggle if WebGPU + Nodes are present
+  try {
+    if (renderer.constructor.name === 'WebGPURenderer' && Nodes?.MeshStandardNodeMaterial) {
+      const { float, sin, add, MeshStandardNodeMaterial } = Nodes;
+      const t = float(0);
+      const nodeMat = new MeshStandardNodeMaterial();
+      nodeMat.colorNode = add(0.06, sin(t.mul(0.3))); // safe simple modulation
+      knot.material = nodeMat;
+      knot.userData._nodeTime = t;
     }
+  } catch {}
 
-    // Resize
-    const ro = new ResizeObserver(()=>{ const W=mount.clientWidth, H=mount.clientHeight || Math.round(W/(16/9)); camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H); });
-    ro.observe(mount);
+  // Resize
+  const ro = new ResizeObserver(()=>{
+    const W=mount.clientWidth, H=mount.clientHeight || Math.round(W/(16/9));
+    camera.aspect=W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H);
+  });
+  ro.observe(mount);
 
-    // Scroll-reactive camera dolly
-    let targetZ = camera.position.z;
-    mount.addEventListener('wheel', (e)=>{ targetZ += e.deltaY * 0.003; }, { passive:true });
-    function approach(a,b,f=0.08){ return a + (b-a)*f; }
+  // Scroll dolly
+  let targetZ = camera.position.z;
+  mount.addEventListener('wheel', (e)=>{ targetZ += e.deltaY * 0.003; }, { passive:true });
+  const lerp = (a,b,f)=>a+(b-a)*f;
 
-    // Animate
-    const clock = new THREE.Clock();
-    function tick(){
-      const t = clock.getElapsedTime();
-      knot.rotation.x = t*.25; knot.rotation.y = t*.35;
-      key.intensity = 1.1 + Math.sin(t*1.6)*.2;
-      if (knot.userData._nodeTime) knot.userData._nodeTime.value = t;
-      camera.position.z = approach(camera.position.z, targetZ, 0.08);
-      renderer.render(scene, camera);
-      requestAnimationFrame(tick);
-    }
-    tick();
-  </script>
+  // Animate
+  const clock = new THREE.Clock();
+  function tick(){
+    const t = clock.getElapsedTime();
+    knot.rotation.x = t*.25; knot.rotation.y = t*.35;
+    key.intensity = 1.1 + Math.sin(t*1.6)*.2;
+    if (knot.userData._nodeTime) knot.userData._nodeTime.value = t;
+    camera.position.z = lerp(camera.position.z, targetZ, 0.08);
+    renderer.render(scene, camera);
+    requestAnimationFrame(tick);
+  }
+  tick();
+</script>
 </body>
 </html>
