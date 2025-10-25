@@ -397,13 +397,13 @@
 
   <!-- NEW: working scene loader (same-origin imports, no CORS) -->
 <script type="module">
-  // Single dependency with correct CORS+MIME:
+  // One import only (pure ES module served with correct CORS/MIME)
   import * as THREE from 'https://esm.sh/three@0.161.0/build/three.module.js';
 
   const mount = document.getElementById('heroScene');
   if (mount) mount.textContent = 'Initializing…';
 
-  // renderer (WebGL only = least fragile)
+  // Renderer (WebGL) — reliable and fast
   const w = mount.clientWidth;
   const h = mount.clientHeight || Math.round(w / (16/9));
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -412,47 +412,242 @@
   mount.textContent = '';
   mount.appendChild(renderer.domElement);
 
-  // scene + camera
+  // Minimal scene: full-screen quad + custom raymarch shader
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0a0a0a);
-  const camera = new THREE.PerspectiveCamera(50, w / h, 0.1, 100);
-  camera.position.set(0, 0.4, 3.8);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-  // lights
-  const amb = new THREE.AmbientLight(0xffffff, 0.3);
-  const key = new THREE.PointLight(0xffb566, 1.3, 8); key.position.set(1.6, 1.2, 2.4);
-  const rim = new THREE.PointLight(0xff6a00, 0.6, 10); rim.position.set(-2.0, -1.2, -1.5);
-  scene.add(amb, key, rim);
+  const quad = new THREE.Mesh(
+    new THREE.PlaneGeometry(2, 2),
+    new THREE.ShaderMaterial({
+      uniforms: {
+        iTime: { value: 0 },
+        iResolution: { value: new THREE.Vector3(w, h, 1) },
+        iMouse: { value: new THREE.Vector2(0,0) },
+        iScroll: { value: 0 },    // scroll-driven dolly
+        iDPR: { value: Math.min(devicePixelRatio, 2) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main(){
+          vUv = uv;
+          gl_Position = vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
 
-  // mesh
-  const geo = new THREE.TorusKnotGeometry(0.9, 0.28, 320, 48);
-  const mat = new THREE.MeshStandardMaterial({ color: 0xff7a18, emissive: 0x2a1200, roughness: 0.35, metalness: 0.35 });
-  const knot = new THREE.Mesh(geo, mat);
-  scene.add(knot);
+        varying vec2 vUv;
+        uniform vec3 iResolution;
+        uniform float iTime;
+        uniform float iScroll;
+        uniform vec2 iMouse;
+        uniform float iDPR;
 
-  // resize
-  const ro = new ResizeObserver(() => {
+        // --- small utility ---
+        #define PI 3.14159265359
+        float hash11(float p){ p = fract(p * 0.1031); p *= p + 33.33; p *= p + p; return fract(p); }
+        mat2 rot(float a){ float s=sin(a), c=cos(a); return mat2(c,-s,s,c); }
+
+        // --- palette ---
+        vec3 palette(float t){
+          // neon magma-ish
+          vec3 a = vec3(0.55, 0.15, 0.9);
+          vec3 b = vec3(0.25, 0.85, 0.35);
+          vec3 c = vec3(1.00, 0.33, 0.21);
+          vec3 d = vec3(0.20, 2.90, 0.15);
+          return a + b*cos(6.28318*(c*t + d));
+        }
+
+        // --- SDF primitives ---
+        float sdSphere(vec3 p, float r){ return length(p) - r; }
+
+        // Gyroid-ish field (periodic minimal surface)
+        float gyroid(vec3 p, float k){
+          return abs(dot(sin(p), cos(p)))-k;
+        }
+
+        // Twist space
+        vec3 twist(vec3 p, float k){
+          float s = sin(k*p.y);
+          float c = cos(k*p.y);
+          mat2 r = mat2(c,-s,s,c);
+          p.xz = r * p.xz;
+          return p;
+        }
+
+        // Scene SDF: blend a sphere and a warped gyroid shell
+        float mapSDF(vec3 p, float t){
+          // world transforms
+          p.z += 2.0 + iScroll;              // dolly with scroll
+          p.xy *= rot(0.2*sin(t*0.3));       // slow global yaw
+          p = twist(p, 0.6 + 0.1*sin(t*0.7));
+
+          float s = sdSphere(p, 1.2 + 0.1*sin(t*0.5));
+          float g = gyroid(p*1.7 + vec3(0.0, t*0.3, 0.0), 0.23 + 0.05*sin(t*0.4));
+          // combine: sphere core, gyroid shell (take max to carve pattern)
+          float shell = max(s, -g*0.55);
+          return shell;
+        }
+
+        // normal via tetrahedral sampling
+        vec3 calcNormal(vec3 p, float t){
+          float e = 0.0015;
+          vec2 h = vec2(1.0,-1.0)*0.5773;
+          return normalize(
+            h.xyy*mapSDF(p + h.xyy*e, t) +
+            h.yyx*mapSDF(p + h.yyx*e, t) +
+            h.yxy*mapSDF(p + h.yxy*e, t) +
+            h.xxx*mapSDF(p + h.xxx*e, t)
+          );
+        }
+
+        // soft shadow
+        float softshadow(vec3 ro, vec3 rd, float mint, float maxt, float t, float k){
+          float res = 1.0;
+          float ph = 1e10;
+          for(float i=0.0; i<40.0; i++){
+            float h = mapSDF(ro + rd*t, iTime);
+            if(h<0.001) return 0.0;
+            float y = h*h/(2.0*ph);
+            float d = sqrt(max(h*h - y*y, 0.0));
+            res = min(res, k*d/max(0.0, t-y));
+            ph = h;
+            t += clamp(h, 0.02, 0.10);
+            if(t>maxt) break;
+          }
+          return clamp(res, 0.0, 1.0);
+        }
+
+        // ambient occlusion (cheap)
+        float ao(vec3 p, vec3 n){
+          float occ = 0.0;
+          float sca = 1.0;
+          for(int i=0;i<5;i++){
+            float h = 0.02 + 0.12*float(i)/4.0;
+            float d = mapSDF(p + n*h, iTime);
+            occ += (h - d) * sca;
+            sca *= 0.7;
+          }
+          return clamp(1.0 - 2.0*occ, 0.0, 1.0);
+        }
+
+        // raymarch
+        float march(vec3 ro, vec3 rd, out vec3 p){
+          float t = 0.0;
+          float d;
+          for (int i=0; i<128; i++){
+            p = ro + rd*t;
+            d = mapSDF(p, iTime);
+            if (d < 0.001) return t;
+            t += d*0.8; // step scale
+            if (t>30.0) break;
+          }
+          return -1.0;
+        }
+
+        void main(){
+          // normalized coords
+          vec2 uv = (vUv * 2.0 - 1.0);
+          uv.x *= iResolution.x / iResolution.y;
+
+          // interactive orbit from mouse (pixel coords in iMouse)
+          vec2 m = iMouse / iResolution.xy;
+          float yaw = (m.x-0.5) * 1.8;
+          float pitch = (m.y-0.5) * 1.0;
+
+          // camera setup
+          vec3 ro = vec3(0.0, 0.0, -3.5 - iScroll);      // dolly via scroll
+          vec3 ta = vec3(0.0, 0.0, 0.0);
+          // rotate camera by mouse
+          mat2 ry = rot(yaw);
+          mat2 rx = rot(pitch);
+          ro.xz = ry * ro.xz;
+          ro.yz = rx * ro.yz;
+          vec3 ww = normalize(ta - ro);
+          vec3 uu = normalize(cross(vec3(0,1,0), ww));
+          vec3 vv = cross(ww, uu);
+          vec3 rd = normalize(uv.x*uu + uv.y*vv + 1.8*ww);
+
+          // march
+          vec3 pos;
+          float t = march(ro, rd, pos);
+
+          // background
+          vec3 col = vec3(0.04, 0.05, 0.07);
+          if (t>0.0){
+            vec3 n = calcNormal(pos, iTime);
+            float diff = clamp(dot(n, normalize(vec3(0.6,0.8,-0.3))), 0.0, 1.0);
+            float occ = ao(pos, n);
+            float sh = softshadow(pos + n*0.01, normalize(vec3(0.6,0.8,-0.3)), 0.02, 8.0, 0.03, 10.0);
+
+            // “glow” band from gyroid value (fake emission)
+            float gy = abs(dot(sin(pos*1.8), cos(pos*1.8)));
+            float glow = smoothstep(0.18, 0.0, abs(gy - (0.23 + 0.05*sin(iTime*0.4))));
+            glow = pow(glow, 2.5);
+
+            vec3 base = palette(0.35 + 0.15*sin(iTime*0.2) + gy*0.15);
+            vec3 lit = base * (0.15 + 0.85*diff*sh) * occ;
+            vec3 emissive = base * (0.8 + 0.6*sin(iTime*0.7)) * glow;
+
+            // simple rim light
+            float rim = pow(1.0 - max(dot(n, -rd), 0.0), 3.0);
+            col = lit + emissive*1.2 + rim*0.25;
+
+            // fake bloom: threshold + spread
+            float b = smoothstep(0.9, 1.2, max(max(col.r,col.g),col.b));
+            col += b * vec3(0.9,0.5,0.2) * 0.35;
+          }
+
+          // tonemap + gamma
+          col = col / (1.0 + col);
+          col = pow(col, vec3(0.4545)); // gamma 2.2
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `,
+      transparent: true
+    })
+  );
+  scene.add(quad);
+
+  // Interactivity
+  const state = {
+    targetScroll: 0,
+    pointer: new THREE.Vector2()
+  };
+
+  // pointer tracking
+  function setMouse(e){
+    const rect = mount.getBoundingClientRect();
+    const x = ('touches' in e) ? e.touches[0].clientX : e.clientX;
+    const y = ('touches' in e) ? e.touches[0].clientY : e.clientY;
+    state.pointer.set(x - rect.left, y - rect.top);
+  }
+  mount.addEventListener('pointermove', setMouse, { passive:true });
+  mount.addEventListener('touchmove', setMouse, { passive:true });
+  mount.addEventListener('pointerdown', setMouse, { passive:true });
+  mount.addEventListener('touchstart', setMouse, { passive:true });
+
+  // scroll dolly (affects SDF camera z and parallax)
+  mount.addEventListener('wheel', (e)=>{ state.targetScroll += e.deltaY * 0.003; }, { passive:true });
+  const lerp = (a,b,f)=>a+(b-a)*f;
+
+  // Resize
+  const ro = new ResizeObserver(()=>{
     const W = mount.clientWidth;
     const H = mount.clientHeight || Math.round(W / (16/9));
-    camera.aspect = W / H;
-    camera.updateProjectionMatrix();
     renderer.setSize(W, H);
+    quad.material.uniforms.iResolution.value.set(W,H,1);
   });
   ro.observe(mount);
 
-  // scroll dolly
-  let targetZ = camera.position.z;
-  mount.addEventListener('wheel', e => { targetZ += e.deltaY * 0.003; }, { passive: true });
-  const lerp = (a, b, f) => a + (b - a) * f;
-
-  // animate
+  // Animate
   const clock = new THREE.Clock();
-  function tick() {
+  function tick(){
     const t = clock.getElapsedTime();
-    knot.rotation.x = t * 0.25;
-    knot.rotation.y = t * 0.35;
-    key.intensity = 1.1 + Math.sin(t * 1.6) * 0.2;
-    camera.position.z = lerp(camera.position.z, targetZ, 0.08);
+    quad.material.uniforms.iTime.value = t;
+    quad.material.uniforms.iMouse.value.copy(state.pointer);
+    // smooth scroll target
+    quad.material.uniforms.iScroll.value = lerp(quad.material.uniforms.iScroll.value, state.targetScroll, 0.08);
     renderer.render(scene, camera);
     requestAnimationFrame(tick);
   }
