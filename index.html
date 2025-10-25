@@ -409,7 +409,7 @@ const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPref
 renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
 renderer.setSize(w, h);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.08;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 mount.textContent = '';
 mount.appendChild(renderer.domElement);
@@ -420,169 +420,154 @@ rt.texture.colorSpace = THREE.SRGBColorSpace;
 
 // ---------- Scene / Camera ----------
 const scene = new THREE.Scene();
-const bg = new THREE.Color(0x07080b);
+const bg = new THREE.Color(0x06070a);
 scene.background = bg;
-scene.fog = new THREE.FogExp2(bg.getHex(), 0.035);
+// gentle fog for depth but not so dense it clips
+scene.fog = new THREE.FogExp2(bg.getHex(), 0.028);
 
-const camera = new THREE.PerspectiveCamera(70, w/h, 0.05, 500);
-camera.position.set(0, 0, 0);
+const camera = new THREE.PerspectiveCamera(72, w/h, 0.03, 600);
+camera.position.set(0, 0, 0); // camera stays at origin looking down -Z
 
-// ---------- Look palette ----------
-const COLORS = {
-  core:   0x0b0c10,      // tunnel “metal”
-  glowA:  0xff7a18,      // warm rung glow
-  glowB:  0x7fb3ff,      // cool rung glow
-  fog:    bg.getHex()
-};
+// ---------- Tunnel of Rungs ----------
+const GROUP = new THREE.Group();
+scene.add(GROUP);
 
-// ---------- Tunnel of Rungs (instanced) ----------
-const GROUP = new THREE.Group(); scene.add(GROUP);
+// rotate the entire tunnel 90° so it feels turned (portrait/sideways)
+// (around Z so the ring orientation is rotated — motion still along -Z)
+GROUP.rotation.z = Math.PI * 0.5;
 
-// Each rung is a thin torus (ring). We instanced many, and recycle them as they pass.
-const RINGS = 280;                 // total instanced rings (enough for depth)
-const SPACING = 0.7;               // distance between rings
-const RADIUS = 2.2;                // tunnel radius
-const THICK  = 0.045;              // tube thickness
-const TWIST  = 0.65;               // helical twist factor
-const SPEED_BASE = 8.0;            // base forward speed (units/sec)
-let speed = SPEED_BASE;            // live speed (scroll to adjust)
-let zHead = 0;                     // how far we've traveled (for recycling)
+const RINGS = 340;                 // more rings to guarantee no gaps
+const SPACING = 0.64;              // tight spacing so recycling never shows a seam
+const RADIUS  = 2.0;
+const THICK   = 0.05;
+const TWIST   = 0.75;              // helical twist
+const BASE_SPEED = 16.0;           // fast default
+let speed = BASE_SPEED;
+let slowHold = false;              // pointer hold slows to 50%
+let zHead = 0;
 
-const ringGeo = new THREE.TorusGeometry(RADIUS, THICK, 10, 64);
+const ringGeo = new THREE.TorusGeometry(RADIUS, THICK, 12, 72);
 const ringMat = new THREE.MeshStandardMaterial({
-  color: COLORS.core,
-  roughness: 0.35,
-  metalness: 0.6,
-  emissive: new THREE.Color(COLORS.glowA),
-  emissiveIntensity: 1.8
+  color: 0x0e0f14, roughness: 0.35, metalness: 0.65,
+  emissive: 0x000000, emissiveIntensity: 2.0, vertexColors: true
 });
 const rings = new THREE.InstancedMesh(ringGeo, ringMat, RINGS);
 rings.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+rings.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(RINGS*3), 3);
+rings.geometry.setAttribute('instanceColor', rings.instanceColor);
 GROUP.add(rings);
 
-// Populate rings along -Z, helical twist & tint shift down the tunnel
-const tmpM = new THREE.Matrix4();
-const tmpC = new THREE.Color();
-for (let i = 0; i < RINGS; i++) {
-  const z = -i * SPACING;
-  const rot = i * TWIST * 0.2;
-  tmpM.identity().makeRotationFromEuler(new THREE.Euler(0, rot, 0));
-  tmpM.setPosition(0, 0, z);
-  rings.setMatrixAt(i, tmpM);
-
-  // gradient emissive color: warm -> cool -> warm
-  tmpC.set(COLORS.glowA).lerp(new THREE.Color(COLORS.glowB), (Math.sin(i*0.15)*0.5+0.5)*0.8);
-  rings.setColorAt(i, tmpC);
+// rainbow per-ring color buffer (updated over time)
+function hsvToRgb(h,s,v){
+  let r,g,b; const i = Math.floor(h*6); const f = h*6 - i;
+  const p = v*(1-s), q = v*(1-f*s), t = v*(1-(1-f)*s);
+  switch(i%6){ case 0:r=v;g=t;b=p;break; case 1:r=q;g=v;b=p;break;
+    case 2:r=p;g=v;b=t;break; case 3:r=p;g=q;b=v;break; case 4:r=t;g=p;b=v;break; default:r=v;g=p;b=q; }
+  return [r,g,b];
 }
-if (rings.instanceColor) rings.instanceColor.needsUpdate = true;
-rings.instanceMatrix.needsUpdate = true;
+function updateRainbow(timeShift=0){
+  const arr = rings.instanceColor.array;
+  for (let i=0;i<RINGS;i++){
+    const hue = (i*0.006 + timeShift) % 1.0;     // smooth rainbow along depth + time
+    const [r,g,b] = hsvToRgb(hue, 0.9, 1.0);
+    arr[i*3+0] = r; arr[i*3+1] = g; arr[i*3+2] = b;
+  }
+  rings.instanceColor.needsUpdate = true;
+}
 
-// Soft fill + points for sparkle
-const hemi = new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.35);
-scene.add(hemi);
-const coreLight = new THREE.PointLight(0xffffff, 0.6, 8, 2.0);
-coreLight.position.set(0, 0, -2);
+// place rings down -Z, with twist
+const M = new THREE.Matrix4();
+function placeRing(i, z){
+  const rot = (i + zHead*0.02) * TWIST * 0.2;
+  M.identity().makeRotationFromEuler(new THREE.Euler(0, rot, 0));
+  M.setPosition(0, 0, z);
+  rings.setMatrixAt(i, M);
+}
+for (let i=0;i<RINGS;i++){
+  placeRing(i, -i*SPACING);
+}
+rings.instanceMatrix.needsUpdate = true;
+updateRainbow(0);
+
+// soft fill light so metal pops
+scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.3));
+const coreLight = new THREE.PointLight(0xffffff, 0.8, 10, 2.0);
+coreLight.position.set(0,0,-2);
 scene.add(coreLight);
 
-// ---------- Stars (forward streak hints along axis) ----------
-const STAR_COUNT = 1200;
+// stars (inner streaks)
+const STAR_COUNT = 1400;
 const starGeo = new THREE.BufferGeometry();
-const starPos = new Float32Array(STAR_COUNT * 3);
-for (let i = 0; i < STAR_COUNT; i++) {
-  // scatter slightly inside the tunnel radius
-  const a = Math.random() * Math.PI * 2;
-  const r = (RADIUS - 0.2) * Math.sqrt(Math.random());
-  const x = Math.cos(a) * r;
-  const y = Math.sin(a) * r;
-  const z = -Math.random() * RINGS * SPACING;
-  starPos[i*3+0] = x;
-  starPos[i*3+1] = y;
-  starPos[i*3+2] = z;
+const starPos = new Float32Array(STAR_COUNT*3);
+for (let i=0;i<STAR_COUNT;i++){
+  const a = Math.random()*Math.PI*2;
+  const r = (RADIUS - 0.25) * Math.sqrt(Math.random());
+  starPos[i*3+0] = Math.cos(a)*r;
+  starPos[i*3+1] = Math.sin(a)*r;
+  starPos[i*3+2] = -Math.random()*RINGS*SPACING;
 }
-starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
-const starMat = new THREE.PointsMaterial({ size: 0.014, color: 0xffffff, transparent: true, opacity: 0.7 });
+starGeo.setAttribute('position', new THREE.BufferAttribute(starPos,3));
+const starMat = new THREE.PointsMaterial({ size: 0.012, color: 0xffffff, opacity: 0.8, transparent: true });
 const stars = new THREE.Points(starGeo, starMat);
 GROUP.add(stars);
 
-// ---------- Post: zoom-blur + gentle bloom + vignette ----------
+// ---------- Post: zoom blur + chroma + vignette ----------
 const postScene = new THREE.Scene();
 const postCam = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
 const postMat = new THREE.ShaderMaterial({
   uniforms: {
     tColor: { value: rt.texture },
     resolution: { value: new THREE.Vector2(w, h) },
-    center: { value: new THREE.Vector2(0.5, 0.5) },   // zoom center
-    strength: { value: 0.24 },                        // zoom blur strength
-    bloom: { value: 0.8 },                            // overall bloom amount
-    vignette: { value: 0.18 },                        // vignette strength
-    chroma: { value: 0.002 }                          // chromatic aberration
+    center: { value: new THREE.Vector2(0.5, 0.5) },
+    strength: { value: 0.26 },
+    bloom: { value: 0.9 },
+    vignette: { value: 0.16 },
+    chroma: { value: 0.002 }
   },
   vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.0); }`,
   fragmentShader: `
-    precision highp float;
-    varying vec2 vUv;
-    uniform sampler2D tColor;
-    uniform vec2 resolution, center;
+    precision highp float; varying vec2 vUv;
+    uniform sampler2D tColor; uniform vec2 resolution; uniform vec2 center;
     uniform float strength, bloom, vignette, chroma;
 
-    // zoom blur: sample along vector towards center
-    vec3 zoomBlur(sampler2D tex, vec2 uv, vec2 c) {
-      vec2 dir = (c - uv);
-      vec3 col = vec3(0.0);
-      float total = 0.0;
-      // 8 taps (cheap & fast)
-      #define TAPS 8
-      for (int i=0; i<TAPS; i++) {
-        float t = float(i) / float(TAPS - 1);
-        vec2 offs = uv + dir * t * strength;
-        // chromatic shift
-        vec3 s;
-        s.r = texture2D(tex, offs + chroma*dir).r;
-        s.g = texture2D(tex, offs).g;
-        s.b = texture2D(tex, offs - chroma*dir).b;
-        float w = mix(1.0, 0.5, t);
-        col += s * w;
-        total += w;
+    vec3 zoomBlur(vec2 uv, vec2 c){
+      vec2 d = (c - uv);
+      vec3 col = vec3(0.0); float tot = 0.0;
+      for(int i=0;i<8;i++){
+        float t = float(i)/7.0;
+        vec2 o = uv + d * t * strength;
+        vec3 s; s.r = texture2D(tColor, o + chroma*d).r;
+               s.g = texture2D(tColor, o).g;
+               s.b = texture2D(tColor, o - chroma*d).b;
+        float w = mix(1.0, 0.5, t); col += s*w; tot += w;
       }
-      col /= total;
-      return col;
+      return col/tot;
     }
-
     vec3 filmic(vec3 c){
       c = max(vec3(0.0), c - 0.004);
       c = (c*(6.2*c + .5)) / (c*(6.2*c + 1.7) + 0.06);
       return pow(c, vec3(0.96));
     }
-
     void main(){
       vec2 uv = vUv;
       vec3 base = texture2D(tColor, uv).rgb;
-      vec3 zb = zoomBlur(tColor, uv, center);
+      vec3 zb = zoomBlur(uv, center);
       vec3 col = mix(base, zb, 0.7);
-
-      // simple bright-pass bloom
-      float l = max(max(col.r, col.g), col.b);
-      vec3 glow = smoothstep(0.6, 1.2, l) * col;
-      col += glow * bloom * 0.6;
-
-      // vignette
-      vec2 p = uv*2.0 - 1.0;
-      float v = 1.0 - vignette*dot(p,p);
-      col *= v;
-
+      float l = max(max(col.r,col.g),col.b);
+      col += smoothstep(0.6, 1.2, l) * col * bloom * 0.55;
+      vec2 p = uv*2.0 - 1.0; col *= 1.0 - vignette*dot(p,p);
       gl_FragColor = vec4(filmic(col), 1.0);
     }
   `,
-  depthTest: false, depthWrite: false
+  depthTest:false, depthWrite:false
 });
 const postQuad = new THREE.Mesh(new THREE.PlaneGeometry(2,2), postMat);
 postScene.add(postQuad);
 
-// ---------- Interaction ----------
+// ---------- Interaction: parallax + press-to-slow ----------
 const pointer = new THREE.Vector2(0.5, 0.5);
 let yaw = 0, pitch = 0;
-
-function onPointer(e){
+function setPointer(e){
   const r = mount.getBoundingClientRect();
   const x = ('touches' in e) ? e.touches[0].clientX : e.clientX;
   const y = ('touches' in e) ? e.touches[0].clientY : e.clientY;
@@ -590,111 +575,93 @@ function onPointer(e){
     THREE.MathUtils.clamp((x - r.left)/r.width, 0, 1),
     THREE.MathUtils.clamp((y - r.top )/r.height, 0, 1)
   );
-  // keep zoom blur centered toward pointer (subtle)
   postMat.uniforms.center.value.set(pointer.x, 1.0 - pointer.y);
 }
 ['pointermove','pointerdown','touchstart','touchmove'].forEach(ev =>
-  mount.addEventListener(ev, onPointer, { passive:true })
+  mount.addEventListener(ev, setPointer, { passive:true })
 );
 
-mount.addEventListener('wheel', (e)=>{
-  // accelerate / decelerate
-  const delta = THREE.MathUtils.clamp(e.deltaY, -200, 200);
-  speed += delta * -0.02;
-  speed = THREE.MathUtils.clamp(speed, 1.5, 60.0);
-  // tie blur strength to speed
-  postMat.uniforms.strength.value = THREE.MathUtils.mapLinear(speed, 1.5, 60.0, 0.08, 0.3);
-  postMat.uniforms.bloom.value    = THREE.MathUtils.mapLinear(speed, 1.5, 60.0, 0.6, 1.0);
-}, { passive:true });
+// hold to slow 50%
+function setSlow(flag){ slowHold = flag; }
+['pointerdown','touchstart'].forEach(ev => mount.addEventListener(ev, ()=>setSlow(true), { passive:true }));
+['pointerup','pointerleave','touchend','touchcancel'].forEach(ev => mount.addEventListener(ev, ()=>setSlow(false), { passive:true }));
 
 // ---------- Resize ----------
 const ro = new ResizeObserver(()=>{
   const W = mount.clientWidth, H = mount.clientHeight || Math.round(W/(16/9));
   renderer.setSize(W, H);
   camera.aspect = W/H; camera.updateProjectionMatrix();
-  rt.setSize(W, H);
-  postMat.uniforms.resolution.value.set(W, H);
-  // maintain fog impression across sizes
-  scene.fog.density = THREE.MathUtils.clamp(0.035*(1920/W), 0.033, 0.065);
+  rt.setSize(W,H);
+  postMat.uniforms.resolution.value.set(W,H);
+  scene.fog.density = THREE.MathUtils.clamp(0.028*(1920/W), 0.025, 0.05);
 });
 ro.observe(mount);
 
-// ---------- Animate ----------
-const clock = new THREE.Clock();
-let lastNow = performance.now();
+// ---------- Advance / Recycle ----------
+const tmp = new THREE.Vector3();
+function advance(dt){
+  const targetSpeed = slowHold ? BASE_SPEED*0.5 : BASE_SPEED;
+  speed += (targetSpeed - speed) * Math.min(1.0, dt*8.0); // quick ease
 
-function recycleAndAdvance(dt){
-  // Move tunnel content towards camera by 'speed'
-  const dz = speed * dt; // forward
+  const dz = speed * dt;
   zHead += dz;
 
-  // Shift group
+  // move group forward (content towards camera). Camera stays inside.
   GROUP.position.z += dz;
 
-  // Recycle rings that pass camera forward (z > SPACING)
-  const threshold = SPACING * 1.0;
-  for (let i = 0; i < RINGS; i++){
-    rings.getMatrixAt(i, tmpM);
-    const pos = new THREE.Vector3().setFromMatrixPosition(tmpM);
-    pos.z += dz;
-
-    if (pos.z > threshold) {
-      // push far back to maintain endless stream
-      pos.z -= RINGS * SPACING;
-      // small twist variation so it feels alive
-      const rot = (i + zHead*0.02) * TWIST * 0.2;
-      tmpM.makeRotationFromEuler(new THREE.Euler(0, rot, 0));
-      tmpM.setPosition(0, 0, pos.z);
-      rings.setMatrixAt(i, tmpM);
+  // recycle rings that pass the camera
+  for (let i=0;i<RINGS;i++){
+    rings.getMatrixAt(i, M);
+    tmp.setFromMatrixPosition(M);
+    tmp.z += dz;
+    if (tmp.z > SPACING){ // once in front of camera, push to far end
+      tmp.z -= RINGS * SPACING;
+      placeRing(i, tmp.z);
     } else {
-      tmpM.setPosition(0, 0, pos.z);
-      rings.setMatrixAt(i, tmpM);
+      M.setPosition(0,0,tmp.z);
+      rings.setMatrixAt(i, M);
     }
   }
   rings.instanceMatrix.needsUpdate = true;
 
-  // Move stars forward and recycle
+  // move & recycle stars
   const arr = starGeo.attributes.position.array;
-  for (let i = 0; i < STAR_COUNT; i++){
+  for (let i=0;i<STAR_COUNT;i++){
     const idx = i*3 + 2;
     arr[idx] += dz;
-    if (arr[idx] > 0.4) arr[idx] -= (RINGS * SPACING + 1.0);
+    if (arr[idx] > 0.3) arr[idx] -= (RINGS * SPACING + 1.0);
   }
   starGeo.attributes.position.needsUpdate = true;
 
-  // Light travels with us for core sparkle
+  // light follows subtly
   coreLight.position.z = -2 + (GROUP.position.z * 0.02);
 }
 
 function updateCamera(dt){
-  // soft parallax (very clamped so nothing “disappears”)
-  const targetYaw = (pointer.x - 0.5) * 0.12;
-  const targetPitch = (pointer.y - 0.5) * 0.06;
+  // subtle parallax only; strong clamps prevent flips/disappears
+  const ty = (pointer.x - 0.5) * 0.12;
+  const tp = (pointer.y - 0.5) * 0.06;
   const s = 1.0 - Math.pow(0.001, dt);
-  yaw += (targetYaw - yaw) * s;
-  pitch += (targetPitch - pitch) * s;
-  pitch = THREE.MathUtils.clamp(pitch, -0.18, 0.18);
+  yaw += (ty - yaw)*s; pitch += (tp - pitch)*s;
+  pitch = THREE.MathUtils.clamp(pitch, -0.16, 0.16);
   camera.rotation.set(pitch, yaw, 0);
   camera.position.set(0, 0, 0);
   camera.lookAt(0, 0, -6);
 }
 
+// ---------- Animate ----------
+let last = performance.now();
 function animate(){
   requestAnimationFrame(animate);
   const now = performance.now();
-  const dt = Math.min((now - lastNow)/1000, 0.033);
-  lastNow = now;
+  const dt = Math.min((now - last)/1000, 0.033);
+  last = now;
 
-  recycleAndAdvance(dt);
+  advance(dt);
   updateCamera(dt);
+  updateRainbow((now*0.00008) % 1.0); // smooth rainbow drift
 
-  // Update emissive tint gently over time
-  const t = clock.getElapsedTime();
-  const warm = new THREE.Color(COLORS.glowA);
-  const cool = new THREE.Color(COLORS.glowB);
-  ringMat.emissive.copy(warm).lerp(cool, 0.5 + 0.5*Math.sin(t*0.5));
-
-  // Render to RT -> Post
+  // render -> post
   renderer.setRenderTarget(rt);
   renderer.setClearColor(bg, 1);
   renderer.clear();
@@ -704,6 +671,5 @@ function animate(){
 }
 animate();
 </script>
-
 </body>
 </html>
