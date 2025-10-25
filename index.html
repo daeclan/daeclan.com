@@ -42,10 +42,9 @@
     /* Scene block */
     #showcase{padding:16px 0 50px}
     #heroScene{
-      aspect-ratio:16/9; /* modern browsers */
-      background:#0e0f12;border:1px solid var(--line);border-radius:16px;
-      display:grid;place-items:center;overflow:hidden;
-      min-height: 260px; /* fallback so it’s never 0px tall */
+      aspect-ratio:16/9; background:#0e0f12; border:1px solid var(--line);
+      border-radius:16px; display:grid; place-items:center; overflow:hidden;
+      min-height:260px; /* fallback in case aspect-ratio isn't honored */
     }
     #heroScene p{color:#8b8d94;font-size:14px}
 
@@ -101,7 +100,7 @@
       <p class="lead">(hidden)</p>
     </section>
 
-    <!-- THREE.JS SHOWCASE -->
+    <!-- THREE.JS SHOWCASE (auto-load, also responds to tap/scroll) -->
     <section id="showcase" class="container">
       <div id="heroScene"><p>Initializing…</p></div>
     </section>
@@ -111,6 +110,7 @@
       <h2>Music</h2>
       <p class="lead">Releases under <strong>DEGH</strong>.</p>
 
+      <!-- Trilogy grid -->
       <div class="grid" style="margin-top:18px;">
         <!-- Declan Emphasized A Movie -->
         <article class="card col-4 reveal">
@@ -162,7 +162,7 @@
         </article>
       </div>
 
-      <!-- Latest Music Video -->
+      <!-- Latest Music Video (YouTube embed) -->
       <div class="grid" style="margin-top:28px;">
         <article class="card col-12 reveal">
           <div class="card-body">
@@ -215,7 +215,7 @@
       </div>
     </section>
 
-    <!-- ACTING -->
+    <!-- ACTING (resume + headshots/photos placeholders) -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
       <p class="lead">Resume, headshots, and production stills.</p>
@@ -316,7 +316,7 @@
           </div>
         </article>
 
-        <!-- SLIME NO B -->
+        <!-- SLIME NO B (Young Thug-only remake) -->
         <article class="card col-6 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
@@ -332,9 +332,10 @@
           </div>
         </article>
 
-        <!-- MORE LIFE -->
+        <!-- MORE LIFE (without Aubrey) -->
         <article class="card col-6 reveal">
           <div class="thumb">
+            <!-- TODO: replace with direct asset if desired -->
             <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
             <span class="tag">Project</span>
           </div>
@@ -350,7 +351,7 @@
       </div>
     </section>
 
-    <!-- WRITING -->
+    <!-- WRITING: 4-up grid -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
       <p class="lead">Poems, blurbs, fragments.</p>
@@ -362,7 +363,7 @@
       </div>
     </section>
 
-    <!-- CONTACT -->
+    <!-- CONTACT with orange buttons -->
     <section id="contact" class="section container">
       <h2>Contact</h2>
       <p class="lead">Bookings, collabs, or just to say hi.</p>
@@ -388,54 +389,36 @@
   <!-- Year + Scrollspy -->
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
+
     const secs=[...document.querySelectorAll('main section[id]')];
     const links=[...document.querySelectorAll('header nav a')];
     const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
     const io=new IntersectionObserver(es=>{
-      es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return; if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }});
+      es.forEach(e=>{
+        const id=e.target.id, link=map(id);
+        if(!link) return;
+        if(e.isIntersecting){
+          links.forEach(a=>a.classList.remove('active'));
+          link.classList.add('active');
+        }
+      });
     },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
     secs.forEach(s=>io.observe(s));
   </script>
 
-  <!-- Robust Three.js loader + scene bootstrap -->
+  <!-- Load Three.js FIRST (single known-good URL). If you self-host, swap src to your path. -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js" crossorigin="anonymous"></script>
+
+  <!-- ROYGBIV wormhole (camera inside, endless, spin on click) -->
   <script>
   (function(){
     const mount = document.getElementById('heroScene');
     if (!mount) return;
 
-    // 1) Try local paths first (edit these to match your repo structure)
-    const localPaths = [
-      '/vendor/three/0.161.0/build/three.min.js',
-      '/vendor/three/build/three.min.js',
-      '/three/three.min.js'
-    ];
-    // 2) CDN fallbacks
-    const cdnPaths = [
-      'https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js',
-      'https://unpkg.com/three@0.161.0/build/three.min.js'
-    ];
-    const sources = [...localPaths, ...cdnPaths];
+    let booted = false;
 
-    function loadThree(i=0){
-      if (window.THREE) return boot();
-      if (i >= sources.length){
-        mount.innerHTML = '<p style="color:#f99">Failed to load Three.js</p>';
-        return;
-      }
-      const s = document.createElement('script');
-      s.src = sources[i];
-      s.onload = () => { window.THREE ? boot() : loadThree(i+1); };
-      s.onerror = () => { s.remove(); loadThree(i+1); };
-      document.head.appendChild(s);
-    }
-
-    function boot(){
-      // Avoid double-boot
-      if (boot.started) return; boot.started = true;
-      startScene();
-    }
-
-    function startScene(){
+    function start(){
+      if (booted) return; booted = true;
       mount.textContent = '';
 
       const W = mount.clientWidth;
@@ -482,10 +465,11 @@
         const idx=((step%PAL.length)+PAL.length)%PAL.length;
         mesh.setColorAt(i, PAL[idx]);
       }
+      for(let i=0;i&RINGS;i++){ /* safety guard */ }
       for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
       mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
 
-      // Lighting
+      // Lights
       scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
       const core = new THREE.PointLight(0xffffff, 0.55, 16, 2.0);
       core.position.set(0,0,-2);
@@ -537,9 +521,18 @@
       animate();
     }
 
-    // Start after DOM ready
-    if (document.readyState === 'complete' || document.readyState === 'interactive') loadThree();
-    else document.addEventListener('DOMContentLoaded', loadThree);
+    // Boot once the DOM is ready and Three.js is loaded
+    function ready(fn){
+      if (document.readyState === 'complete' || document.readyState === 'interactive') fn();
+      else document.addEventListener('DOMContentLoaded', fn);
+    }
+    ready(()=> {
+      if (typeof THREE === 'undefined') {
+        document.getElementById('heroScene').innerHTML = '<p style="color:#f99">Three.js failed to load</p>';
+        return;
+      }
+      start();
+    });
   })();
   </script>
 </body>
