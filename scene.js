@@ -22,12 +22,17 @@
     // Clear any fallback text/content
     mount.textContent = '';
 
-    // Dynamically import Three.js.  Fall back to the unpkg CDN if Skypack fails.
+    // Dynamically import Three.js.  Prefer the unpkg CDN which serves prebuilt
+    // modules, and fall back to Skypack if that fails.  Skypack may not always
+    // successfully build newer versions of three.js, resulting in a package
+    // error like the one reported by the browser.
     let THREE;
     try {
-      THREE = await import('https://cdn.skypack.dev/three@0.161.0');
-    } catch (err) {
       THREE = await import('https://unpkg.com/three@0.161.0/build/three.module.js');
+    } catch (err) {
+      // Fallback: attempt to load from Skypack.  Note: if this also fails,
+      // Three.js will remain undefined and an error will occur.
+      THREE = await import('https://cdn.skypack.dev/three@0.161.0');
     }
 
     /*
@@ -44,17 +49,38 @@
       vec3,
       mx_noise_vec3,
       MeshPhysicalNodeMaterial
-    } = await import('https://cdn.skypack.dev/three@0.161.0/nodes');
+    } = await import('https://unpkg.com/three@0.161.0/examples/jsm/nodes/Nodes.js');
 
     // Determine the canvas size.  Maintain a 16:9 aspect ratio if no height is set.
     const w = mount.clientWidth;
     const h = mount.clientHeight || Math.round(w / (16 / 9));
 
-    // Use the WebGPU renderer.  WebGPU exposes compute shaders and delivers
-    // significantly better performance for heavy techniques like path tracing【296856254362920†L19-L41】.
-    const renderer = new THREE.WebGPURenderer({ antialias: true, alpha: true });
+    // Try to import WebGPURenderer from the examples folder.  In recent
+    // versions of three.js, WebGPURenderer is not bundled in the core
+    // module but provided via the examples namespace.  If the import
+    // fails or WebGPU is unavailable (navigator.gpu is undefined), fall
+    // back to WebGLRenderer so the scene still renders on unsupported
+    // devices.  Note: WebGPU requires asynchronous initialisation via
+    // renderer.init()【296856254362920†L19-L41】.
+    let WebGPURenderer;
+    try {
+      const mod = await import('https://unpkg.com/three@0.161.0/examples/jsm/renderers/webgpu/WebGPURenderer.js');
+      WebGPURenderer = mod.WebGPURenderer;
+    } catch (e) {
+      WebGPURenderer = THREE.WebGPURenderer;
+    }
+    let renderer;
+    const useWebGPU = WebGPURenderer && typeof navigator !== 'undefined' && navigator.gpu;
+    if (useWebGPU) {
+      renderer = new WebGPURenderer({ antialias: true, alpha: true });
+      // WebGPURenderer requires an explicit init() call before rendering.
+      if (typeof renderer.init === 'function') {
+        await renderer.init();
+      }
+    } else {
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
+    }
     renderer.setSize(w, h);
-    // Cap device pixel ratio to avoid excessive GPU workload on high‑DPI screens.
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mount.appendChild(renderer.domElement);
 
@@ -216,54 +242,57 @@
      */
     const planeGeometry = new THREE.PlaneGeometry(2.5, 2.5, 100, 100);
     const count = planeGeometry.attributes.position.count;
-    // Original positions and normals
-    const initial_pos = storage(planeGeometry.attributes.position, 'vec3', count);
-    const normal_attr = storage(planeGeometry.attributes.normal, 'vec3', count);
-    // Storage buffers for current positions and velocities
-    const pos_storage = storage(new THREE.StorageBufferAttribute(count, 3), 'vec3', count);
-    const vel_storage = storage(new THREE.StorageBufferAttribute(count, 3), 'vec3', count);
-    // Uniform nodes
-    const u_timeNode = uniform(0);
-    const u_noise_amp = uniform(0.4);
-    const u_spring = uniform(0.02);
-    const u_friction = uniform(0.92);
-    // Compute function to initialise positions and velocities
-    const computeInit = Fn(() => {
-      pos_storage.element(instanceIndex).assign(initial_pos.element(instanceIndex));
-      vel_storage.element(instanceIndex).assign(vec3(0.0, 0.0, 0.0));
-    })().compute(count);
-    // Run the initial compute pass once before animation starts
-    await renderer.computeAsync(computeInit);
-    // Compute function executed each frame.  It displaces vertices along
-    // their normals by a noise field and integrates velocity with spring
-    // dynamics【283365056804811†L336-L377】.
-    const computeUpdate = Fn(() => {
-      const base = initial_pos.element(instanceIndex);
-      const current = pos_storage.element(instanceIndex);
-      const vel = vel_storage.element(instanceIndex);
-      const normal = normal_attr.element(instanceIndex);
-      // Generate animated noise; displace along the normal.
-      const noise = mx_noise_vec3(current.mul(0.5).add(vec3(0.0, u_timeNode, 0.0)), 1.0).mul(u_noise_amp);
-      const displaced = base.add(noise.mul(normal));
-      // Spring integration: velocity += (target - current) * spring
-      vel.addAssign(displaced.sub(current).mul(u_spring));
-      // Position integration: current += velocity
-      current.addAssign(vel);
-      // Damping
-      vel.assign(vel.mul(u_friction));
-    })().compute(count);
-    // Define a node‑based material for the deforming plane.  The physical
-    // material responds to lights and uses the compute buffer for its vertex
-    // positions.  We could add color variations here by sampling the noise
-    // buffer or normals, but keeping it simple improves readability.
-    const planeMaterial = new MeshPhysicalNodeMaterial({
-      roughness: 0.5,
-      metalness: 0.0,
-      clearcoat: 0.0
-    });
-    // Assign computed positions to the material
-    planeMaterial.positionNode = pos_storage.toAttribute();
-    const planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    const supportsCompute = typeof renderer.computeAsync === 'function';
+    let planeMesh;
+    let computeInit, computeUpdate, u_timeNode;
+    if (supportsCompute) {
+      // Original positions and normals
+      const initial_pos = storage(planeGeometry.attributes.position, 'vec3', count);
+      const normal_attr = storage(planeGeometry.attributes.normal, 'vec3', count);
+      // Storage buffers for current positions and velocities
+      const pos_storage = storage(new THREE.StorageBufferAttribute(count, 3), 'vec3', count);
+      const vel_storage = storage(new THREE.StorageBufferAttribute(count, 3), 'vec3', count);
+      // Uniform nodes
+      u_timeNode = uniform(0);
+      const u_noise_amp = uniform(0.4);
+      const u_spring = uniform(0.02);
+      const u_friction = uniform(0.92);
+      // Compute function to initialise positions and velocities
+      computeInit = Fn(() => {
+        pos_storage.element(instanceIndex).assign(initial_pos.element(instanceIndex));
+        vel_storage.element(instanceIndex).assign(vec3(0.0, 0.0, 0.0));
+      })().compute(count);
+      // Compute function executed each frame.  It displaces vertices along
+      // their normals by a noise field and integrates velocity with spring
+      // dynamics【283365056804811†L336-L377】.
+      computeUpdate = Fn(() => {
+        const base = initial_pos.element(instanceIndex);
+        const current = pos_storage.element(instanceIndex);
+        const vel = vel_storage.element(instanceIndex);
+        const normal = normal_attr.element(instanceIndex);
+        const noise = mx_noise_vec3(current.mul(0.5).add(vec3(0.0, u_timeNode, 0.0)), 1.0).mul(u_noise_amp);
+        const displaced = base.add(noise.mul(normal));
+        vel.addAssign(displaced.sub(current).mul(u_spring));
+        current.addAssign(vel);
+        vel.assign(vel.mul(u_friction));
+      })().compute(count);
+      // Define a node‑based material for the deforming plane.
+      const planeMaterial = new MeshPhysicalNodeMaterial({
+        roughness: 0.5,
+        metalness: 0.0,
+        clearcoat: 0.0
+      });
+      planeMaterial.positionNode = pos_storage.toAttribute();
+      planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+      // Run the initial compute pass once before animation starts
+      await renderer.computeAsync(computeInit);
+    } else {
+      // Fallback: create a static plane with a simple material when compute shaders
+      // are unavailable (e.g. when using WebGLRenderer).  This preserves the
+      // composition of the scene but omits the deformation effect.
+      const fallbackMaterial = new THREE.MeshStandardMaterial({ color: 0x444444, roughness: 0.7, metalness: 0.1 });
+      planeMesh = new THREE.Mesh(planeGeometry, fallbackMaterial);
+    }
     planeMesh.rotation.x = -Math.PI / 2;
     planeMesh.position.y = 0.5;
     scene.add(planeMesh);
@@ -300,13 +329,18 @@
     ro.observe(mount);
 
     const clock = new THREE.Clock();
+    // Determine if computeAsync exists on the renderer
+    const supportsComputeLoop = typeof renderer.computeAsync === 'function';
 
     async function tick() {
       const t = clock.getElapsedTime();
-      u_timeNode.value = t;
+      // Update time uniform for the path tracer
       pathUniforms.time.value = t;
-      // Update deforming geometry on the GPU
-      await renderer.computeAsync(computeUpdate);
+      // If compute is supported, update the deforming plane via GPU and set time
+      if (supportsComputeLoop) {
+        u_timeNode.value = t;
+        await renderer.computeAsync(computeUpdate);
+      }
       // Smoothly move camera towards the scroll target
       updateCamera();
       // Render the scene
