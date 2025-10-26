@@ -229,198 +229,185 @@
 
   <!-- ZERO-DEPENDENCY WEBGL2 WORMHOLE -->
   <script>
-  (function(){
-    const mount = document.getElementById('heroScene');
-    if (!mount) return;
+(function(){
+  const mount = document.getElementById('heroScene');
+  if (!mount) return;
 
-    // create canvas
-    const canvas = document.createElement('canvas');
-    canvas.style.display = 'block';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    mount.textContent = '';
-    mount.appendChild(canvas);
+  // canvas + GL
+  const canvas = document.createElement('canvas');
+  canvas.style.display = 'block';
+  canvas.style.width = '100%';
+  canvas.style.height = '100%';
+  mount.textContent = '';
+  mount.appendChild(canvas);
 
-    const gl = canvas.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true });
-    if (!gl){ mount.innerHTML = '<p style="color:#f99">WebGL2 not available</p>'; return; }
+  const gl = canvas.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true });
+  if (!gl){ mount.innerHTML = '<p style="color:#f99">WebGL2 not available</p>'; return; }
 
-    // full-screen triangle
-    const vsrc = `#version 300 es
-    const vec2 verts[3] = vec2[3](
-      vec2(-1.0, -1.0),
-      vec2( 3.0, -1.0),
-      vec2(-1.0,  3.0)
-    );
-    out vec2 vUv;
-    void main(){
-      vec2 p = verts[gl_VertexID];
-      vUv = 0.5 * (p + 1.0);
-      gl_Position = vec4(p, 0.0, 1.0);
-    }`;
+  // full-screen triangle
+  const vsrc = `#version 300 es
+  const vec2 verts[3] = vec2[3](
+    vec2(-1.0, -1.0),
+    vec2( 3.0, -1.0),
+    vec2(-1.0,  3.0)
+  );
+  out vec2 vUv;
+  void main(){
+    vec2 p = verts[gl_VertexID];
+    vUv = 0.5 * (p + 1.0);
+    gl_Position = vec4(p, 0.0, 1.0);
+  }`;
 
-    // ROYGBIV palette helper
-    // Tunnel is generated analytically (no textures, no libs).
-    const fsrc = `#version 300 es
-    precision highp float;
+  const fsrc = `#version 300 es
+  precision highp float;
 
-    in vec2 vUv;
-    out vec4 frag;
+  in vec2 vUv;
+  out vec4 frag;
 
-    uniform vec2  uRes;
-    uniform float uTime;
-    uniform float uSpin;   // axial rotation added on click
+  uniform vec2  uRes;
+  uniform float uTime;
+  uniform float uSpin;     // rotation from scroll
+  uniform float uSpeed;    // 1.0 = base, >1 faster
 
-    // Return strict ROYGBIV by index 0..6
-    vec3 roygbiv(float idx){
-      if(idx<0.5) return vec3(1.0,0.0,0.0);
-      if(idx<1.5) return vec3(1.0,0.5,0.0);
-      if(idx<2.5) return vec3(1.0,1.0,0.0);
-      if(idx<3.5) return vec3(0.0,1.0,0.0);
-      if(idx<4.5) return vec3(0.0,0.0,1.0);
-      if(idx<5.5) return vec3(0.294,0.0,0.510);   // Indigo
-      return vec3(0.561,0.0,1.0);                // Violet
+  // ROYGBIV indexed color
+  vec3 roygbiv(float idx){
+    if(idx<0.5) return vec3(1.0,0.0,0.0);
+    if(idx<1.5) return vec3(1.0,0.5,0.0);
+    if(idx<2.5) return vec3(1.0,1.0,0.0);
+    if(idx<3.5) return vec3(0.0,1.0,0.0);
+    if(idx<4.5) return vec3(0.0,0.0,1.0);
+    if(idx<5.5) return vec3(0.294,0.0,0.510);
+    return vec3(0.561,0.0,1.0);
+  }
+
+  mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+
+  void main(){
+    vec2 p = (vUv * uRes - 0.5*uRes) / min(uRes.x,uRes.y);
+    p = rot(uSpin) * p;
+
+    float r = length(p) + 1e-6;
+    float a = atan(p.y, p.x);
+
+    // base speed is 1.6; multiply by uSpeed from JS (click boost)
+    float speed = 1.6 * uSpeed;
+
+    float z = uTime * speed + 4.0 / r;
+
+    float stripeDensity = 1.35;
+    float ringStep = floor(mod(z * stripeDensity, 7.0));
+    float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
+
+    float innerFade = smoothstep(0.12, 0.20, r);
+    float outerFade = smoothstep(1.6, 0.6, r);
+    float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
+
+    vec3 base = roygbiv(ringStep);
+    float core = stripe * innerFade;
+    float halo = glow * 0.55;
+    vec3 col = base * (core * 1.7 + halo);
+
+    float vig = smoothstep(1.4, 0.2, length(p));
+    col *= vig;
+
+    col = max(col - 0.004, 0.0);
+    col = (col*(6.2*col+0.5)) / (col*(6.2*col+1.7) + 0.06);
+
+    frag = vec4(col, 1.0);
+  }`;
+
+  function makeShader(type, src){
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+      console.error(gl.getShaderInfoLog(s));
+      throw new Error('Shader compile failed');
     }
+    return s;
+  }
 
-    // rotate 2D
-    mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+  const vs = makeShader(gl.VERTEX_SHADER, vsrc);
+  const fs = makeShader(gl.FRAGMENT_SHADER, fsrc);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.error(gl.getProgramInfoLog(prog));
+    throw new Error('Program link failed');
+  }
+  gl.useProgram(prog);
 
-    void main(){
-      // normalized coords
-      vec2 p = (vUv * uRes - 0.5*uRes) / min(uRes.x,uRes.y);
+  // uniforms
+  const uRes  = gl.getUniformLocation(prog, 'uRes');
+  const uTime = gl.getUniformLocation(prog, 'uTime');
+  const uSpin = gl.getUniformLocation(prog, 'uSpin');
+  const uSpeed= gl.getUniformLocation(prog, 'uSpeed');
 
-      // apply axial spin (click -> uSpin accumulates)
-      p = rot(uSpin) * p;
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
 
-      // tunnel mapping: use polar coords, make longitudinal coord increase with time
-      float r = length(p) + 1e-6;               // radial distance
-      float a = atan(p.y, p.x);
+  // sizing
+  function resize(){
+    const w = mount.clientWidth;
+    const h = mount.clientHeight || Math.round(w/(16/9));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = Math.max(1, Math.floor(w * dpr));
+    canvas.height = Math.max(1, Math.floor(h * dpr));
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+  }
+  new ResizeObserver(resize).observe(mount);
+  resize();
 
-      // forward velocity; tune to taste
-      float speed = 1.6;
+  // --- Interaction ---
+  // Scroll → rotate around axis
+  let spinAccum = 0.0;
+  mount.addEventListener('wheel', (e)=>{
+    // Negative sign so scrolling down rotates clockwise; tune factor as desired
+    spinAccum += -e.deltaY * 0.003;
+  }, {passive:true});
 
-      // z-like coordinate along the tunnel: 1/r gives acceleration towards center; add time to move forward
-      float z = uTime * speed + 4.0 / r;
+  // Click / press & hold → speed boost
+  let boostTarget = 0.0;   // 0..1
+  let boostLevel  = 0.0;   // eased
+  const onDown = ()=>{ boostTarget = 1.0; };
+  const onUp   = ()=>{ boostTarget = 0.0; };
+  mount.addEventListener('pointerdown', onDown, {passive:true});
+  window.addEventListener('pointerup', onUp, {passive:true});
+  mount.addEventListener('touchstart', onDown, {passive:true});
+  window.addEventListener('touchend', onUp, {passive:true});
+  window.addEventListener('touchcancel', onUp, {passive:true});
+  mount.addEventListener('pointerleave', onUp, {passive:true});
 
-      // banding along z -> stripes
-      float stripeDensity = 1.35;               // ring frequency
-      float ringStep = floor(mod(z * stripeDensity, 7.0)); // 0..6 repeat
+  // Animation
+  let last = performance.now();
+  function animate(){
+    const now = performance.now();
+    const dt = Math.min((now - last)/1000, 0.033);
+    last = now;
 
-      // ring thickness: make bands narrow and neon-like
-      float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
+    // ease boost toward target (snappy, but not jarring)
+    const ease = 1.0 - Math.pow(0.0005, dt); // time-based smoothing
+    boostLevel += (boostTarget - boostLevel) * ease;
 
-      // keep center clear (inside tunnel) by suppressing very small r brightness spikes
-      float innerFade = smoothstep(0.12, 0.20, r);    // 0 near center -> 1 outward
-      float outerFade = smoothstep(1.6, 0.6, r);      // fade to black at edges
+    // map boost to speed multiplier (e.g., 1.0 → 2.2x)
+    const speedMul = 1.0 + boostLevel * 1.2;
 
-      // radial glow falloff (emissive feel)
-      float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
+    gl.uniform1f(uSpin, spinAccum);
+    gl.uniform1f(uSpeed, speedMul);
+    gl.uniform1f(uTime, now * 0.001);
 
-      // color from discrete palette
-      vec3 base = roygbiv(ringStep);
-
-      // intensity: stripe core + halo
-      float core = stripe * innerFade;
-      float halo = glow * 0.55;
-
-      // slight chroma shift by angle for richness
-      vec3 col = base * (core * 1.7 + halo);
-
-      // vignette
-      float vig = smoothstep(1.4, 0.2, length(p));
-      col *= vig;
-
-      // subtle filmic tone
-      col = max(col - 0.004, 0.0);
-      col = (col*(6.2*col+0.5)) / (col*(6.2*col+1.7) + 0.06);
-
-      frag = vec4(col, 1.0);
-    }`;
-
-    function makeShader(type, src){
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
-        const log = gl.getShaderInfoLog(s);
-        console.error(log);
-        throw new Error('Shader compile failed');
-      }
-      return s;
-    }
-
-    const vs = makeShader(gl.VERTEX_SHADER, vsrc);
-    const fs = makeShader(gl.FRAGMENT_SHADER, fsrc);
-    const prog = gl.createProgram();
-    gl.attachShader(prog, vs);
-    gl.attachShader(prog, fs);
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)){
-      console.error(gl.getProgramInfoLog(prog));
-      throw new Error('Program link failed');
-    }
-    gl.useProgram(prog);
-
-    // uniforms
-    const uRes  = gl.getUniformLocation(prog, 'uRes');
-    const uTime = gl.getUniformLocation(prog, 'uTime');
-    const uSpin = gl.getUniformLocation(prog, 'uSpin');
-
-    // no VAO needed for gl_VertexID trick, but create one for safety
-    const vao = gl.createVertexArray();
-    gl.bindVertexArray(vao);
-
-    // resize
-    function resize(){
-      const w = mount.clientWidth;
-      const h = mount.clientHeight || Math.round(w/(16/9));
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      canvas.width  = Math.max(1, Math.floor(w * dpr));
-      canvas.height = Math.max(1, Math.floor(h * dpr));
-      canvas.style.width  = w + 'px';
-      canvas.style.height = h + 'px';
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-    }
-    new ResizeObserver(resize).observe(mount);
-    resize();
-
-    // interaction: click/tap → add one full spin, with easing done in JS
-    let spinRemain = 0.0; // radians to add
-    let spinVel = 0.0;
-    function spinOnce(){ spinRemain += Math.PI * 2.0; }
-    mount.addEventListener('click', spinOnce, {passive:true});
-    mount.addEventListener('touchstart', e => { spinOnce(); }, {passive:true});
-
-    let last = performance.now();
-    let spinAccum = 0.0;
-
-    function animate(){
-      const now = performance.now();
-      const dt = Math.min((now - last)/1000, 0.033);
-      last = now;
-
-      // spin easing
-      if (spinRemain > 0.0){
-        const accel = 6.0, maxVel = 4.0;
-        const desired = Math.min(maxVel, Math.sqrt(2.0*accel*spinRemain));
-        spinVel += (desired - spinVel) * Math.min(1.0, dt*6.0);
-        const step = Math.min(spinVel * dt, spinRemain);
-        spinAccum += step;
-        spinRemain -= step;
-      } else {
-        spinVel *= Math.pow(0.001, dt); // damp to zero
-      }
-
-      gl.uniform1f(uSpin, spinAccum);
-      gl.uniform1f(uTime, now * 0.001);
-
-      gl.disable(gl.DEPTH_TEST);
-      gl.disable(gl.BLEND);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      requestAnimationFrame(animate);
-    }
-    animate();
-  })();
-  </script>
+    gl.disable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
 </body>
 </html>
