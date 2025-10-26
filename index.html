@@ -6,7 +6,6 @@
   <title>DAECLAN.COM — Portfolio</title>
   <meta name="theme-color" content="#0a0a0a" />
   <meta name="description" content="DAECLAN.COM — music, performance, technology." />
-
   <style>
     :root{
       --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
@@ -19,7 +18,6 @@
     .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
     a{color:inherit}
 
-    /* Header */
     header{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
     .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
     .brand{text-decoration:none;font-weight:900;letter-spacing:.3px}
@@ -32,23 +30,20 @@
     .menu-btn{display:none}
     @media (max-width:860px){ nav{display:none}.menu-btn{display:inline-flex;border:1px solid var(--line);padding:8px 10px;border-radius:10px} }
 
-    /* Sections */
     section{scroll-margin-top:calc(var(--header) + 14px)}
     .section{padding:60px 0;border-bottom:1px solid var(--line)}
     .lead{color:var(--muted);max-width:68ch}
     .title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px;overflow:visible}
     .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 
-    /* Scene block */
     #showcase{padding:16px 0 50px}
     #heroScene{
       aspect-ratio:16/9; background:#0e0f12; border:1px solid var(--line);
       border-radius:16px; display:grid; place-items:center; overflow:hidden;
-      min-height:260px; /* fallback in case aspect-ratio isn't honored */
+      min-height:260px;
     }
     #heroScene p{color:#8b8d94;font-size:14px}
 
-    /* Grid + Cards */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
     .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
     @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
@@ -68,13 +63,8 @@
     .btn.ghost{border:1px solid var(--line);color:var(--fg)}
     .btn.orange{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
 
-    /* Footer */
     footer{padding:40px 0 70px;color:var(--muted)}
-
-    /* Simple reveal baseline */
     .reveal{opacity:1;transform:none}
-
-    /* Hide landing copy entirely */
     .landing-copy{display:none}
   </style>
 </head>
@@ -94,13 +84,12 @@
   </header>
 
   <main id="main">
-    <!-- Landing copy intentionally removed -->
     <section class="section container landing-copy">
       <h1 class="title">(hidden)</h1>
       <p class="lead">(hidden)</p>
     </section>
 
-    <!-- THREE.JS SHOWCASE (auto-load, also responds to tap/scroll) -->
+    <!-- SCENE -->
     <section id="showcase" class="container">
       <div id="heroScene"><p>Initializing…</p></div>
     </section>
@@ -110,9 +99,7 @@
       <h2>Music</h2>
       <p class="lead">Releases under <strong>DEGH</strong>.</p>
 
-      <!-- Trilogy grid -->
       <div class="grid" style="margin-top:18px;">
-        <!-- Declan Emphasized A Movie -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Album cover: DECLAN EMPHASIZED A MOVIE"/>
@@ -129,7 +116,6 @@
           </div>
         </article>
 
-        <!-- Declan Questioned An Image -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Album cover: Declan Questioned An Image"/>
@@ -138,14 +124,10 @@
           <div class="card-body">
             <div class="meta"><span>DEGH</span></div>
             <h3 class="title-sm">Declan Questioned An Image</h3>
-            <p class="desc">Part of the trilogy.</p>
-            <div class="actions">
-              <a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a>
-            </div>
+            <div class="actions"><a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a></div>
           </div>
         </article>
 
-        <!-- Declan Loved A Message -->
         <article class="card col-4 reveal">
           <div class="thumb">
             <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Album cover: Declan Loved A Message"/>
@@ -154,204 +136,51 @@
           <div class="card-body">
             <div class="meta"><span>DEGH</span></div>
             <h3 class="title-sm">Declan Loved A Message</h3>
-            <p class="desc">Part of the trilogy.</p>
-            <div class="actions">
-              <a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a>
-            </div>
+            <div class="actions"><a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a></div>
           </div>
         </article>
       </div>
 
-      <!-- Latest Music Video (YouTube embed) -->
       <div class="grid" style="margin-top:28px;">
         <article class="card col-12 reveal">
           <div class="card-body">
             <h3 class="title-sm" style="margin-bottom:10px;">Latest Music Video</h3>
             <div class="embed" style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid var(--line);background:#0e0f12;">
-              <iframe 
-                title="YouTube video player"
-                src="https://www.youtube.com/embed/XBsp40jGAIk" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowfullscreen 
-                style="position:absolute;inset:0;width:100%;height:100%;border:0;">
-              </iframe>
+              <iframe title="YouTube video player" src="https://www.youtube.com/embed/XBsp40jGAIk" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe>
             </div>
           </div>
         </article>
       </div>
 
-      <!-- earlyera series (Spotify embeds) -->
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-4 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">earlyera vol. 1</h3>
-            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
-              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                src="https://open.spotify.com/embed/album/6tNvw5hMojUHmy3LIDzBkE?theme=0"></iframe>
-            </div>
-          </div>
-        </article>
-        <article class="card col-4 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">earlyera vol. 2</h3>
-            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
-              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                src="https://open.spotify.com/embed/album/5pLgW31uG73lLzsLAhXhTN?theme=0"></iframe>
-            </div>
-          </div>
-        </article>
-        <article class="card col-4 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">earlyera vol. 3</h3>
-            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
-              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                src="https://open.spotify.com/embed/album/3puC9dCxZRIpiZOGy6MBby?theme=0"></iframe>
-            </div>
-          </div>
-        </article>
+        <article class="card col-4 reveal"><div class="card-body"><h3 class="title-sm">earlyera vol. 1</h3><div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);"><iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/album/6tNvw5hMojUHmy3LIDzBkE?theme=0"></iframe></div></div></article>
+        <article class="card col-4 reveal"><div class="card-body"><h3 class="title-sm">earlyera vol. 2</h3><div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);"><iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/album/5pLgW31uG73lLzsLAhXhTN?theme=0"></iframe></div></div></article>
+        <article class="card col-4 reveal"><div class="card-body"><h3 class="title-sm">earlyera vol. 3</h3><div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);"><iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" src="https://open.spotify.com/embed/album/3puC9dCxZRIpiZOGy6MBby?theme=0"></iframe></div></div></article>
       </div>
     </section>
 
-    <!-- ACTING (resume + headshots/photos placeholders) -->
     <section id="acting" class="section container">
       <h2>Acting</h2>
       <p class="lead">Resume, headshots, and production stills.</p>
       <div class="grid" style="margin-top:18px;">
-        <article class="card col-6 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">Resume</h3>
-            <p class="desc">PDF download and web view.</p>
-            <div class="actions">
-              <a class="btn primary" href="#" target="_blank" rel="noopener">View Resume</a>
-              <a class="btn ghost" href="#" download>Download PDF</a>
-            </div>
-          </div>
-        </article>
-        <article class="card col-6 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">Headshots & Photos</h3>
-            <p class="desc">A small gallery of select images.</p>
-            <div class="actions">
-              <a class="btn ghost" href="#" target="_blank" rel="noopener">Open Gallery</a>
-            </div>
-          </div>
-        </article>
+        <article class="card col-6 reveal"><div class="card-body"><h3 class="title-sm">Resume</h3><p class="desc">PDF download and web view.</p><div class="actions"><a class="btn primary" href="#" target="_blank" rel="noopener">View Resume</a><a class="btn ghost" href="#" download>Download PDF</a></div></div></article>
+        <article class="card col-6 reveal"><div class="card-body"><h3 class="title-sm">Headshots & Photos</h3><p class="desc">A small gallery of select images.</p><div class="actions"><a class="btn ghost" href="#" target="_blank" rel="noopener">Open Gallery</a></div></div></article>
       </div>
     </section>
 
-    <!-- WEB PROJECTS -->
     <section id="web" class="section container">
       <h2>Web Projects</h2>
       <p class="lead">Interfaces, interactive art, and tools.</p>
       <div class="grid" style="margin-top:18px;">
-        <!-- SLIME.SURF -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
-            <span class="tag">Site</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>SLIME.SURF</span></div>
-            <h3 class="title-sm">SLIME.SURF</h3>
-            <p class="desc">(Summary coming soon.)</p>
-            <div class="actions">
-              <a class="btn primary" href="https://www.slime.surf/" target="_blank" rel="noopener">Visit</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- MIGOS ADLIBS -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork">
-            <span class="tag">Site</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>MIGOS ADLIBS</span></div>
-            <h3 class="title-sm">MIGOS ADLIBS</h3>
-            <p class="desc">Every Single Ad Lib from 2017's Culture Perfectly Synced in the Migos Adlibs Visualizer.</p>
-            <div class="actions">
-              <a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Visit</a>
-              <a class="btn ghost" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank" rel="noopener">Complex</a>
-              <a class="btn ghost" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank" rel="noopener">The Fader</a>
-              <a class="btn ghost" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank" rel="noopener">VICE</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- SLAM HARRIS -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
-            <span class="tag">Audio</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>SLAM HARRIS</span></div>
-            <h3 class="title-sm">SLAM HARRIS</h3>
-            <p class="desc">a parody of sam harris' intro theme & guided meditations</p>
-            <div class="actions">
-              <a class="btn primary" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank" rel="noopener">waking yall up (parody)</a>
-              <a class="btn ghost" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank" rel="noopener">instrumental</a>
-              <a class="btn ghost" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank" rel="noopener">guided meditation (4:20)</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- XXXSENSATION -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage">
-            <span class="tag">Site</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>XXXSENSATION</span></div>
-            <h3 class="title-sm">XXXSENSATION</h3>
-            <p class="desc">(Summary coming soon.)</p>
-            <div class="actions">
-              <a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Visit</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- SLIME NO B (Young Thug-only remake) -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
-            <span class="tag">Editorial</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>SLIME NO B</span></div>
-            <h3 class="title-sm">SLIME NO B</h3>
-            <p class="desc">A Young Thug-Only Remake Of Slime & B That Cuts Chris Brown Off The Project.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a>
-            </div>
-          </div>
-        </article>
-
-        <!-- MORE LIFE (without Aubrey) -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <!-- TODO: replace with direct asset if desired -->
-            <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
-            <span class="tag">Project</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>MORE LIFE (without Aubrey)</span></div>
-            <h3 class="title-sm">MORE LIFE — Without Aubrey Drake Graham</h3>
-            <p class="desc">Alt-sequenced listening experience.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open</a>
-            </div>
-          </div>
-        </article>
+        <article class="card col-6 reveal"><div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background"><span class="tag">Site</span></div><div class="card-body"><div class="meta"><span>SLIME.SURF</span></div><h3 class="title-sm">SLIME.SURF</h3><p class="desc">(Summary coming soon.)</p><div class="actions"><a class="btn primary" href="https://www.slime.surf/" target="_blank" rel="noopener">Visit</a></div></div></article>
+        <article class="card col-6 reveal"><div class="thumb"><img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork"><span class="tag">Site</span></div><div class="card-body"><div class="meta"><span>MIGOS ADLIBS</span></div><h3 class="title-sm">MIGOS ADLIBS</h3><p class="desc">Every Single Ad Lib from 2017's Culture Perfectly Synced in the Migos Adlibs Visualizer.</p><div class="actions"><a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Visit</a><a class="btn ghost" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank" rel="noopener">Complex</a><a class="btn ghost" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank" rel="noopener">The Fader</a><a class="btn ghost" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank" rel="noopener">VICE</a></div></div></article>
+        <article class="card col-6 reveal"><div class="thumb"><img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar"><span class="tag">Audio</span></div><div class="card-body"><div class="meta"><span>SLAM HARRIS</span></div><h3 class="title-sm">SLAM HARRIS</h3><p class="desc">a parody of sam harris' intro theme & guided meditations</p><div class="actions"><a class="btn primary" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank" rel="noopener">waking yall up (parody)</a><a class="btn ghost" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank" rel="noopener">instrumental</a><a class="btn ghost" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank" rel="noopener">guided meditation (4:20)</a></div></div></article>
+        <article class="card col-6 reveal"><div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage"><span class="tag">Site</span></div><div class="card-body"><div class="meta"><span>XXXSENSATION</span></div><h3 class="title-sm">XXXSENSATION</h3><p class="desc">(Summary coming soon.)</p><div class="actions"><a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Visit</a></div></div></article>
+        <article class="card col-6 reveal"><div class="thumb"><img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork"><span class="tag">Editorial</span></div><div class="card-body"><div class="meta"><span>SLIME NO B</span></div><h3 class="title-sm">SLIME NO B</h3><p class="desc">A Young Thug-Only Remake Of Slime & B That Cuts Chris Brown Off The Project.</p><div class="actions"><a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a></div></div></article>
+        <article class="card col-6 reveal"><div class="thumb"><img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder"><span class="tag">Project</span></div><div class="card-body"><div class="meta"><span>MORE LIFE (without Aubrey)</span></div><h3 class="title-sm">MORE LIFE — Without Aubrey Drake Graham</h3><p class="desc">Alt-sequenced listening experience.</p><div class="actions"><a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open</a></div></div></article>
       </div>
     </section>
 
-    <!-- WRITING: 4-up grid -->
     <section id="writing" class="section container">
       <h2>Writing</h2>
       <p class="lead">Poems, blurbs, fragments.</p>
@@ -363,7 +192,6 @@
       </div>
     </section>
 
-    <!-- CONTACT with orange buttons -->
     <section id="contact" class="section container">
       <h2>Contact</h2>
       <p class="lead">Bookings, collabs, or just to say hi.</p>
@@ -386,41 +214,42 @@
     <p>© <span id="year"></span> DAECLAN.COM</p>
   </footer>
 
-  <!-- Year + Scrollspy -->
   <script>
     document.getElementById('year').textContent = new Date().getFullYear();
-
     const secs=[...document.querySelectorAll('main section[id]')];
     const links=[...document.querySelectorAll('header nav a')];
     const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
     const io=new IntersectionObserver(es=>{
-      es.forEach(e=>{
-        const id=e.target.id, link=map(id);
-        if(!link) return;
-        if(e.isIntersecting){
-          links.forEach(a=>a.classList.remove('active'));
-          link.classList.add('active');
-        }
-      });
+      es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return; if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }});
     },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
     secs.forEach(s=>io.observe(s));
   </script>
 
-  <!-- Load Three.js FIRST (single known-good URL). If you self-host, swap src to your path. -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js" crossorigin="anonymous"></script>
-
-  <!-- ROYGBIV wormhole (camera inside, endless, spin on click) -->
-  <script>
-  (function(){
+  <!-- SCENE BOOTSTRAP (ESM with robust fallbacks) -->
+  <script type="module">
     const mount = document.getElementById('heroScene');
-    if (!mount) return;
+    if (mount) mount.textContent = 'Initializing…';
 
-    let booted = false;
+    async function loadThree() {
+      // Try local first (adjust path if your local copy differs)
+      const candidates = [
+        '/vendor/three/0.161.0/build/three.module.js',
+        '/vendor/three/build/three.module.js',
+        '/three/three.module.js',
+        'https://unpkg.com/three@0.161.0/build/three.module.js?module',
+        'https://esm.run/three@0.161.0'
+      ];
+      let mod = null, lastErr = null;
+      for (const url of candidates) {
+        try {
+          mod = await import(url);
+          if (mod && mod.Scene) return mod;
+        } catch (e) { lastErr = e; }
+      }
+      throw lastErr || new Error('Unable to import three.module.js from any source.');
+    }
 
-    function start(){
-      if (booted) return; booted = true;
-      mount.textContent = '';
-
+    function boot(THREE){
       const W = mount.clientWidth;
       const H = mount.clientHeight || Math.round(W/(16/9));
 
@@ -430,6 +259,7 @@
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.12;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
+      mount.textContent = '';
       mount.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
@@ -442,10 +272,7 @@
 
       const GROUP = new THREE.Group(); scene.add(GROUP);
 
-      // Tunnel params
       const RINGS=500, SPACING=0.58, RADIUS=3.3, THICK=0.08, SPEED=14.0;
-
-      // Geometry + material
       const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
       const mat = new THREE.MeshStandardMaterial({
         color:0x0b0c12, roughness:0.25, metalness:0.65,
@@ -455,33 +282,24 @@
       mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       GROUP.add(mesh);
 
-      // ROYGBIV palette repeat
       const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
       const PAL=HEX.map(h=> new THREE.Color(h));
       const M = new THREE.Matrix4(), TMP = new THREE.Vector3();
       function place(i,z){ M.identity(); M.setPosition(0,0,z); mesh.setMatrixAt(i,M); }
-      function colorAtDepth(i,z){
-        const step=Math.floor((-z)/SPACING);
-        const idx=((step%PAL.length)+PAL.length)%PAL.length;
-        mesh.setColorAt(i, PAL[idx]);
-      }
-      for(let i=0;i&RINGS;i++){ /* safety guard */ }
+      function colorAtDepth(i,z){ const step=Math.floor((-z)/SPACING); const idx=((step%PAL.length)+PAL.length)%PAL.length; mesh.setColorAt(i, PAL[idx]); }
       for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
       mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
 
-      // Lights
       scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
       const core = new THREE.PointLight(0xffffff, 0.55, 16, 2.0);
       core.position.set(0,0,-2);
       scene.add(core);
 
-      // Click/tap -> one axial spin with easing
       let spinVel=0, spinRemain=0; const SPIN_TARGET=Math.PI*2;
       function spinOnce(){ spinRemain += SPIN_TARGET; }
       mount.addEventListener('click',  spinOnce, {passive:true});
       mount.addEventListener('touchstart', spinOnce, {passive:true});
 
-      // Resize
       const ro = new ResizeObserver(()=>{
         const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
         renderer.setSize(w,h);
@@ -490,7 +308,6 @@
       });
       ro.observe(mount);
 
-      // Animate
       let last = performance.now();
       function advance(dt){
         const dz = SPEED*dt; GROUP.position.z += dz;
@@ -506,7 +323,7 @@
           const accel=6, maxVel=4;
           const desired=Math.min(maxVel, Math.sqrt(2*accel*spinRemain));
           spinVel += (desired - spinVel) * Math.min(1, dt*6);
-          const step = Math.min(spinVel*dt, spinRemain);
+          const step=Math.min(spinVel*dt, spinRemain);
           GROUP.rotation.z += step; spinRemain -= step;
         } else {
           spinVel *= Math.pow(0.001, dt);
@@ -521,19 +338,16 @@
       animate();
     }
 
-    // Boot once the DOM is ready and Three.js is loaded
-    function ready(fn){
-      if (document.readyState === 'complete' || document.readyState === 'interactive') fn();
-      else document.addEventListener('DOMContentLoaded', fn);
-    }
-    ready(()=> {
-      if (typeof THREE === 'undefined') {
-        document.getElementById('heroScene').innerHTML = '<p style="color:#f99">Three.js failed to load</p>';
-        return;
+    (async () => {
+      try {
+        const THREE = await loadThree();
+        if (!document.getElementById('heroScene')) return;
+        boot(THREE);
+      } catch (err) {
+        if (mount) mount.innerHTML = `<p style="color:#f99">Three.js import failed. Check CSP or serve /vendor/three/... with Content-Type: application/javascript.</p>`;
+        console.error(err);
       }
-      start();
-    });
-  })();
+    })();
   </script>
 </body>
 </html>
