@@ -244,7 +244,7 @@
   const gl = canvas.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true });
   if (!gl){ mount.innerHTML = '<p style="color:#f99">WebGL2 not available</p>'; return; }
 
-  // full-screen triangle
+  // fullscreen triangle
   const vsrc = `#version 300 es
   const vec2 verts[3] = vec2[3](
     vec2(-1.0, -1.0),
@@ -266,8 +266,8 @@
 
   uniform vec2  uRes;
   uniform float uTime;
-  uniform float uSpin;     // rotation from scroll
-  uniform float uSpeed;    // 1.0 = base, >1 faster
+  uniform float uSpin;     // continuous axial rotation
+  uniform float uSpeed;    // speed multiplier (click bumps this permanently)
 
   // ROYGBIV indexed color
   vec3 roygbiv(float idx){
@@ -287,19 +287,19 @@
     p = rot(uSpin) * p;
 
     float r = length(p) + 1e-6;
-    float a = atan(p.y, p.x);
 
-    // base speed is 1.6; multiply by uSpeed from JS (click boost)
+    // base speed 1.6, multiplied by uSpeed (from JS, permanent bumps)
     float speed = 1.6 * uSpeed;
 
+    // forward travel; 4.0/r gives the “rungs” perspective
     float z = uTime * speed + 4.0 / r;
 
+    // ring frequency + neon band
     float stripeDensity = 1.35;
     float ringStep = floor(mod(z * stripeDensity, 7.0));
     float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
 
     float innerFade = smoothstep(0.12, 0.20, r);
-    float outerFade = smoothstep(1.6, 0.6, r);
     float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
 
     vec3 base = roygbiv(ringStep);
@@ -310,6 +310,7 @@
     float vig = smoothstep(1.4, 0.2, length(p));
     col *= vig;
 
+    // simple filmic-ish tone
     col = max(col - 0.004, 0.0);
     col = (col*(6.2*col+0.5)) / (col*(6.2*col+1.7) + 0.06);
 
@@ -363,25 +364,26 @@
   new ResizeObserver(resize).observe(mount);
   resize();
 
-  // --- Interaction ---
-  // Scroll → rotate around axis
-  let spinAccum = 0.0;
-  mount.addEventListener('wheel', (e)=>{
-    // Negative sign so scrolling down rotates clockwise; tune factor as desired
-    spinAccum += -e.deltaY * 0.003;
+  // --- Interaction / Motion controls ---
+  // Continuous, gentle rotation (radians per second)
+  const spinSpeed = 0.25;    // tweak for faster/slower rotation
+  let spinAccum   = 0.0;
+
+  // Click = permanent speed bump; Double-click = reset
+  const BASE_SPEED = 1.0;
+  let speedMul = BASE_SPEED;
+
+  // Each click adds +0.5x until a cap; double-click resets to base.
+  const CLICK_INCREMENT = 0.5;
+  const SPEED_CAP       = 3.0;
+
+  mount.addEventListener('click', () => {
+    speedMul = Math.min(SPEED_CAP, speedMul + CLICK_INCREMENT);
   }, {passive:true});
 
-  // Click / press & hold → speed boost
-  let boostTarget = 0.0;   // 0..1
-  let boostLevel  = 0.0;   // eased
-  const onDown = ()=>{ boostTarget = 1.0; };
-  const onUp   = ()=>{ boostTarget = 0.0; };
-  mount.addEventListener('pointerdown', onDown, {passive:true});
-  window.addEventListener('pointerup', onUp, {passive:true});
-  mount.addEventListener('touchstart', onDown, {passive:true});
-  window.addEventListener('touchend', onUp, {passive:true});
-  window.addEventListener('touchcancel', onUp, {passive:true});
-  mount.addEventListener('pointerleave', onUp, {passive:true});
+  mount.addEventListener('dblclick', () => {
+    speedMul = BASE_SPEED;
+  }, {passive:true});
 
   // Animation
   let last = performance.now();
@@ -390,16 +392,12 @@
     const dt = Math.min((now - last)/1000, 0.033);
     last = now;
 
-    // ease boost toward target (snappy, but not jarring)
-    const ease = 1.0 - Math.pow(0.0005, dt); // time-based smoothing
-    boostLevel += (boostTarget - boostLevel) * ease;
+    // accumulate slow, steady spin
+    spinAccum += spinSpeed * dt;
 
-    // map boost to speed multiplier (e.g., 1.0 → 2.2x)
-    const speedMul = 1.0 + boostLevel * 1.2;
-
-    gl.uniform1f(uSpin, spinAccum);
+    gl.uniform1f(uSpin,  spinAccum);
     gl.uniform1f(uSpeed, speedMul);
-    gl.uniform1f(uTime, now * 0.001);
+    gl.uniform1f(uTime,  now * 0.001);
 
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
