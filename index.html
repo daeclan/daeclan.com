@@ -228,12 +228,13 @@
   </script>
 
   <!-- ZERO-DEPENDENCY WEBGL2 WORMHOLE -->
-  <!-- ZERO-DEPENDENCY WEBGL2 WORMHOLE (big smooth speed bumps + click ripples + auto-rotate) -->
+  <!-- ZERO-DEPENDENCY WEBGL2 WORMHOLE (big speed bumps + auto-rotate + click ripples) -->
 <script>
 (function(){
   const mount = document.getElementById('heroScene');
   if (!mount) return;
 
+  // Canvas & GL
   const canvas = document.createElement('canvas');
   canvas.style.display = 'block';
   canvas.style.width = '100%';
@@ -244,25 +245,33 @@
   const gl = canvas.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true });
   if (!gl){ mount.innerHTML = '<p style="color:#f99">WebGL2 not available</p>'; return; }
 
+  // Fullscreen triangle
   const vsrc = `#version 300 es
   const vec2 V[3] = vec2[3]( vec2(-1.,-1.), vec2(3.,-1.), vec2(-1.,3.) );
   out vec2 vUv;
-  void main(){ vec2 p = V[gl_VertexID]; vUv = .5*(p+1.); gl_Position = vec4(p,0.,1.); }`;
+  void main(){
+    vec2 p = V[gl_VertexID];
+    vUv = 0.5 * (p + 1.0);
+    gl_Position = vec4(p, 0.0, 1.0);
+  }`;
 
-  const MAX_RIPPLES = 8;
+  // Fragment shader (ROYGBIV tunnel + ripples)
   const fsrc = `#version 300 es
   precision highp float;
-  in vec2 vUv; out vec4 frag;
+
+  in vec2 vUv;
+  out vec4 frag;
 
   uniform vec2  uRes;
   uniform float uTimeSec;
-  uniform float uSpin;
-  uniform float uTravel;
+  uniform float uSpin;     // axial rotation
+  uniform float uTravel;   // accumulated forward travel
 
+  // Ripple uniforms (hard-coded to 8 slots)
   uniform int   uRippleCount;
-  uniform vec2  uRipplePos[${MAX_RIPPLES}];   // in 0..1 (screen UV)
-  uniform float uRippleStart[${MAX_RIPPLES}]; // seconds
-  uniform float uRippleAmp[${MAX_RIPPLES}];   // amplitude
+  uniform vec2  uRipplePos[8];
+  uniform float uRippleStart[8];
+  uniform float uRippleAmp[8];
 
   vec3 roygbiv(float i){
     if(i<0.5) return vec3(1.,0.,0.);
@@ -273,179 +282,188 @@
     if(i<5.5) return vec3(0.294,0.,0.510);
     return vec3(0.561,0.,1.);
   }
+
   mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
 
   void main(){
-    // normalized NDC-ish space preserving aspect
-    vec2 p = (vUv * uRes - 0.5*uRes) / min(uRes.x,uRes.y);
+    // Aspect-corrected coords in [-something, +something]
+    vec2 p = (vUv * uRes - 0.5*uRes) / min(uRes.x, uRes.y);
 
-    // --- Screen-space ripple displacement (before spin) ---
-    // Convert ripple centers into same space as p
-    for (int i=0;i<${MAX_RIPPLES};i++){
-      if (i>=uRippleCount) break;
-      // transform center to p-space
-      vec2 c = (uRipplePos[i]*uRes - 0.5*uRes) / min(uRes.x,uRes.y);
+    // Screen-space ripple displacement (before rotation)
+    for (int i=0; i<8; i++){
+      if (i >= uRippleCount) break;
+      vec2 c = (uRipplePos[i] * uRes - 0.5*uRes) / min(uRes.x, uRes.y);
       vec2 d = p - c;
       float r = length(d) + 1e-5;
 
       float t = max(0.0, uTimeSec - uRippleStart[i]);
-      // ring travels outward: phase = k*r - w*t
-      float k = 18.0;          // spatial frequency
-      float w = 9.0;           // temporal frequency
-      float env = exp(-2.2*t) * exp(-2.0*r); // decay over time and radius
+      float k = 18.0;        // spatial frequency
+      float w = 9.0;         // temporal frequency
+      float env = exp(-2.2*t) * exp(-2.0*r); // decay in time & radius
       float wave = sin(k*r - w*t);
 
-      // push along radial dir
       vec2 dir = d / r;
       p += dir * (uRippleAmp[i] * wave * env);
     }
 
-    // axial rotation
+    // Axial rotation
     p = rot(uSpin) * p;
 
     float r = length(p) + 1e-6;
 
-    // forward coordinate uses accumulated travel for smooth speed changes
+    // Forward coordinate uses accumulated travel for smooth speed changes
     float z = uTravel + 4.0 / r;
 
+    // Neon rings (ROYGBIV repeating by depth)
     float stripeDensity = 1.35;
-    float ringStep = floor(mod(z * stripeDensity, 7.0));
+    float ringIndex = floor(mod(z * stripeDensity, 7.0));
     float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
 
+    // Keep core open; soft halo
     float innerFade = smoothstep(0.12, 0.20, r);
     float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
 
-    vec3 base = roygbiv(ringStep);
+    vec3 base = roygbiv(ringIndex);
     float core = stripe * innerFade;
     float halo = glow * 0.55;
     vec3 col = base * (core * 1.7 + halo);
 
-    // vignette
+    // Vignette
     float vig = smoothstep(1.4, 0.2, length(p));
     col *= vig;
 
-    // filmic-ish tone
+    // Filmic-ish tonemapping
     col = max(col - 0.004, 0.0);
     col = (col*(6.2*col+0.5)) / (col*(6.2*col+1.7) + 0.06);
 
     frag = vec4(col, 1.0);
   }`;
 
-  function sh(type, src){
+  // Compile/link
+  function compile(type, src){
     const s = gl.createShader(type);
-    gl.shaderSource(s, src); gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)||'shader compile fail');
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+      console.error(gl.getShaderInfoLog(s));
+      throw new Error('Shader compile failed');
+    }
     return s;
   }
   const prog = gl.createProgram();
-  gl.attachShader(prog, sh(gl.VERTEX_SHADER, vsrc));
-  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, fsrc));
+  gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsrc));
+  gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsrc));
   gl.linkProgram(prog);
-  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog)||'link fail');
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+    console.error(gl.getProgramInfoLog(prog));
+    throw new Error('Program link failed');
+  }
   gl.useProgram(prog);
   gl.bindVertexArray(gl.createVertexArray());
 
-  const uRes      = gl.getUniformLocation(prog, 'uRes');
-  const uTimeSec  = gl.getUniformLocation(prog, 'uTimeSec');
-  const uSpin     = gl.getUniformLocation(prog, 'uSpin');
-  const uTravel   = gl.getUniformLocation(prog, 'uTravel');
+  // Uniforms
+  const uRes        = gl.getUniformLocation(prog, 'uRes');
+  const uTimeSec    = gl.getUniformLocation(prog, 'uTimeSec');
+  const uSpin       = gl.getUniformLocation(prog, 'uSpin');
+  const uTravel     = gl.getUniformLocation(prog, 'uTravel');
+  const uRippleCount= gl.getUniformLocation(prog, 'uRippleCount');
+  const uRipplePos  = gl.getUniformLocation(prog, 'uRipplePos[0]');
+  const uRippleStart= gl.getUniformLocation(prog, 'uRippleStart[0]');
+  const uRippleAmp  = gl.getUniformLocation(prog, 'uRippleAmp[0]');
 
-  const uRippleCount = gl.getUniformLocation(prog, 'uRippleCount');
-  const uRipplePos   = gl.getUniformLocation(prog, 'uRipplePos[0]');
-  const uRippleStart = gl.getUniformLocation(prog, 'uRippleStart[0]');
-  const uRippleAmp   = gl.getUniformLocation(prog, 'uRippleAmp[0]');
-
+  // Resize
   function resize(){
     const w = mount.clientWidth;
     const h = mount.clientHeight || Math.round(w/(16/9));
-    const dpr = Math.min(window.devicePixelRatio||1, 2);
-    canvas.width  = Math.max(1, Math.floor(w*dpr));
-    canvas.height = Math.max(1, Math.floor(h*dpr));
-    canvas.style.width  = w+'px';
-    canvas.style.height = h+'px';
-    gl.viewport(0,0,canvas.width,canvas.height);
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width  = Math.max(1, Math.floor(w * dpr));
+    canvas.height = Math.max(1, Math.floor(h * dpr));
+    canvas.style.width  = w + 'px';
+    canvas.style.height = h + 'px';
+    gl.viewport(0, 0, canvas.width, canvas.height);
     gl.uniform2f(uRes, canvas.width, canvas.height);
   }
   new ResizeObserver(resize).observe(mount);
   resize();
 
-  // --- Motion & speed control ---
-  const BASE_SPEED = 1.6;
-  let travel = 0.0;
+  // Motion & speed
+  const BASE_SPEED   = 1.6;  // base forward units/sec
+  let   travel       = 0.0;  // integrated forward position
+  const SPIN_SPEED   = 0.6;  // radians/sec auto-rotation
+  let   spinAccum    = 0.0;
 
-  // auto-rotation (visible)
-  const spinSpeed = 0.6;
-  let spinAccum = 0.0;
+  // Extreme but smooth speed bumps (multiplicative)
+  let speedMul    = 1.0;     // current multiplier
+  let speedTarget = 1.0;     // target multiplier (eased to)
+  const SPEED_GROWTH = 1.8;  // per-click multiplier
+  const SPEED_CAP    = 12.0; // max multiplier
+  const SPEED_EASE   = 0.0015; // easing factor (higher = snappier)
 
-  // extreme but smooth speed bumps
-  let speedMul = 1.0;          // current
-  let speedTarget = 1.0;       // desired, eased to
-  const SPEED_GROWTH = 1.8;    // per click multiply
-  const SPEED_CAP    = 12.0;   // max multiplier
-  const SPEED_EASE   = 0.0015; // larger = snappier easing
-
-  // --- Ripples (ring buffer) ---
-  const MAX = ${MAX_RIPPLES};
-  const ripplePos   = new Float32Array(MAX*2); // x,y pairs
-  const rippleStart = new Float32Array(MAX);
-  const rippleAmp   = new Float32Array(MAX);
-  let rippleCount = 0;
+  // Ripples
+  const MAX = 8;
+  const ripplePos   = new Float32Array(MAX * 2); // x,y pairs
+  const rippleStart = new Float32Array(MAX);     // start time (sec)
+  const rippleAmp   = new Float32Array(MAX);     // amplitude
+  let rippleCountTotal = 0;                      // monotonically increasing, use modulo for ring buffer
 
   function pushRipple(uvx, uvy, amp){
-    // overwrite oldest when full
-    const idx = rippleCount % MAX;
-    ripplePos[idx*2+0] = uvx;
-    ripplePos[idx*2+1] = uvy;
-    rippleStart[idx]   = performance.now()*0.001;
-    rippleAmp[idx]     = amp;
-    rippleCount++;
+    const idx = rippleCountTotal % MAX;
+    ripplePos[idx*2 + 0] = uvx;
+    ripplePos[idx*2 + 1] = uvy;
+    rippleStart[idx]     = performance.now() * 0.001;
+    rippleAmp[idx]       = amp;
+    rippleCountTotal++;
   }
 
-  function clickAt(e){
+  function onClick(e){
     const r = mount.getBoundingClientRect();
-    const x = ('touches' in e)? e.touches[0].clientX : e.clientX;
-    const y = ('touches' in e)? e.touches[0].clientY : e.clientY;
+    const x = ('touches' in e) ? e.touches[0].clientX : e.clientX;
+    const y = ('touches' in e) ? e.touches[0].clientY : e.clientY;
     const u = (x - r.left) / Math.max(1, r.width);
     const v = (y - r.top ) / Math.max(1, r.height);
-    // Big smooth speed boost
+
+    // Big smooth speed boost (compound)
     speedTarget = Math.min(SPEED_CAP, speedTarget * SPEED_GROWTH);
-    // Ripple (slightly stronger at center feel)
+
+    // Water ripple at click
     pushRipple(u, v, 0.018);
   }
 
-  mount.addEventListener('click', clickAt, {passive:true});
-  mount.addEventListener('touchstart', clickAt, {passive:true});
-  // Double-click to reset speed to base
-  mount.addEventListener('dblclick', ()=>{
+  mount.addEventListener('click', onClick, {passive:true});
+  mount.addEventListener('touchstart', onClick, {passive:true});
+
+  // Double-click resets speed
+  mount.addEventListener('dblclick', function(){
     speedTarget = 1.0;
   }, {passive:true});
 
-  // animate
+  // Animate
   let last = performance.now();
   function animate(){
     const now = performance.now();
-    const dt  = Math.min((now-last)/1000, 0.033); last = now;
+    const dt  = Math.min((now - last)/1000, 0.033);
+    last = now;
 
-    // ease current speed toward target smoothly
-    const ease = 1.0 - Math.pow(1.0 - SPEED_EASE, dt*60.0);
+    // Ease speed toward target (time-based smoothing)
+    const ease = 1.0 - Math.pow(1.0 - SPEED_EASE, dt * 60.0);
     speedMul += (speedTarget - speedMul) * ease;
 
-    // integrate travel and spin
-    travel   += BASE_SPEED * speedMul * dt;
-    spinAccum += spinSpeed * dt;
+    // Integrate motion
+    travel    += BASE_SPEED * speedMul * dt;
+    spinAccum += SPIN_SPEED * dt;
 
-    // upload uniforms
-    gl.uniform1f(uTimeSec, now*0.001);
-    gl.uniform1f(uSpin,    spinAccum);
-    gl.uniform1f(uTravel,  travel);
+    // Upload uniforms
+    gl.uniform1f(uTimeSec,  now * 0.001);
+    gl.uniform1f(uSpin,     spinAccum);
+    gl.uniform1f(uTravel,   travel);
 
-    // upload active ripple arrays (cap to MAX)
-    const count = Math.min(rippleCount, MAX);
-    gl.uniform1i(uRippleCount, count);
-    gl.uniform2fv(uRipplePos, ripplePos);
+    const active = Math.min(rippleCountTotal, MAX);
+    gl.uniform1i(uRippleCount, active);
+    gl.uniform2fv(uRipplePos,   ripplePos);
     gl.uniform1fv(uRippleStart, rippleStart);
-    gl.uniform1fv(uRippleAmp, rippleAmp);
+    gl.uniform1fv(uRippleAmp,   rippleAmp);
 
+    // Draw
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
