@@ -33,9 +33,10 @@
     section{scroll-margin-top:calc(var(--header) + 14px)}
     .section{padding:60px 0;border-bottom:1px solid var(--line)}
     .lead{color:var(--muted);max-width:68ch}
-    .title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px;overflow:visible}
+    .title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px}
     .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 
+    /* Scene block */
     #showcase{padding:16px 0 50px}
     #heroScene{
       aspect-ratio:16/9; background:#0e0f12; border:1px solid var(--line);
@@ -44,6 +45,7 @@
     }
     #heroScene p{color:#8b8d94;font-size:14px}
 
+    /* Grid + Cards */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
     .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
     @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
@@ -225,129 +227,200 @@
     secs.forEach(s=>io.observe(s));
   </script>
 
-  <!-- SCENE BOOTSTRAP (ESM with robust fallbacks) -->
-  <script type="module">
+  <!-- ZERO-DEPENDENCY WEBGL2 WORMHOLE -->
+  <script>
+  (function(){
     const mount = document.getElementById('heroScene');
-    if (mount) mount.textContent = 'Initializing…';
+    if (!mount) return;
 
-    async function loadThree() {
-      // Try local first (adjust path if your local copy differs)
-      const candidates = [
-        '/vendor/three/0.161.0/build/three.module.js',
-        '/vendor/three/build/three.module.js',
-        '/three/three.module.js',
-        'https://unpkg.com/three@0.161.0/build/three.module.js?module',
-        'https://esm.run/three@0.161.0'
-      ];
-      let mod = null, lastErr = null;
-      for (const url of candidates) {
-        try {
-          mod = await import(url);
-          if (mod && mod.Scene) return mod;
-        } catch (e) { lastErr = e; }
-      }
-      throw lastErr || new Error('Unable to import three.module.js from any source.');
+    // create canvas
+    const canvas = document.createElement('canvas');
+    canvas.style.display = 'block';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    mount.textContent = '';
+    mount.appendChild(canvas);
+
+    const gl = canvas.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true });
+    if (!gl){ mount.innerHTML = '<p style="color:#f99">WebGL2 not available</p>'; return; }
+
+    // full-screen triangle
+    const vsrc = `#version 300 es
+    const vec2 verts[3] = vec2[3](
+      vec2(-1.0, -1.0),
+      vec2( 3.0, -1.0),
+      vec2(-1.0,  3.0)
+    );
+    out vec2 vUv;
+    void main(){
+      vec2 p = verts[gl_VertexID];
+      vUv = 0.5 * (p + 1.0);
+      gl_Position = vec4(p, 0.0, 1.0);
+    }`;
+
+    // ROYGBIV palette helper
+    // Tunnel is generated analytically (no textures, no libs).
+    const fsrc = `#version 300 es
+    precision highp float;
+
+    in vec2 vUv;
+    out vec4 frag;
+
+    uniform vec2  uRes;
+    uniform float uTime;
+    uniform float uSpin;   // axial rotation added on click
+
+    // Return strict ROYGBIV by index 0..6
+    vec3 roygbiv(float idx){
+      if(idx<0.5) return vec3(1.0,0.0,0.0);
+      if(idx<1.5) return vec3(1.0,0.5,0.0);
+      if(idx<2.5) return vec3(1.0,1.0,0.0);
+      if(idx<3.5) return vec3(0.0,1.0,0.0);
+      if(idx<4.5) return vec3(0.0,0.0,1.0);
+      if(idx<5.5) return vec3(0.294,0.0,0.510);   // Indigo
+      return vec3(0.561,0.0,1.0);                // Violet
     }
 
-    function boot(THREE){
-      const W = mount.clientWidth;
-      const H = mount.clientHeight || Math.round(W/(16/9));
+    // rotate 2D
+    mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
 
-      const renderer = new THREE.WebGLRenderer({ antialias:true, alpha:true, powerPreference:'high-performance' });
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-      renderer.setSize(W, H);
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.12;
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      mount.textContent = '';
-      mount.appendChild(renderer.domElement);
+    void main(){
+      // normalized coords
+      vec2 p = (vUv * uRes - 0.5*uRes) / min(uRes.x,uRes.y);
 
-      const scene = new THREE.Scene();
-      const bg = new THREE.Color(0x05060a);
-      scene.background = bg;
-      scene.fog = new THREE.FogExp2(bg.getHex(), 0.018);
+      // apply axial spin (click -> uSpin accumulates)
+      p = rot(uSpin) * p;
 
-      const camera = new THREE.PerspectiveCamera(72, W/H, 0.03, 1000);
-      camera.position.set(0,0,0);
+      // tunnel mapping: use polar coords, make longitudinal coord increase with time
+      float r = length(p) + 1e-6;               // radial distance
+      float a = atan(p.y, p.x);
 
-      const GROUP = new THREE.Group(); scene.add(GROUP);
+      // forward velocity; tune to taste
+      float speed = 1.6;
 
-      const RINGS=500, SPACING=0.58, RADIUS=3.3, THICK=0.08, SPEED=14.0;
-      const geo = new THREE.TorusGeometry(RADIUS, THICK, 12, 96);
-      const mat = new THREE.MeshStandardMaterial({
-        color:0x0b0c12, roughness:0.25, metalness:0.65,
-        emissive:0x000000, emissiveIntensity:2.7, vertexColors:true
-      });
-      const mesh = new THREE.InstancedMesh(geo, mat, RINGS);
-      mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-      GROUP.add(mesh);
+      // z-like coordinate along the tunnel: 1/r gives acceleration towards center; add time to move forward
+      float z = uTime * speed + 4.0 / r;
 
-      const HEX=[0xFF0000,0xFF7F00,0xFFFF00,0x00FF00,0x0000FF,0x4B0082,0x8F00FF];
-      const PAL=HEX.map(h=> new THREE.Color(h));
-      const M = new THREE.Matrix4(), TMP = new THREE.Vector3();
-      function place(i,z){ M.identity(); M.setPosition(0,0,z); mesh.setMatrixAt(i,M); }
-      function colorAtDepth(i,z){ const step=Math.floor((-z)/SPACING); const idx=((step%PAL.length)+PAL.length)%PAL.length; mesh.setColorAt(i, PAL[idx]); }
-      for(let i=0;i<RINGS;i++){ const z=-i*SPACING; place(i,z); colorAtDepth(i,z); }
-      mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      // banding along z -> stripes
+      float stripeDensity = 1.35;               // ring frequency
+      float ringStep = floor(mod(z * stripeDensity, 7.0)); // 0..6 repeat
 
-      scene.add(new THREE.HemisphereLight(0xaec2ff, bg.getHex(), 0.22));
-      const core = new THREE.PointLight(0xffffff, 0.55, 16, 2.0);
-      core.position.set(0,0,-2);
-      scene.add(core);
+      // ring thickness: make bands narrow and neon-like
+      float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
 
-      let spinVel=0, spinRemain=0; const SPIN_TARGET=Math.PI*2;
-      function spinOnce(){ spinRemain += SPIN_TARGET; }
-      mount.addEventListener('click',  spinOnce, {passive:true});
-      mount.addEventListener('touchstart', spinOnce, {passive:true});
+      // keep center clear (inside tunnel) by suppressing very small r brightness spikes
+      float innerFade = smoothstep(0.12, 0.20, r);    // 0 near center -> 1 outward
+      float outerFade = smoothstep(1.6, 0.6, r);      // fade to black at edges
 
-      const ro = new ResizeObserver(()=>{
-        const w = mount.clientWidth, h = mount.clientHeight || Math.round(w/(16/9));
-        renderer.setSize(w,h);
-        camera.aspect = w/h; camera.updateProjectionMatrix();
-        scene.fog.density = THREE.MathUtils.clamp(0.018*(1920/w), 0.016, 0.03);
-      });
-      ro.observe(mount);
+      // radial glow falloff (emissive feel)
+      float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
 
-      let last = performance.now();
-      function advance(dt){
-        const dz = SPEED*dt; GROUP.position.z += dz;
-        for(let i=0;i<RINGS;i++){
-          mesh.getMatrixAt(i,M); TMP.setFromMatrixPosition(M); TMP.z += dz;
-          if (TMP.z > SPACING){ TMP.z -= RINGS*SPACING; place(i,TMP.z); colorAtDepth(i,TMP.z); }
-          else { M.setPosition(0,0,TMP.z); mesh.setMatrixAt(i,M); }
-        }
-        mesh.instanceMatrix.needsUpdate = true; if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+      // color from discrete palette
+      vec3 base = roygbiv(ringStep);
+
+      // intensity: stripe core + halo
+      float core = stripe * innerFade;
+      float halo = glow * 0.55;
+
+      // slight chroma shift by angle for richness
+      vec3 col = base * (core * 1.7 + halo);
+
+      // vignette
+      float vig = smoothstep(1.4, 0.2, length(p));
+      col *= vig;
+
+      // subtle filmic tone
+      col = max(col - 0.004, 0.0);
+      col = (col*(6.2*col+0.5)) / (col*(6.2*col+1.7) + 0.06);
+
+      frag = vec4(col, 1.0);
+    }`;
+
+    function makeShader(type, src){
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+        const log = gl.getShaderInfoLog(s);
+        console.error(log);
+        throw new Error('Shader compile failed');
       }
-      function updateSpin(dt){
-        if (spinRemain>0){
-          const accel=6, maxVel=4;
-          const desired=Math.min(maxVel, Math.sqrt(2*accel*spinRemain));
-          spinVel += (desired - spinVel) * Math.min(1, dt*6);
-          const step=Math.min(spinVel*dt, spinRemain);
-          GROUP.rotation.z += step; spinRemain -= step;
-        } else {
-          spinVel *= Math.pow(0.001, dt);
-        }
-      }
-      function animate(){
-        requestAnimationFrame(animate);
-        const now = performance.now(); const dt = Math.min((now-last)/1000, 0.033); last=now;
-        advance(dt); updateSpin(dt);
-        renderer.render(scene, camera);
-      }
-      animate();
+      return s;
     }
 
-    (async () => {
-      try {
-        const THREE = await loadThree();
-        if (!document.getElementById('heroScene')) return;
-        boot(THREE);
-      } catch (err) {
-        if (mount) mount.innerHTML = `<p style="color:#f99">Three.js import failed. Check CSP or serve /vendor/three/... with Content-Type: application/javascript.</p>`;
-        console.error(err);
+    const vs = makeShader(gl.VERTEX_SHADER, vsrc);
+    const fs = makeShader(gl.FRAGMENT_SHADER, fsrc);
+    const prog = gl.createProgram();
+    gl.attachShader(prog, vs);
+    gl.attachShader(prog, fs);
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+      console.error(gl.getProgramInfoLog(prog));
+      throw new Error('Program link failed');
+    }
+    gl.useProgram(prog);
+
+    // uniforms
+    const uRes  = gl.getUniformLocation(prog, 'uRes');
+    const uTime = gl.getUniformLocation(prog, 'uTime');
+    const uSpin = gl.getUniformLocation(prog, 'uSpin');
+
+    // no VAO needed for gl_VertexID trick, but create one for safety
+    const vao = gl.createVertexArray();
+    gl.bindVertexArray(vao);
+
+    // resize
+    function resize(){
+      const w = mount.clientWidth;
+      const h = mount.clientHeight || Math.round(w/(16/9));
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width  = Math.max(1, Math.floor(w * dpr));
+      canvas.height = Math.max(1, Math.floor(h * dpr));
+      canvas.style.width  = w + 'px';
+      canvas.style.height = h + 'px';
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      gl.uniform2f(uRes, canvas.width, canvas.height);
+    }
+    new ResizeObserver(resize).observe(mount);
+    resize();
+
+    // interaction: click/tap → add one full spin, with easing done in JS
+    let spinRemain = 0.0; // radians to add
+    let spinVel = 0.0;
+    function spinOnce(){ spinRemain += Math.PI * 2.0; }
+    mount.addEventListener('click', spinOnce, {passive:true});
+    mount.addEventListener('touchstart', e => { spinOnce(); }, {passive:true});
+
+    let last = performance.now();
+    let spinAccum = 0.0;
+
+    function animate(){
+      const now = performance.now();
+      const dt = Math.min((now - last)/1000, 0.033);
+      last = now;
+
+      // spin easing
+      if (spinRemain > 0.0){
+        const accel = 6.0, maxVel = 4.0;
+        const desired = Math.min(maxVel, Math.sqrt(2.0*accel*spinRemain));
+        spinVel += (desired - spinVel) * Math.min(1.0, dt*6.0);
+        const step = Math.min(spinVel * dt, spinRemain);
+        spinAccum += step;
+        spinRemain -= step;
+      } else {
+        spinVel *= Math.pow(0.001, dt); // damp to zero
       }
-    })();
+
+      gl.uniform1f(uSpin, spinAccum);
+      gl.uniform1f(uTime, now * 0.001);
+
+      gl.disable(gl.DEPTH_TEST);
+      gl.disable(gl.BLEND);
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      requestAnimationFrame(animate);
+    }
+    animate();
+  })();
   </script>
 </body>
 </html>
