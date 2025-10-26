@@ -258,6 +258,7 @@
     gl_Position = vec4(p, 0.0, 1.0);
   }`;
 
+  // NOTE: uses uTravel (integrated distance), not absolute time * speed
   const fsrc = `#version 300 es
   precision highp float;
 
@@ -265,9 +266,8 @@
   out vec4 frag;
 
   uniform vec2  uRes;
-  uniform float uTime;
   uniform float uSpin;     // continuous axial rotation
-  uniform float uSpeed;    // speed multiplier (click bumps this permanently)
+  uniform float uTravel;   // accumulated forward travel
 
   // ROYGBIV indexed color
   vec3 roygbiv(float idx){
@@ -288,18 +288,15 @@
 
     float r = length(p) + 1e-6;
 
-    // base speed 1.6, multiplied by uSpeed (from JS, permanent bumps)
-    float speed = 1.6 * uSpeed;
-
-    // forward travel; 4.0/r gives the “rungs” perspective
-    float z = uTime * speed + 4.0 / r;
+    // forward "position" along tunnel: accumulated in JS for smooth speed changes
+    float z = uTravel + 4.0 / r;
 
     // ring frequency + neon band
     float stripeDensity = 1.35;
-    float ringStep = floor(mod(z * stripeDensity, 7.0));
+    float ringStep = floor(mod(z * stripeDensity, 7.0));     // 0..6 repeats -> ROYGBIV
     float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
 
-    float innerFade = smoothstep(0.12, 0.20, r);
+    float innerFade = smoothstep(0.12, 0.20, r);             // keep core clear
     float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
 
     vec3 base = roygbiv(ringStep);
@@ -307,6 +304,7 @@
     float halo = glow * 0.55;
     vec3 col = base * (core * 1.7 + halo);
 
+    // vignette
     float vig = smoothstep(1.4, 0.2, length(p));
     col *= vig;
 
@@ -341,10 +339,9 @@
   gl.useProgram(prog);
 
   // uniforms
-  const uRes  = gl.getUniformLocation(prog, 'uRes');
-  const uTime = gl.getUniformLocation(prog, 'uTime');
-  const uSpin = gl.getUniformLocation(prog, 'uSpin');
-  const uSpeed= gl.getUniformLocation(prog, 'uSpeed');
+  const uRes    = gl.getUniformLocation(prog, 'uRes');
+  const uSpin   = gl.getUniformLocation(prog, 'uSpin');
+  const uTravel = gl.getUniformLocation(prog, 'uTravel');
 
   const vao = gl.createVertexArray();
   gl.bindVertexArray(vao);
@@ -364,17 +361,18 @@
   new ResizeObserver(resize).observe(mount);
   resize();
 
-  // --- Interaction / Motion controls ---
-  // Continuous, gentle rotation (radians per second)
-  const spinSpeed = 0.25;    // tweak for faster/slower rotation
+  // --- Motion controls ---
+  // Continuous, visible rotation
+  const spinSpeed = 0.6;   // radians/sec; bump this if you want even faster rotation
   let spinAccum   = 0.0;
 
-  // Click = permanent speed bump; Double-click = reset
-  const BASE_SPEED = 1.0;
-  let speedMul = BASE_SPEED;
+  // Forward travel accumulator with smooth speed changes
+  const BASE_SPEED = 1.6;  // base forward units/sec (shader uses z = travel + 4/r)
+  let speedMul     = 1.0;  // multiplied onto BASE_SPEED
+  let travel       = 0.0;  // accumulated distance
 
-  // Each click adds +0.5x until a cap; double-click resets to base.
-  const CLICK_INCREMENT = 0.5;
+  // Click = permanent speed-up; Double-click = reset to base
+  const CLICK_INCREMENT = 0.4;
   const SPEED_CAP       = 3.0;
 
   mount.addEventListener('click', () => {
@@ -382,7 +380,7 @@
   }, {passive:true});
 
   mount.addEventListener('dblclick', () => {
-    speedMul = BASE_SPEED;
+    speedMul = 1.0;
   }, {passive:true});
 
   // Animation
@@ -392,12 +390,11 @@
     const dt = Math.min((now - last)/1000, 0.033);
     last = now;
 
-    // accumulate slow, steady spin
-    spinAccum += spinSpeed * dt;
+    spinAccum += spinSpeed * dt;                 // smooth, constant rotation
+    travel    += BASE_SPEED * speedMul * dt;     // smooth forward travel (no jumps)
 
-    gl.uniform1f(uSpin,  spinAccum);
-    gl.uniform1f(uSpeed, speedMul);
-    gl.uniform1f(uTime,  now * 0.001);
+    gl.uniform1f(uSpin,   spinAccum);
+    gl.uniform1f(uTravel, travel);
 
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.BLEND);
