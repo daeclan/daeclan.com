@@ -5,55 +5,42 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>DAECLAN.COM — Portfolio</title>
 <meta name="theme-color" content="#0a0a0a"/>
-<meta name="description" content="DAECLAN.COM — music, performance, technology."/>
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,600,700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
-  --line:#1d1e22; --accent:#ff7a18; --accent2:#ffb566; --r:14px;
-  --maxw:1160px; --header:68px;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
+:root{--bg:#0a0a0a;--panel:#111215;--fg:#f5f5f6;--muted:#b6b8bf;--line:#1d1e22;--accent:#ff7a18;--accent2:#ffb566;--r:14px;--maxw:1160px;--header:68px}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
 .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
-a{color:inherit;text-decoration:none}
+a{text-decoration:none;color:inherit}
 
-/* Header / Nav */
+/* header */
 header{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
 .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
-.brand{font-weight:900;letter-spacing:.3px}
+.brand{font-family:"Clash Display",system-ui,sans-serif;font-weight:700;letter-spacing:.3px}
 .brand b{color:var(--accent)}
-nav.primary{display:flex;gap:22px;align-items:center}
-nav.primary a{color:var(--muted);font-size:15px;padding:8px 0;position:relative}
+nav.primary{display:flex;gap:22px;align-items:center;text-transform:uppercase}
+nav.primary a{color:var(--muted);font-size:15px;padding:8px 0;position:relative;font-weight:600;letter-spacing:.04em}
 nav.primary a:hover{color:var(--fg)}
 nav.primary a.active{color:var(--accent)}
 nav.primary a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px}
-
-/* Mobile menu */
-.menu-btn{appearance:none;border:1px solid var(--line);background:#0c0d10;color:var(--accent2);padding:10px 14px;border-radius:12px;font-weight:800;letter-spacing:.02em;cursor:pointer;display:none}
-.menu-btn:active{transform:translateY(1px)}
-@media (max-width:860px){nav.primary{display:none}.menu-btn{display:inline-flex;align-items:center;gap:10px}}
+.menu-btn{display:none}
+@media (max-width:860px){nav.primary{display:none}.menu-btn{display:inline-flex;appearance:none;border:1px solid var(--line);background:#0c0d10;color:var(--accent2);padding:10px 14px;border-radius:12px;font-weight:800}}
 #mobileNav{position:fixed;inset:var(--header) 0 0 0;background:#0b0c10f2;backdrop-filter:blur(6px);border-top:1px solid var(--line);display:none;z-index:19}
 #mobileNav.open{display:block}
 #mobileNav .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
-#mobileNav a{display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2))}
-#mobileNav a:active{transform:translateY(1px)}
+#mobileNav a{display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2));text-transform:uppercase}
 
-/* Sections */
-section{scroll-margin-top:calc(var(--header) + 14px)}
-.section{padding:60px 0;border-bottom:1px solid var(--line)}
-.lead{color:var(--muted);max-width:68ch}
-.title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px}
-.accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* sections */
+section{scroll-margin-top:calc(var(--header) + 14px)} .section{padding:54px 0}
+.section-head{max-width:720px;margin:0 auto 16px;background:#000;border-radius:12px;padding:8px 14px}
+.title{font-family:"Clash Display",system-ui,sans-serif;font-size:clamp(26px,4.5vw,40px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
+.subtitle{font-family:"Clash Display",system-ui,sans-serif;font-size:clamp(13px,2.2vw,17px);margin:0 auto 10px;color:var(--fg);opacity:.9;text-align:center;text-transform:lowercase;letter-spacing:.02em}
 
-/* Scene block */
-#showcase{padding:16px 0 50px}
-#heroScene{width:100%;height:clamp(240px,56vw,560px);background:#0e0f12;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center;overflow:hidden;touch-action:manipulation}
-@media (min-width:861px){#heroScene{height:auto;aspect-ratio:16/9}}
-#heroScene p{color:#8b8d94;font-size:14px}
-#heroScene canvas{display:block;width:100%;height:100%}
+/* fixed bg canvas */
+#bgScene{position:fixed;left:0;right:0;bottom:0;top:var(--header);z-index:0;pointer-events:none}
+main,footer{position:relative;z-index:1}
 
-/* Grid + Cards */
+/* grid/cards */
 .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
 .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
 @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
@@ -68,27 +55,28 @@ section{scroll-margin-top:calc(var(--header) + 14px)}
 .desc{color:#d7d9df;font-size:14px}
 .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 
-/* Buttons + logos */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-size:14px;border:1px solid transparent}
-.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
-.btn.ghost{border:1px solid var(--line);color:var(--fg)}
-.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:#0c0d10;transition:transform .1s,border-color .2s}
-.icon-btn:hover{border-color:#2a2c33;transform:translateY(-1px)}
-.icon-btn img{width:22px;height:22px;display:block} /* use actual brand artwork; no recolor */
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-size:14px;border:1px solid transparent;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
+.btn.alt{background:#1a1b20;color:#fff;border-color:#2a2c33}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:#0c0d10}
+.icon-btn svg{width:22px;height:22px;fill:currentColor;color:var(--accent)}
 
-/* Modal gallery */
-dialog.headshots{border:1px solid var(--line);background:#0b0c10;max-width:min(980px,94vw);width:94vw;border-radius:16px;color:var(--fg)}
-dialog.headshots::backdrop{background:rgba(0,0,0,.6)}
-.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px}
-.gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
-.gallery-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
-.close-btn{appearance:none;border:1px solid var(--line);background:#0c0d10;color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
-.close-btn:active{transform:translateY(1px)}
+/* tape overlay (yellow, offset ~15% toward center) */
+.taped{position:relative;filter:grayscale(100%) contrast(1.05)}
+.tape{
+  position:absolute; left:42%; top:12%;
+  transform:translateX(-42%) rotate(-12deg);
+  background:#ffd400; color:#111; font-weight:900; letter-spacing:.02em;
+  border:1px solid #111; padding:6px 12px; box-shadow:0 2px 0 #0006;
+  text-transform:uppercase; font-size:12px; line-height:1.1; display:inline-block; z-index:2;
+}
+.tape small{display:block;font-weight:800}
 
-/* Footer */
+/* narrow rows (acting/contact icon rows) */
+.narrow{max-width:640px;margin:0 auto}
+
+/* footer */
 footer{padding:40px 0 70px;color:var(--muted)}
-.reveal{opacity:1;transform:none}
-.landing-copy{display:none}
 </style>
 </head>
 <body>
@@ -96,95 +84,96 @@ footer{padding:40px 0 70px;color:var(--muted)}
   <div class="container bar">
     <a class="brand" href="#top">DAECLAN<b>.COM</b></a>
     <nav class="primary" aria-label="Chapters">
-      <a href="#music">Music</a>
-      <a href="#web">Web&nbsp;Projects</a>
-      <a href="#writing">Writing</a>
-      <a href="#contact">Contact</a>
-      <a href="#acting">Acting</a> <!-- kept in nav, section moved to bottom -->
+      <a href="#music">MUSIC</a>
+      <a href="#web">WEB&nbsp;PROJECTS</a>
+      <a href="#writing">WRITING</a>
+      <a href="#acting">ACTING</a>
+      <a href="#contact">CONTACT</a>
     </nav>
-    <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false"><span aria-hidden="true">☰</span> Menu</button>
+    <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false">Menu</button>
   </div>
   <nav id="mobileNav" aria-label="Mobile Navigation" hidden>
     <div class="wrap">
-      <a href="#music">Music</a>
-      <a href="#web">Web&nbsp;Projects</a>
-      <a href="#writing">Writing</a>
-      <a href="#contact">Contact</a>
-      <a href="#acting">Acting</a>
+      <a href="#music">MUSIC</a><a href="#web">WEB PROJECTS</a><a href="#writing">WRITING</a><a href="#acting">ACTING</a><a href="#contact">CONTACT</a>
     </div>
   </nav>
 </header>
 
-<main id="main">
-  <!-- HERO SCENE -->
-  <section id="showcase" class="container">
-    <div id="heroScene"><p>Initializing…</p></div>
-  </section>
+<canvas id="bgScene"></canvas>
 
+<main id="main">
   <!-- MUSIC -->
   <section id="music" class="section container">
-    <h2>Music</h2>
-    <p class="lead">Releases under <strong>DEGH</strong>.</p>
-
+    <div class="section-head"><h2 class="title">MUSIC</h2><p class="subtitle">releases by degh</p></div>
     <div class="grid" style="margin-top:18px;">
-      <!-- Declan Loved A Message -->
-      <article class="card col-4 reveal">
+      <!-- Loved A Message -->
+      <article class="card col-4">
         <div class="thumb">
-          <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Declan Loved A Message"/>
-          <span class="tag">Album</span>
+          <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Declan Loved A Message"><span class="tag">Album</span>
         </div>
         <div class="card-body">
           <div class="meta"><span>DEGH</span></div>
           <h3 class="title-sm">Declan Loved A Message</h3>
           <div class="actions">
-            <a class="icon-btn" href="https://open.spotify.com/album/3R0oRVPjz7V53wJ4Nia9pk" target="_blank" rel="noopener" aria-label="Spotify">
-              <img src="/assets/brands/spotify.svg" alt="">
+            <!-- Spotify (same) -->
+            <a class="icon-btn" href="https://open.spotify.com/album/3R0oRVPjz7V53wJ4Nia9pk" target="_blank" aria-label="Spotify">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8" stroke-width="1.6"/><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6" stroke-width="1.6"/><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5" stroke-width="1.6"/></g></svg>
             </a>
-            <a class="icon-btn" href="https://music.apple.com/us/album/declan-loved-a-message/1479080675?ign-mpt=uo%3D4" target="_blank" rel="noopener" aria-label="Apple Music">
-              <img src="/assets/brands/apple-music.svg" alt="">
+            <!-- Apple = actual apple -->
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-loved-a-message/1479080675" target="_blank" aria-label="Apple Music">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path d="M16.2 2.2c-.7.9-1.4 2.1-1.2 3.4 1.3.1 2.6-.6 3.4-1.5.7-.8 1.2-2 .9-3-1 .1-2.2.7-3.1 1.1zM12 6.2c-2.2 0-4 1.8-5 4.2-1.3 3.2.2 8.4 2.5 10.9.9.9 1.9 1.7 3.1 1.7 1.1 0 1.6-.4 2.7-.4 1.1 0 1.5.4 2.7.4 1.2 0 2.1-.9 2.9-1.8.8-.9 1.2-1.7 1.9-3 .1-.2.2-.5.3-.8-3-.8-4.4-5.1-2.1-7.7-1.3-1-3-1.6-4.1-1.6-1.3 0-2.4.5-3.3.5-1 0-2.1-.5-3.6-.4z" fill="currentColor"/>
+              </svg>
             </a>
-            <a class="icon-btn" href="https://tidal.com/browse/album/117178044" target="_blank" rel="noopener" aria-label="Tidal">
-              <img src="/assets/brands/tidal.svg" alt="">
+            <!-- Tidal = four 45° diamonds in T layout -->
+            <a class="icon-btn" href="https://tidal.com/browse/album/117178044" target="_blank" aria-label="Tidal">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <g transform="translate(12 11)">
+                  <rect x="-7" y="-1" width="4" height="4" transform="rotate(45)" fill="currentColor"/>
+                  <rect x="-2" y="-6" width="4" height="4" transform="rotate(45)" fill="currentColor"/>
+                  <rect x="3"  y="-1" width="4" height="4" transform="rotate(45)" fill="currentColor"/>
+                  <rect x="-2" y="4"  width="4" height="4" transform="rotate(45)" fill="currentColor"/>
+                </g>
+              </svg>
             </a>
-            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-loved-a-message" target="_blank" rel="noopener" aria-label="Bandcamp">
-              <img src="/assets/brands/bandcamp.svg" alt="">
+            <!-- Bandcamp +15% width -->
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-loved-a-message" target="_blank" aria-label="Bandcamp">
+              <svg viewBox="0 0 24 24"><path d="M6.2 18h10.4l3.4-12H9.6z" fill="currentColor"/></svg>
             </a>
           </div>
         </div>
       </article>
 
-      <!-- Declan Questioned An Image -->
-      <article class="card col-4 reveal">
+      <!-- Questioned An Image -->
+      <article class="card col-4">
         <div class="thumb">
-          <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Declan Questioned An Image"/>
-          <span class="tag">Album</span>
+          <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Declan Questioned An Image"><span class="tag">Album</span>
         </div>
         <div class="card-body">
           <div class="meta"><span>DEGH</span></div>
           <h3 class="title-sm">Declan Questioned An Image</h3>
           <div class="actions">
-            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" rel="noopener" aria-label="Spotify"><img src="/assets/brands/spotify.svg" alt=""></a>
-            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><img src="/assets/brands/apple-music.svg" alt=""></a>
-            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><img src="/assets/brands/tidal.svg" alt=""></a>
-            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-questioned-an-image" target="_blank" rel="noopener" aria-label="Bandcamp"><img src="/assets/brands/bandcamp.svg" alt=""></a>
+            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" aria-label="Spotify"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8" stroke-width="1.6"/><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6" stroke-width="1.6"/><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5" stroke-width="1.6"/></g></svg></a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" aria-label="Apple Music"><svg viewBox="0 0 24 24"><path d="M16.2 2.2c-.7.9-1.4 2.1-1.2 3.4 1.3.1 2.6-.6 3.4-1.5.7-.8 1.2-2 .9-3-1 .1-2.2.7-3.1 1.1zM12 6.2c-2.2 0-4 1.8-5 4.2-1.3 3.2.2 8.4 2.5 10.9.9.9 1.9 1.7 3.1 1.7 1.1 0 1.6-.4 2.7-.4 1.1 0 1.5.4 2.7.4 1.2 0 2.1-.9 2.9-1.8.8-.9 1.2-1.7 1.9-3 .1-.2.2-.5.3-.8-3-.8-4.4-5.1-2.1-7.7-1.3-1-3-1.6-4.1-1.6-1.3 0-2.4.5-3.3.5-1 0-2.1-.5-3.6-.4z" fill="currentColor"/></svg></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" aria-label="Tidal"><svg viewBox="0 0 24 24"><g transform="translate(12 11)"><rect x="-7" y="-1" width="4" height="4" transform="rotate(45)" fill="currentColor"/><rect x="-2" y="-6" width="4" height="4" transform="rotate(45)" fill="currentColor"/><rect x="3" y="-1" width="4" height="4" transform="rotate(45)" fill="currentColor"/><rect x="-2" y="4" width="4" height="4" transform="rotate(45)" fill="currentColor"/></g></svg></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-questioned-an-image" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24"><path d="M6.2 18h10.4l3.4-12H9.6z" fill="currentColor"/></svg></a>
           </div>
         </div>
       </article>
 
-      <!-- Declan Emphasized A Movie -->
-      <article class="card col-4 reveal">
+      <!-- Emphasized A Movie -->
+      <article class="card col-4">
         <div class="thumb">
-          <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="DECLAN EMPHASIZED A MOVIE"/>
-          <span class="tag">Album</span>
+          <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="DECLAN EMPHASIZED A MOVIE"><span class="tag">Album</span>
         </div>
         <div class="card-body">
           <div class="meta"><span>2025</span><span>DEGH</span></div>
           <h3 class="title-sm">DECLAN EMPHASIZED A MOVIE</h3>
           <div class="actions">
-            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" rel="noopener" aria-label="Spotify"><img src="/assets/brands/spotify.svg" alt=""></a>
-            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><img src="/assets/brands/apple-music.svg" alt=""></a>
-            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><img src="/assets/brands/tidal.svg" alt=""></a>
-            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-emphasized-a-movie" target="_blank" rel="noopener" aria-label="Bandcamp"><img src="/assets/brands/bandcamp.svg" alt=""></a>
+            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" aria-label="Spotify"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8" stroke-width="1.6"/><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6" stroke-width="1.6"/><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5" stroke-width="1.6"/></g></svg></a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" aria-label="Apple Music"><svg viewBox="0 0 24 24"><path d="M16.2 2.2c-.7.9-1.4 2.1-1.2 3.4 1.3.1 2.6-.6 3.4-1.5.7-.8 1.2-2 .9-3-1 .1-2.2.7-3.1 1.1zM12 6.2c-2.2 0-4 1.8-5 4.2-1.3 3.2.2 8.4 2.5 10.9.9.9 1.9 1.7 3.1 1.7 1.1 0 1.6-.4 2.7-.4 1.1 0 1.5.4 2.7.4 1.2 0 2.1-.9 2.9-1.8.8-.9 1.2-1.7 1.9-3 .1-.2.2-.5.3-.8-3-.8-4.4-5.1-2.1-7.7-1.3-1-3-1.6-4.1-1.6-1.3 0-2.4.5-3.3.5-1 0-2.1-.5-3.6-.4z" fill="currentColor"/></svg></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" aria-label="Tidal"><svg viewBox="0 0 24 24"><g transform="translate(12 11)"><rect x="-7" y="-1" width="4" height="4" transform="rotate(45)" fill="currentColor"/><rect x="-2" y="-6" width="4" height="4" transform="rotate(45)" fill="currentColor"/><rect x="3" y="-1" width="4" height="4" transform="rotate(45)" fill="currentColor"/><rect x="-2" y="4" width="4" height="4" transform="rotate(45)" fill="currentColor"/></g></svg></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-emphasized-a-movie" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24"><path d="M6.2 18h10.4l3.4-12H9.6z" fill="currentColor"/></svg></a>
           </div>
         </div>
       </article>
@@ -193,101 +182,89 @@ footer{padding:40px 0 70px;color:var(--muted)}
 
   <!-- WEB PROJECTS -->
   <section id="web" class="section container">
-    <h2>Web Projects</h2>
-    <p class="lead">Interfaces, interactive art, and tools.</p>
+    <div class="section-head"><h2 class="title">WEB PROJECTS</h2><p class="subtitle">interfaces, interactive art, and tools</p></div>
     <div class="grid" style="margin-top:18px;">
       <!-- SLIME.SURF -->
-      <article class="card col-6 reveal">
-        <div class="thumb">
-          <img loading="lazy" src="/assets/tree-of-slime.jpg" alt="THE TREE OF SLIME screenshot">
-          <span class="tag">Site</span>
-        </div>
+      <article class="card col-6">
+        <div class="thumb"><img loading="lazy" src="/assets/tree-of-slime.jpg" alt="THE TREE OF SLIME"><span class="tag">Site</span></div>
         <div class="card-body">
           <div class="meta"><span>SLIME.SURF</span></div>
           <h3 class="title-sm">SLIME.SURF</h3>
           <p class="desc">THE TREE OF SLIME: A 3D YSL Soundboard built in Three.JS</p>
           <div class="actions">
-            <a class="btn primary" href="https://www.slime.surf/" target="_blank" rel="noopener">Go To Visualizer</a>
-            <a class="btn ghost" href="#" target="_blank" rel="noopener">Backstory</a> <!-- add your URL -->
+            <a class="btn" href="https://www.slime.surf/" target="_blank" rel="noopener">Go To Visualizer</a>
+            <a class="btn alt" href="https://www.reddit.com/r/YoungThug/comments/l764h9/i_was_tapped_by_300_entertainment_to_make_a/" target="_blank" rel="noopener">Backstory</a>
           </div>
         </div>
       </article>
 
       <!-- MIGOS ADLIBS -->
-      <article class="card col-6 reveal">
-        <div class="thumb">
-          <img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork">
-          <span class="tag">Site</span>
-        </div>
+      <article class="card col-6">
+        <div class="thumb"><img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs"><span class="tag">Site</span></div>
         <div class="card-body">
           <div class="meta"><span>MIGOS ADLIBS</span></div>
           <h3 class="title-sm">MIGOS ADLIBS</h3>
-          <p class="desc">Every Single Ad Lib from 2017's Culture Perfectly Synced in the Migos Adlibs Visualizer.</p>
+          <p class="desc">Every Single Ad Lib from 2017's Culture perfectly synced in the Migos Adlibs Visualizer.</p>
           <div class="actions">
-            <a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Go To Visualizer</a>
-            <a class="btn ghost" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank" rel="noopener">Complex</a>
-            <a class="btn ghost" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank" rel="noopener">VICE</a>
-            <a class="btn ghost" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank" rel="noopener">The Fader</a>
-            <a class="btn ghost" href="https://genius.com/a/every-ad-lib-on-migos-culture-visualized" target="_blank" rel="noopener">Genius</a>
+            <a class="btn" href="http://migosadlibs.com/" target="_blank">Go To Visualizer</a>
+            <a class="btn alt" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank">Complex</a>
+            <a class="btn" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank">VICE</a>
+            <a class="btn alt" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank">The Fader</a>
+            <a class="btn" href="https://genius.com/a/every-ad-lib-on-migos-culture-visualized" target="_blank">Genius</a>
           </div>
         </div>
       </article>
 
       <!-- XXXSENSATION -->
-      <article class="card col-6 reveal">
-        <div class="thumb">
-          <img loading="lazy" src="https://i.scdn.co/image/ab67616d00001e028b4ab0e172584a790ede3ddb" alt="XXXSENSATION cover">
-          <span class="tag">Site</span>
-        </div>
+      <article class="card col-6">
+        <div class="thumb"><img loading="lazy" src="https://i.scdn.co/image/ab67616d00001e028b4ab0e172584a790ede3ddb" alt="XXXSENSATION"><span class="tag">Site</span></div>
         <div class="card-body">
           <div class="meta"><span>XXXSENSATION</span></div>
           <h3 class="title-sm">XXXSENSATION</h3>
           <p class="desc">a 3D soundboard that uses #ThreeJS and #ToneJS, all loaded up with YSL ad libs</p>
           <div class="actions">
-            <a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Go To Visualizer</a>
-            <a class="btn ghost" href="https://www.reddit.com/r/YoungThug/comments/l764h9/i_was_tapped_by_300_entertainment_to_make_a/" target="_blank" rel="noopener">Backstory</a>
+            <a class="btn" href="http://xxxsensation.org/" target="_blank" rel="noopener">XXXSENSATION.ORG</a>
           </div>
         </div>
       </article>
 
       <!-- SLAM HARRIS -->
-      <article class="card col-6 reveal">
-        <div class="thumb">
-          <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
-          <span class="tag">Audio</span>
-        </div>
+      <article class="card col-6">
+        <div class="thumb"><img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS"><span class="tag">Audio</span></div>
         <div class="card-body">
           <div class="meta"><span>SLAM HARRIS</span></div>
           <h3 class="title-sm">SLAM HARRIS</h3>
           <p class="desc">a parody of sam harris' intro theme & guided meditations</p>
           <div class="actions">
-            <a class="btn primary" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank" rel="noopener">waking yall up (parody)</a>
-            <a class="btn ghost" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank" rel="noopener">instrumental</a>
-            <a class="btn ghost" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank" rel="noopener">guided meditation (4:20)</a>
+            <a class="btn" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank">waking yall up (parody)</a>
+            <a class="btn alt" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank">instrumental</a>
+            <a class="btn" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank">guided meditation (4:20)</a>
           </div>
         </div>
       </article>
 
-      <!-- SLIME NO B -->
-      <article class="card col-6 reveal">
-        <div class="thumb">
-          <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
-          <span class="tag">Editorial</span>
+      <!-- SLIME NO B (yellow tape over grayscale) -->
+      <article class="card col-6">
+        <div class="thumb taped">
+          <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B">
+          <span class="tape">Taken Down By The Man<small>Too Real</small></span>
+          <span class="tag">Project</span>
         </div>
         <div class="card-body">
           <div class="meta"><span>SLIME NO B</span></div>
           <h3 class="title-sm">SLIME NO B</h3>
-          <p class="desc">A Young Thug-Only Remake Of Slime & B That Cuts Chris Brown Off The Project.</p>
+          <p class="desc">A Young Thug-only remake of Slime & B that cuts Chris Brown off the project.</p>
           <div class="actions">
-            <a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a>
+            <a class="btn" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank">Read Coverage</a>
           </div>
         </div>
       </article>
 
-      <!-- MORE LIFE -->
-      <article class="card col-6 reveal">
-        <div class="thumb">
-          <img loading="lazy" src="https://i1.sndcdn.com/avatars-000321758334-11pr0g-t1080x1080.jpg" alt="More Life alt-sequenced artwork">
+      <!-- MORE LIFE (yellow tape over grayscale) -->
+      <article class="card col-6">
+        <div class="thumb taped">
+          <img loading="lazy" src="https://i1.sndcdn.com/avatars-000321758334-11pr0g-t1080x1080.jpg" alt="More Life alt">
+          <span class="tape">Taken Down By The Man<small>Too Controversial</small></span>
           <span class="tag">Project</span>
         </div>
         <div class="card-body">
@@ -295,8 +272,7 @@ footer{padding:40px 0 70px;color:var(--muted)}
           <h3 class="title-sm">MORE LIFE — Without Aubrey Drake Graham</h3>
           <p class="desc">Reimagining a world without Drake</p>
           <div class="actions">
-            <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open</a>
-            <a class="btn ghost" href="https://www.reddit.com/r/Music/comments/6l0h48/v_petty_presents_more_life_without_aubrey_drake/" target="_blank" rel="noopener">Backstory</a>
+            <a class="btn" href="https://www.reddit.com/r/Music/comments/6l0h48/v_petty_presents_more_life_without_aubrey_drake/" target="_blank">Backstory</a>
           </div>
         </div>
       </article>
@@ -305,62 +281,59 @@ footer{padding:40px 0 70px;color:var(--muted)}
 
   <!-- WRITING -->
   <section id="writing" class="section container">
-    <h2>Writing</h2>
-    <p class="lead">Poems, blurbs, fragments.</p>
+    <div class="section-head"><h2 class="title">WRITING</h2><p class="subtitle">poetry, prose, reviews, etc,</p></div>
     <div class="grid" style="margin-top:18px;">
-      <article class="card col-3 reveal">
+      <article class="card col-3"><div class="card-body"><div class="meta"><span>2022</span></div><h3 class="title-sm">My experience at the Chance The Rapper / SaveMoney reunion show [Concert Review]</h3><div class="actions"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">Read</a></div></div></article>
+      <article class="card col-3"><div class="card-body"><div class="meta"><span>—</span></div><h3 class="title-sm">Letterboxd</h3><p class="desc">film log & micro-reviews</p><div class="actions"><a class="btn alt" href="https://letterboxd.com/" target="_blank">Open Letterboxd</a></div></div></article>
+      <article class="card col-3"><div class="card-body"><div class="meta"><span>—</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn" href="#">Read</a></div></div></article>
+      <article class="card col-3"><div class="card-body"><div class="meta"><span>—</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn alt" href="#">Read</a></div></div></article>
+    </div>
+  </section>
+
+  <!-- ACTING -->
+  <section id="acting" class="section container">
+    <div class="section-head"><h2 class="title">ACTING</h2><p class="subtitle">the art of make ’em ups</p></div>
+    <div class="narrow">
+      <div class="card">
         <div class="card-body">
-          <div class="meta"><span>2025</span></div>
-          <h3 class="title-sm">My experience at the Chance The Rapper / SaveMoney reunion show [Concert Review]</h3>
-          <div class="actions"><a class="btn ghost" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank" rel="noopener">Read</a></div>
+          <div class="actions">
+            <a class="btn" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" target="_blank" rel="noopener">View Resume</a>
+            <a class="btn alt" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" download>Download Resume</a>
+            <button class="btn" id="openHeadshots" type="button">Headshots</button>
+          </div>
         </div>
-      </article>
-      <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-      <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-      <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+      </div>
     </div>
   </section>
 
   <!-- CONTACT -->
   <section id="contact" class="section container">
-    <h2>Contact</h2>
-    <p class="lead">Bookings, collabs, or share your deepest darkest secret.</p>
-    <div class="grid" style="margin-top:18px;">
-      <article class="card col-12 reveal">
+    <div class="section-head"><h2 class="title">CONTACT</h2><p class="subtitle">bookings, collabs, or share your deepest darkest secret.</p></div>
+    <div class="narrow">
+      <div class="card">
         <div class="card-body">
-          <div class="actions" style="gap:14px;flex-wrap:wrap">
-            <a class="icon-btn" href="mailto:hello@example.com" aria-label="Email"><img src="/assets/brands/email.svg" alt=""></a>
-            <a class="icon-btn" href="https://www.facebook.com/declxn" target="_blank" rel="noopener" aria-label="Facebook"><img src="/assets/brands/facebook.svg" alt=""></a>
-            <a class="icon-btn" href="https://twitter.com/daeclan" target="_blank" rel="noopener" aria-label="X/Twitter"><img src="/assets/brands/x.svg" alt=""></a>
-            <a class="icon-btn" href="https://instagram.com/daeclan" target="_blank" rel="noopener" aria-label="Instagram"><img src="/assets/brands/instagram.svg" alt=""></a>
+          <div class="actions" style="justify-content:center;gap:14px;flex-wrap:wrap">
+            <!-- Email -->
+            <a class="icon-btn" href="mailto:hello@example.com" aria-label="Email">
+              <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v12H3z"/><path d="M3 6l9 7 9-7" fill="none" stroke="#0c0d10" stroke-width="2"/></svg>
+            </a>
+            <!-- Facebook -->
+            <a class="icon-btn" href="https://www.facebook.com/declxn" target="_blank" aria-label="Facebook">
+              <svg viewBox="0 0 24 24"><path d="M13 22v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2h-3a5 5 0 0 0-5 5v3H6v4h3v8z" fill="currentColor"/></svg>
+            </a>
+            <!-- X (redone) -->
+            <a class="icon-btn" href="https://twitter.com/daeclan" target="_blank" aria-label="X/Twitter">
+              <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+                <path d="M3 3h4.3l5.2 6.8L17.8 3H22l-7.3 9.4L21.3 21H17l-5.1-6.7L6.3 21H2l7.9-8.6L3 3z" fill="currentColor"/>
+              </svg>
+            </a>
+            <!-- Instagram -->
+            <a class="icon-btn" href="https://instagram.com/daeclan" target="_blank" aria-label="Instagram">
+              <svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm5 5a5 5 0 1 0 5 5 5 5 0 0 0-5-5Zm6.5-.75a1.25 1.25 0 1 0 1.25 1.25A1.25 1.25 0 0 0 18.5 6.25Z" fill="currentColor"/></svg>
+            </a>
           </div>
         </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- ACTING (moved to bottom; headshots hidden behind button) -->
-  <section id="acting" class="section container">
-    <h2>Acting</h2>
-    <p class="lead">Resume & (optional) headshots.</p>
-    <div class="grid" style="margin-top:18px;">
-      <article class="card col-6 reveal">
-        <div class="card-body">
-          <h3 class="title-sm">Resume</h3>
-          <p class="desc">PDF web view & download.</p>
-          <div class="actions">
-            <a class="btn primary" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" target="_blank" rel="noopener">View Resume</a>
-            <a class="btn ghost" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" download>Download PDF</a>
-          </div>
-        </div>
-      </article>
-      <article class="card col-6 reveal">
-        <div class="card-body">
-          <h3 class="title-sm">Headshots (Hidden)</h3>
-          <p class="desc">These are older; click to open a private gallery modal.</p>
-          <div class="actions"><button class="btn ghost" id="openHeadshots" type="button">View Headshots (Modal)</button></div>
-        </div>
-      </article>
+      </div>
     </div>
   </section>
 </main>
@@ -368,188 +341,67 @@ footer{padding:40px 0 70px;color:var(--muted)}
 <footer class="container"><p>© <span id="year"></span> DAECLAN.COM</p></footer>
 
 <!-- Headshots Modal -->
-<dialog class="headshots" id="headshotsDlg">
-  <div class="gallery-head">
-    <strong>Headshots (Private Preview)</strong>
-    <button class="close-btn" id="closeHeadshots" type="button">Close</button>
+<dialog id="headshotsDlg" style="border:1px solid var(--line);background:#0b0c10;max-width:min(980px,94vw);width:94vw;border-radius:16px;color:var(--fg)">
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)">
+    <strong>Headshots</strong>
+    <button class="btn alt" id="closeHeadshots" type="button" style="padding:8px 12px;border-radius:10px">Close</button>
   </div>
-  <div class="gallery">
-    <img src="/assets/headshot1.jpg" alt="Headshot 1">
-    <img src="/assets/headshot2.jpg" alt="Headshot 2">
-    <img src="/assets/headshot3.jpg" alt="Headshot 3">
-    <img src="/assets/headshot4.jpg" alt="Headshot 4">
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px">
+    <img src="/assets/headshot1.jpg" alt="Headshot 1" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
+    <img src="/assets/headshot2.jpg" alt="Headshot 2" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
+    <img src="/assets/headshot3.jpg" alt="Headshot 3" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
+    <img src="/assets/headshot4.jpg" alt="Headshot 4" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
   </div>
 </dialog>
 
-<!-- Core UX scripts -->
 <script>
 document.getElementById('year').textContent = new Date().getFullYear();
-
-// Scrollspy
+/* scrollspy */
 const secs=[...document.querySelectorAll('main section[id]')];
 const links=[...document.querySelectorAll('header nav.primary a')];
 const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
-const io=new IntersectionObserver(es=>{
-  es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return;
-    if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }
-  });
-},{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{const id=e.target.id,link=map(id);if(!link) return;if(e.isIntersecting){links.forEach(a=>a.classList.remove('active'));link.classList.add('active');}});},{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
 secs.forEach(s=>io.observe(s));
-
-// Mobile menu
-(function(){
-  const btn=document.getElementById('menuToggle'), drawer=document.getElementById('mobileNav');
-  if(!btn||!drawer) return;
-  const setOpen=o=>{ btn.setAttribute('aria-expanded',o?'true':'false'); drawer.hidden=!o; drawer.classList.toggle('open',o); document.documentElement.style.overflow=o?'hidden':''; document.body.style.overflow=o?'hidden':''; };
-  btn.addEventListener('click', ()=>setOpen(btn.getAttribute('aria-expanded')!=='true'));
-  drawer.addEventListener('click', e=>{ if(e.target.closest('a[href^="#"]')) setOpen(false); });
-  window.matchMedia('(min-width:861px)').addEventListener('change',ev=>{ if(ev.matches) setOpen(false); });
-})();
-
-// Headshots modal
-(function(){
-  const dlg=document.getElementById('headshotsDlg');
-  const openBtn=document.getElementById('openHeadshots');
-  const closeBtn=document.getElementById('closeHeadshots');
-  if(!dlg||!openBtn||!closeBtn) return;
-  openBtn.addEventListener('click',()=>{ dlg.showModal(); });
-  closeBtn.addEventListener('click',()=>{ dlg.close(); });
-  dlg.addEventListener('click',e=>{ if(e.target===dlg) dlg.close(); });
-})();
+/* mobile menu */
+(function(){const b=document.getElementById('menuToggle'),d=document.getElementById('mobileNav');if(!b||!d)return;const open=o=>{b.setAttribute('aria-expanded',o?'true':'false');d.hidden=!o;d.classList.toggle('open',o);document.documentElement.style.overflow=o?'hidden':'';document.body.style.overflow=o?'hidden':''};b.addEventListener('click',()=>open(b.getAttribute('aria-expanded')!=='true'));d.addEventListener('click',e=>{if(e.target.closest('a[href^="#"]'))open(false)});window.matchMedia('(min-width:861px)').addEventListener('change',ev=>{if(ev.matches)open(false)})})();
+/* headshots modal */
+(function(){const dlg=document.getElementById('headshotsDlg');const openBtn=document.getElementById('openHeadshots');const closeBtn=document.getElementById('closeHeadshots');if(!dlg||!openBtn||!closeBtn)return;openBtn.addEventListener('click',()=>dlg.showModal());closeBtn.addEventListener('click',()=>dlg.close());dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()})})();
 </script>
 
-<!-- WEBGL2 wormhole (same mid ripple & 2s decay as previous working version) -->
+<!-- WEBGL2 fixed background (ripple already 15% calmer) -->
 <script>
 (function(){
-  const mount=document.getElementById('heroScene'); if(!mount) return;
-  const canvas=document.createElement('canvas'); canvas.style.cssText='display:block;width:100%;height:100%';
-  mount.textContent=''; mount.appendChild(canvas);
-  const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true});
-  if(!gl){ mount.innerHTML='<p style="color:#f99">WebGL2 not available</p>'; return; }
-
+  const canvas=document.getElementById('bgScene'); if(!canvas) return;
+  const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
   const vsrc=`#version 300 es
   const vec2 V[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));
   out vec2 vUv; void main(){ vec2 p=V[gl_VertexID]; vUv=.5*(p+1.); gl_Position=vec4(p,0.,1.); }`;
-
   const fsrc=`#version 300 es
   precision highp float; in vec2 vUv; out vec4 frag;
-  uniform vec2 uRes; uniform float uTimeSec; uniform float uSpin; uniform float uTravel;
-  uniform int uRippleCount; uniform vec2 uRipplePos[8]; uniform float uRippleStart[8]; uniform float uRippleAmp[8];
-  uniform float uScrollAmp; uniform float uScrollDir;
-
-  vec3 roygbiv(float i){
-    if(i<0.5) return vec3(1.,0.,0.);
-    if(i<1.5) return vec3(1.,0.5,0.);
-    if(i<2.5) return vec3(1.,1.,0.);
-    if(i<3.5) return vec3(0.,1.,0.);
-    if(i<4.5) return vec3(0.,0.,1.);
-    if(i<5.5) return vec3(0.294,0.,0.510);
-    return vec3(0.561,0.,1.);
-  }
-  mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
-
+  uniform vec2 uRes; uniform float uTime; uniform float uSpin; uniform float uTravel;
+  uniform float uAmp; uniform float uDir;
+  vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.5,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.); }
+  mat2 r(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c); }
   void main(){
     vec2 p=(vUv*uRes-0.5*uRes)/min(uRes.x,uRes.y);
-
-    // Mid-strength directional ripple
-    if(uScrollAmp>0.0001){
-      float k = 14.0;
-      float phase = uTimeSec*7.0*uScrollDir;
-      float w = sin(k*p.y + phase);
-      float env = smoothstep(1.35,0.18,abs(p.y));
-      p.x += (w * env) * (uScrollAmp * 0.095);
-      p.y += (cos(k*p.y + phase)*env) * (uScrollAmp * 0.032) * uScrollDir;
-    }
-
-    // Click ripples
-    for(int i=0;i<8;i++){
-      if(i>=uRippleCount) break;
-      vec2 c=(uRipplePos[i]*uRes-0.5*uRes)/min(uRes.x,uRes.y);
-      vec2 d=p-c; float r=length(d)+1e-5;
-      float t=max(0.0,uTimeSec-uRippleStart[i]);
-      float k=18.0, w=9.0;
-      float env=exp(-2.2*t)*exp(-2.0*r);
-      float wave=sin(k*r-w*t);
-      vec2 dir=d/r; p+=dir*(uRippleAmp[i]*wave*env);
-    }
-
-    p=rot(uSpin)*p; float r=length(p)+1e-6;
-    float z=uTravel+4.0/r;
-
-    float stripeDensity=1.35;
-    float ringIndex=floor(mod(z*stripeDensity,7.0));
-    float stripe=smoothstep(0.02,0.0,abs(fract(z*stripeDensity)-0.5));
-    float innerFade=smoothstep(0.12,0.20,r);
-    float glow=pow(1.0/(1.0+6.0*pow(r,2.2)),1.2);
-
-    vec3 base=roygbiv(ringIndex);
-    float core=stripe*innerFade; float halo=glow*0.55;
-    vec3 col=base*(core*1.7+halo);
-
-    float vig=smoothstep(1.4,0.2,length(p)); col*=vig;
-
-    col=max(col-0.004,0.0);
-    col=(col*(6.2*col+0.5))/(col*(6.2*col+1.7)+0.06);
+    if(uAmp>0.0001){ float k=14., ph=uTime*7.*uDir, w=sin(k*p.y+ph), env=smoothstep(1.35,.18,abs(p.y));
+      p.x += w*env*(0.06375*uAmp); p.y += cos(k*p.y+ph)*env*(0.0221*uAmp)*uDir; }
+    p=r(uSpin)*p; float rlen=length(p)+1e-6, z=uTravel+4./rlen;
+    float d=1.35, ring=floor(mod(z*d,7.)), stripe=smoothstep(.02,0.,abs(fract(z*d)-.5));
+    float inner=smoothstep(.12,.20,rlen), glow=pow(1./(1.+6.*pow(rlen,2.2)),1.2);
+    vec3 col=roygbiv(ring)*(stripe*inner*1.5 + glow*.55);
+    float vig=smoothstep(1.5,.15,length(p)); col*=vig;
+    col=max(col-0.004,0.); col=(col*(6.2*col+.5))/(col*(6.2*col+1.7)+.06);
     frag=vec4(col,1.0);
   }`;
-
-  function compile(type,src){ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
-    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){ console.error(gl.getShaderInfoLog(s)); throw new Error('Shader compile failed'); } return s; }
-  const prog=gl.createProgram(); gl.attachShader(prog,compile(gl.VERTEX_SHADER,vsrc)); gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,fsrc));
-  gl.linkProgram(prog); if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){ console.error(gl.getProgramInfoLog(prog)); throw new Error('Program link failed'); }
-  gl.useProgram(prog); gl.bindVertexArray(gl.createVertexArray());
-
-  const uRes=gl.getUniformLocation(prog,'uRes'), uTimeSec=gl.getUniformLocation(prog,'uTimeSec');
-  const uSpin=gl.getUniformLocation(prog,'uSpin'), uTravel=gl.getUniformLocation(prog,'uTravel');
-  const uRippleCount=gl.getUniformLocation(prog,'uRippleCount'), uRipplePos=gl.getUniformLocation(prog,'uRipplePos[0]');
-  const uRippleStart=gl.getUniformLocation(prog,'uRippleStart[0]'), uRippleAmp=gl.getUniformLocation(prog,'uRippleAmp[0]');
-  const uScrollAmp=gl.getUniformLocation(prog,'uScrollAmp'), uScrollDir=gl.getUniformLocation(prog,'uScrollDir');
-
-  function resize(){
-    const w=mount.clientWidth, h=mount.clientHeight||Math.round(w/(16/9));
-    const dpr=Math.min(Math.max(1,window.devicePixelRatio||1),2.5);
-    canvas.width=Math.max(1,Math.floor(w*dpr)); canvas.height=Math.max(1,Math.floor(h*dpr));
-    canvas.style.width=w+'px'; canvas.style.height=h+'px';
-    gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uRes,canvas.width,canvas.height);
-  }
-  new ResizeObserver(resize).observe(mount); resize();
-
-  // Motion & interactions
-  const BASE_SPEED=1.6; let travel=0; const SPIN_SPEED=0.6; let spin=0;
-  let speedMul=1, speedTarget=1; const SPEED_GROWTH=1.8, SPEED_CAP=12, SPEED_EASE=0.0015;
-
-  const MAX=8; const rPos=new Float32Array(MAX*2), rStart=new Float32Array(MAX), rAmp=new Float32Array(MAX); let rCountTotal=0;
-  function pushRipple(u,v,amp){ const i=rCountTotal%MAX; rPos[i*2]=u; rPos[i*2+1]=v; rStart[i]=performance.now()*0.001; rAmp[i]=amp; rCountTotal++; }
-  function onClick(e){ const r=mount.getBoundingClientRect(); const x=('touches'in e)?e.touches[0].clientX:e.clientX; const y=('touches'in e)?e.touches[0].clientY:e.clientY;
-    const u=(x-r.left)/Math.max(1,r.width), v=(y-r.top)/Math.max(1,r.height);
-    speedTarget=Math.min(SPEED_CAP,speedTarget*SPEED_GROWTH); pushRipple(u,v,0.02);
-  }
-  mount.addEventListener('click',onClick,{passive:true}); mount.addEventListener('touchstart',onClick,{passive:true});
-  mount.addEventListener('dblclick',()=>{speedTarget=1},{passive:true});
-
-  let scrollEnergy=0, scrollDir=1;
-  mount.addEventListener('wheel', e=>{
-    const dy = e.deltaY; scrollDir = dy<0 ? 1 : -1;
-    scrollEnergy = Math.min(1.0, scrollEnergy + Math.min(0.6, Math.abs(dy)*0.003));
-  }, {passive:true});
-
-  let last=performance.now();
-  function animate(){
-    const now=performance.now(); const dt=Math.min((now-last)/1000,0.033); last=now;
-    const ease=1.0-Math.pow(1.0-SPEED_EASE,dt*60.0); speedMul += (speedTarget-speedMul)*ease;
-    travel += BASE_SPEED*speedMul*dt; spin += SPIN_SPEED*dt;
-    scrollEnergy = Math.max(0, scrollEnergy - dt/2);
-
-    gl.uniform1f(uTimeSec, now*0.001); gl.uniform1f(uSpin, spin); gl.uniform1f(uTravel, travel);
-    gl.uniform1f(uScrollAmp, scrollEnergy); gl.uniform1f(uScrollDir, scrollDir);
-
-    const active=Math.min(rCountTotal,MAX);
-    gl.uniform1i(uRippleCount,active); gl.uniform2fv(uRipplePos,rPos); gl.uniform1fv(uRippleStart,rStart); gl.uniform1fv(uRippleAmp,rAmp);
-
-    gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3);
-    requestAnimationFrame(animate);
-  }
-  animate();
+  function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+  const pr=gl.createProgram(); gl.attachShader(pr,sh(gl.VERTEX_SHADER,vsrc)); gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fsrc)); gl.linkProgram(pr); if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw gl.getProgramInfoLog(pr);
+  gl.useProgram(pr); gl.bindVertexArray(gl.createVertexArray());
+  const uRes=gl.getUniformLocation(pr,'uRes'),uTime=gl.getUniformLocation(pr,'uTime'),uSpin=gl.getUniformLocation(pr,'uSpin'),uTravel=gl.getUniformLocation(pr,'uTravel'),uAmp=gl.getUniformLocation(pr,'uAmp'),uDir=gl.getUniformLocation(pr,'uDir');
+  function resize(){ const w=innerWidth, h=max(1, innerHeight-(parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68)); const d=min(max(1,devicePixelRatio||1),2.5); canvas.width=w*d; canvas.height=h*d; canvas.style.width=w+'px'; canvas.style.height=h+'px'; gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uRes,canvas.width,canvas.height);} const {min,max}=Math; resize(); addEventListener('resize',resize);
+  let t=0, spin=0, travel=0, amp=0, dir=1, lastY=scrollY;
+  addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=min(1,amp+min(.6,Math.abs(dy)*.004));}}, {passive:true});
+  let l=performance.now(); (function loop(){const n=performance.now(), dt=min((n-l)/1000, .033); l=n; t=n*.001; travel+=1.2*dt; spin+=.35*dt; amp=max(0, amp-dt/2); gl.uniform1f(uTime,t); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir); gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3); requestAnimationFrame(loop) })();
 })();
 </script>
 </body>
