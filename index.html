@@ -1,711 +1,556 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>DAECLAN.COM — Portfolio</title>
-  <meta name="theme-color" content="#0a0a0a" />
-  <meta name="description" content="DAECLAN.COM — music, performance, technology." />
-  <style>
-    :root{
-      --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
-      --line:#1d1e22; --accent:#ff7a18; --accent2:#ffb566; --r:14px;
-      --maxw:1160px; --header:68px;
-    }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
-    a{color:inherit;text-decoration:none}
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>DAECLAN.COM — Portfolio</title>
+<meta name="theme-color" content="#0a0a0a"/>
+<meta name="description" content="DAECLAN.COM — music, performance, technology."/>
+<style>
+:root{
+  --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf;
+  --line:#1d1e22; --accent:#ff7a18; --accent2:#ffb566; --r:14px;
+  --maxw:1160px; --header:68px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+a{color:inherit;text-decoration:none}
 
-    /* ===== Header / Nav ===== */
-    header{
-      position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);
-      backdrop-filter:blur(6px);background:#0b0b0cbf
-    }
-    .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
-    .brand{text-decoration:none;font-weight:900;letter-spacing:.3px}
-    .brand b{color:var(--accent)}
-    nav.primary{display:flex;gap:22px;align-items:center}
-    nav.primary a{color:var(--muted);font-size:15px;padding:8px 0;position:relative}
-    nav.primary a:hover{color:var(--fg)}
-    nav.primary a.active{color:var(--accent)}
-    nav.primary a.active::after{
-      content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;
-      background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px
-    }
+/* Header / Nav */
+header{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
+.bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:900;letter-spacing:.3px}
+.brand b{color:var(--accent)}
+nav.primary{display:flex;gap:22px;align-items:center}
+nav.primary a{color:var(--muted);font-size:15px;padding:8px 0;position:relative}
+nav.primary a:hover{color:var(--fg)}
+nav.primary a.active{color:var(--accent)}
+nav.primary a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px}
 
-    /* Mobile button */
-    .menu-btn{
-      appearance:none;-webkit-appearance:none;border:1px solid var(--line);
-      background:#0c0d10;color:var(--accent2);padding:10px 14px;border-radius:12px;
-      font-weight:800;letter-spacing:.02em;cursor:pointer;display:none
-    }
-    .menu-btn:active{transform:translateY(1px)}
-    @media (max-width:860px){
-      nav.primary{display:none}
-      .menu-btn{display:inline-flex;align-items:center;gap:10px}
-    }
+/* Mobile menu */
+.menu-btn{appearance:none;border:1px solid var(--line);background:#0c0d10;color:var(--accent2);padding:10px 14px;border-radius:12px;font-weight:800;letter-spacing:.02em;cursor:pointer;display:none}
+.menu-btn:active{transform:translateY(1px)}
+@media (max-width:860px){nav.primary{display:none}.menu-btn{display:inline-flex;align-items:center;gap:10px}}
+#mobileNav{position:fixed;inset:var(--header) 0 0 0;background:#0b0c10f2;backdrop-filter:blur(6px);border-top:1px solid var(--line);display:none;z-index:19}
+#mobileNav.open{display:block}
+#mobileNav .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
+#mobileNav a{display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+#mobileNav a:active{transform:translateY(1px)}
 
-    /* Mobile drawer */
-    #mobileNav{
-      position:fixed;inset:var(--header) 0 0 0;background:#0b0c10f2;
-      backdrop-filter:blur(6px);border-top:1px solid var(--line);
-      display:none;z-index:19
-    }
-    #mobileNav.open{display:block}
-    #mobileNav .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
-    #mobileNav a{
-      display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;
-      color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2))
-    }
-    #mobileNav a:active{transform:translateY(1px)}
+/* Sections */
+section{scroll-margin-top:calc(var(--header) + 14px)}
+.section{padding:60px 0;border-bottom:1px solid var(--line)}
+.lead{color:var(--muted);max-width:68ch}
+.title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px}
+.accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
 
-    /* ===== Sections ===== */
-    section{scroll-margin-top:calc(var(--header) + 14px)}
-    .section{padding:60px 0;border-bottom:1px solid var(--line)}
-    .lead{color:var(--muted);max-width:68ch}
-    .title{font-size:clamp(30px,5vw,60px);line-height:1.15;margin:.3rem 0 1rem;font-weight:900;letter-spacing:.1px}
-    .accent{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+/* Scene block */
+#showcase{padding:16px 0 50px}
+#heroScene{width:100%;height:clamp(240px,56vw,560px);background:#0e0f12;border:1px solid var(--line);border-radius:16px;display:grid;place-items:center;overflow:hidden;touch-action:manipulation}
+@media (min-width:861px){#heroScene{height:auto;aspect-ratio:16/9}}
+#heroScene p{color:#8b8d94;font-size:14px}
+#heroScene canvas{display:block;width:100%;height:100%}
 
-    /* ===== Scene block ===== */
-    #showcase{padding:16px 0 50px}
-    #heroScene{
-      width:100%;
-      height:clamp(240px, 56vw, 560px); /* robust mobile height */
-      background:#0e0f12;border:1px solid var(--line);border-radius:16px;
-      display:grid;place-items:center;overflow:hidden;touch-action:manipulation
-    }
-    @media (min-width:861px){
-      #heroScene{height:auto;aspect-ratio:16/9}
-    }
-    #heroScene p{color:#8b8d94;font-size:14px}
-    #heroScene canvas{display:block;width:100%;height:100%}
+/* Grid + Cards */
+.grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
+.col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
+@media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
+.thumb{position:relative;aspect-ratio:1/1;background:#0e0f12;display:grid;place-items:center;overflow:hidden}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.thumb .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
+.card-body{padding:16px}
+.meta{display:flex;gap:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
+.title-sm{font-weight:700;font-size:18px;margin:6px 0}
+.desc{color:#d7d9df;font-size:14px}
+.actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 
-    /* ===== Grid + Cards ===== */
-    .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
-    .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
-    @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
-    .card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
-    .thumb{position:relative;aspect-ratio:16/9;background:#0e0f12;display:grid;place-items:center}
-    .thumb img{width:100%;height:100%;object-fit:cover;display:block}
-    .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
-    .card-body{padding:16px}
-    .meta{display:flex;gap:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
-    .title-sm{font-weight:700;font-size:18px;margin:6px 0}
-    .desc{color:#d7d9df;font-size:14px}
-    .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+/* Buttons + logos */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-size:14px;border:1px solid transparent}
+.btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
+.btn.ghost{border:1px solid var(--line);color:var(--fg)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:#0c0d10;transition:transform .1s,border-color .2s}
+.icon-btn:hover{border-color:#2a2c33;transform:translateY(-1px)}
+.icon-btn img{width:22px;height:22px;display:block} /* use actual brand artwork; no recolor */
 
-    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;font-size:14px;border:1px solid transparent}
-    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
-    .btn.ghost{border:1px solid var(--line);color:var(--fg)}
-    .btn.orange{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#111;font-weight:800}
+/* Modal gallery */
+dialog.headshots{border:1px solid var(--line);background:#0b0c10;max-width:min(980px,94vw);width:94vw;border-radius:16px;color:var(--fg)}
+dialog.headshots::backdrop{background:rgba(0,0,0,.6)}
+.gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px}
+.gallery img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.gallery-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)}
+.close-btn{appearance:none;border:1px solid var(--line);background:#0c0d10;color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
+.close-btn:active{transform:translateY(1px)}
 
-    /* ===== Footer ===== */
-    footer{padding:40px 0 70px;color:var(--muted)}
-    .reveal{opacity:1;transform:none}
-    .landing-copy{display:none}
-  </style>
+/* Footer */
+footer{padding:40px 0 70px;color:var(--muted)}
+.reveal{opacity:1;transform:none}
+.landing-copy{display:none}
+</style>
 </head>
 <body>
-  <header>
-    <div class="container bar">
-      <a class="brand" href="#top">DAECLAN<b>.COM</b></a>
-
-      <!-- Desktop nav -->
-      <nav class="primary" aria-label="Chapters">
-        <a href="#music">Music</a>
-        <a href="#acting">Acting</a>
-        <a href="#web">Web&nbsp;Projects</a>
-        <a href="#writing">Writing</a>
-        <a href="#contact">Contact</a>
-      </nav>
-
-      <!-- Mobile toggle -->
-      <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false">
-        <span aria-hidden="true">☰</span> Menu
-      </button>
-    </div>
-
-    <!-- Mobile drawer -->
-    <nav id="mobileNav" aria-label="Mobile Navigation" hidden>
-      <div class="wrap">
-        <a href="#music">Music</a>
-        <a href="#acting">Acting</a>
-        <a href="#web">Web&nbsp;Projects</a>
-        <a href="#writing">Writing</a>
-        <a href="#contact">Contact</a>
-      </div>
+<header>
+  <div class="container bar">
+    <a class="brand" href="#top">DAECLAN<b>.COM</b></a>
+    <nav class="primary" aria-label="Chapters">
+      <a href="#music">Music</a>
+      <a href="#web">Web&nbsp;Projects</a>
+      <a href="#writing">Writing</a>
+      <a href="#contact">Contact</a>
+      <a href="#acting">Acting</a> <!-- kept in nav, section moved to bottom -->
     </nav>
-  </header>
+    <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false"><span aria-hidden="true">☰</span> Menu</button>
+  </div>
+  <nav id="mobileNav" aria-label="Mobile Navigation" hidden>
+    <div class="wrap">
+      <a href="#music">Music</a>
+      <a href="#web">Web&nbsp;Projects</a>
+      <a href="#writing">Writing</a>
+      <a href="#contact">Contact</a>
+      <a href="#acting">Acting</a>
+    </div>
+  </nav>
+</header>
 
-  <main id="main">
-    <!-- Landing copy intentionally hidden -->
-    <section class="section container landing-copy">
-      <h1 class="title">(hidden)</h1>
-      <p class="lead">(hidden)</p>
-    </section>
+<main id="main">
+  <!-- HERO SCENE -->
+  <section id="showcase" class="container">
+    <div id="heroScene"><p>Initializing…</p></div>
+  </section>
 
-    <!-- HERO SCENE -->
-    <section id="showcase" class="container">
-      <div id="heroScene"><p>Initializing…</p></div>
-    </section>
+  <!-- MUSIC -->
+  <section id="music" class="section container">
+    <h2>Music</h2>
+    <p class="lead">Releases under <strong>DEGH</strong>.</p>
 
-    <!-- MUSIC -->
-    <section id="music" class="section container">
-      <h2>Music</h2>
-      <p class="lead">Releases under <strong>DEGH</strong>.</p>
-
-      <div class="grid" style="margin-top:18px;">
-        <!-- Declan Emphasized A Movie -->
-        <article class="card col-4 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Album cover: DECLAN EMPHASIZED A MOVIE"/>
-            <span class="tag">Album</span>
+    <div class="grid" style="margin-top:18px;">
+      <!-- Declan Loved A Message -->
+      <article class="card col-4 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Declan Loved A Message"/>
+          <span class="tag">Album</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>DEGH</span></div>
+          <h3 class="title-sm">Declan Loved A Message</h3>
+          <div class="actions">
+            <a class="icon-btn" href="https://open.spotify.com/album/3R0oRVPjz7V53wJ4Nia9pk" target="_blank" rel="noopener" aria-label="Spotify">
+              <img src="/assets/brands/spotify.svg" alt="">
+            </a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-loved-a-message/1479080675?ign-mpt=uo%3D4" target="_blank" rel="noopener" aria-label="Apple Music">
+              <img src="/assets/brands/apple-music.svg" alt="">
+            </a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/117178044" target="_blank" rel="noopener" aria-label="Tidal">
+              <img src="/assets/brands/tidal.svg" alt="">
+            </a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-loved-a-message" target="_blank" rel="noopener" aria-label="Bandcamp">
+              <img src="/assets/brands/bandcamp.svg" alt="">
+            </a>
           </div>
-          <div class="card-body">
-            <div class="meta"><span>2025</span><span>DEGH</span></div>
-            <h3 class="title-sm">DECLAN EMPHASIZED A MOVIE</h3>
-            <p class="desc">Latest album. Listen on your platform of choice.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH" target="_blank" rel="noopener">Spotify</a>
-              <a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a>
-            </div>
+        </div>
+      </article>
+
+      <!-- Declan Questioned An Image -->
+      <article class="card col-4 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Declan Questioned An Image"/>
+          <span class="tag">Album</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>DEGH</span></div>
+          <h3 class="title-sm">Declan Questioned An Image</h3>
+          <div class="actions">
+            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" rel="noopener" aria-label="Spotify"><img src="/assets/brands/spotify.svg" alt=""></a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><img src="/assets/brands/apple-music.svg" alt=""></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><img src="/assets/brands/tidal.svg" alt=""></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-questioned-an-image" target="_blank" rel="noopener" aria-label="Bandcamp"><img src="/assets/brands/bandcamp.svg" alt=""></a>
           </div>
-        </article>
+        </div>
+      </article>
 
-        <!-- Declan Questioned An Image -->
-        <article class="card col-4 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://f4.bcbits.com/img/a2404438695_16.jpg" alt="Album cover: Declan Questioned An Image"/>
-            <span class="tag">Album</span>
+      <!-- Declan Emphasized A Movie -->
+      <article class="card col-4 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="DECLAN EMPHASIZED A MOVIE"/>
+          <span class="tag">Album</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>2025</span><span>DEGH</span></div>
+          <h3 class="title-sm">DECLAN EMPHASIZED A MOVIE</h3>
+          <div class="actions">
+            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" rel="noopener" aria-label="Spotify"><img src="/assets/brands/spotify.svg" alt=""></a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><img src="/assets/brands/apple-music.svg" alt=""></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><img src="/assets/brands/tidal.svg" alt=""></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-emphasized-a-movie" target="_blank" rel="noopener" aria-label="Bandcamp"><img src="/assets/brands/bandcamp.svg" alt=""></a>
           </div>
-          <div class="card-body">
-            <div class="meta"><span>DEGH</span></div>
-            <h3 class="title-sm">Declan Questioned An Image</h3>
-            <div class="actions"><a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- WEB PROJECTS -->
+  <section id="web" class="section container">
+    <h2>Web Projects</h2>
+    <p class="lead">Interfaces, interactive art, and tools.</p>
+    <div class="grid" style="margin-top:18px;">
+      <!-- SLIME.SURF -->
+      <article class="card col-6 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="/assets/tree-of-slime.jpg" alt="THE TREE OF SLIME screenshot">
+          <span class="tag">Site</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>SLIME.SURF</span></div>
+          <h3 class="title-sm">SLIME.SURF</h3>
+          <p class="desc">THE TREE OF SLIME: A 3D YSL Soundboard built in Three.JS</p>
+          <div class="actions">
+            <a class="btn primary" href="https://www.slime.surf/" target="_blank" rel="noopener">Go To Visualizer</a>
+            <a class="btn ghost" href="#" target="_blank" rel="noopener">Backstory</a> <!-- add your URL -->
           </div>
-        </article>
+        </div>
+      </article>
 
-        <!-- Declan Loved A Message -->
-        <article class="card col-4 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Album cover: Declan Loved A Message"/>
-            <span class="tag">Album</span>
+      <!-- MIGOS ADLIBS -->
+      <article class="card col-6 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork">
+          <span class="tag">Site</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>MIGOS ADLIBS</span></div>
+          <h3 class="title-sm">MIGOS ADLIBS</h3>
+          <p class="desc">Every Single Ad Lib from 2017's Culture Perfectly Synced in the Migos Adlibs Visualizer.</p>
+          <div class="actions">
+            <a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Go To Visualizer</a>
+            <a class="btn ghost" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank" rel="noopener">Complex</a>
+            <a class="btn ghost" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank" rel="noopener">VICE</a>
+            <a class="btn ghost" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank" rel="noopener">The Fader</a>
+            <a class="btn ghost" href="https://genius.com/a/every-ad-lib-on-migos-culture-visualized" target="_blank" rel="noopener">Genius</a>
           </div>
-          <div class="card-body">
-            <div class="meta"><span>DEGH</span></div>
-            <h3 class="title-sm">Declan Loved A Message</h3>
-            <div class="actions"><a class="btn ghost" href="#" target="_blank" rel="noopener">All Platforms</a></div>
+        </div>
+      </article>
+
+      <!-- XXXSENSATION -->
+      <article class="card col-6 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://i.scdn.co/image/ab67616d00001e028b4ab0e172584a790ede3ddb" alt="XXXSENSATION cover">
+          <span class="tag">Site</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>XXXSENSATION</span></div>
+          <h3 class="title-sm">XXXSENSATION</h3>
+          <p class="desc">a 3D soundboard that uses #ThreeJS and #ToneJS, all loaded up with YSL ad libs</p>
+          <div class="actions">
+            <a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Go To Visualizer</a>
+            <a class="btn ghost" href="https://www.reddit.com/r/YoungThug/comments/l764h9/i_was_tapped_by_300_entertainment_to_make_a/" target="_blank" rel="noopener">Backstory</a>
           </div>
-        </article>
-      </div>
+        </div>
+      </article>
 
-      <!-- Latest Music Video -->
-      <div class="grid" style="margin-top:28px;">
-        <article class="card col-12 reveal">
-          <div class="card-body">
-            <h3 class="title-sm" style="margin-bottom:10px;">Latest Music Video</h3>
-            <div class="embed" style="position:relative;aspect-ratio:16/9;overflow:hidden;border-radius:12px;border:1px solid var(--line);background:#0e0f12;">
-              <iframe 
-                title="YouTube video player"
-                src="https://www.youtube.com/embed/XBsp40jGAIk" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                allowfullscreen 
-                style="position:absolute;inset:0;width:100%;height:100%;border:0;">
-              </iframe>
-            </div>
+      <!-- SLAM HARRIS -->
+      <article class="card col-6 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
+          <span class="tag">Audio</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>SLAM HARRIS</span></div>
+          <h3 class="title-sm">SLAM HARRIS</h3>
+          <p class="desc">a parody of sam harris' intro theme & guided meditations</p>
+          <div class="actions">
+            <a class="btn primary" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank" rel="noopener">waking yall up (parody)</a>
+            <a class="btn ghost" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank" rel="noopener">instrumental</a>
+            <a class="btn ghost" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank" rel="noopener">guided meditation (4:20)</a>
           </div>
-        </article>
-      </div>
+        </div>
+      </article>
 
-      <!-- earlyera series -->
-      <div class="grid" style="margin-top:18px;">
-        <article class="card col-4 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">earlyera vol. 1</h3>
-            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
-              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                src="https://open.spotify.com/embed/album/6tNvw5hMojUHmy3LIDzBkE?theme=0"></iframe>
-            </div>
+      <!-- SLIME NO B -->
+      <article class="card col-6 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
+          <span class="tag">Editorial</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>SLIME NO B</span></div>
+          <h3 class="title-sm">SLIME NO B</h3>
+          <p class="desc">A Young Thug-Only Remake Of Slime & B That Cuts Chris Brown Off The Project.</p>
+          <div class="actions">
+            <a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a>
           </div>
-        </article>
-        <article class="card col-4 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">earlyera vol. 2</h3>
-            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
-              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                src="https://open.spotify.com/embed/album/5pLgW31uG73lLzsLAhXhTN?theme=0"></iframe>
-            </div>
+        </div>
+      </article>
+
+      <!-- MORE LIFE -->
+      <article class="card col-6 reveal">
+        <div class="thumb">
+          <img loading="lazy" src="https://i1.sndcdn.com/avatars-000321758334-11pr0g-t1080x1080.jpg" alt="More Life alt-sequenced artwork">
+          <span class="tag">Project</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>MORE LIFE (without Aubrey)</span></div>
+          <h3 class="title-sm">MORE LIFE — Without Aubrey Drake Graham</h3>
+          <p class="desc">Reimagining a world without Drake</p>
+          <div class="actions">
+            <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open</a>
+            <a class="btn ghost" href="https://www.reddit.com/r/Music/comments/6l0h48/v_petty_presents_more_life_without_aubrey_drake/" target="_blank" rel="noopener">Backstory</a>
           </div>
-        </article>
-        <article class="card col-4 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">earlyera vol. 3</h3>
-            <div class="spotify-embed" style="border-radius:12px;overflow:hidden;border:1px solid var(--line);">
-              <iframe style="border:0; width:100%; height:352px;" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                loading="lazy"
-                src="https://open.spotify.com/embed/album/3puC9dCxZRIpiZOGy6MBby?theme=0"></iframe>
-            </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- WRITING -->
+  <section id="writing" class="section container">
+    <h2>Writing</h2>
+    <p class="lead">Poems, blurbs, fragments.</p>
+    <div class="grid" style="margin-top:18px;">
+      <article class="card col-3 reveal">
+        <div class="card-body">
+          <div class="meta"><span>2025</span></div>
+          <h3 class="title-sm">My experience at the Chance The Rapper / SaveMoney reunion show [Concert Review]</h3>
+          <div class="actions"><a class="btn ghost" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank" rel="noopener">Read</a></div>
+        </div>
+      </article>
+      <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+      <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+      <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section container">
+    <h2>Contact</h2>
+    <p class="lead">Bookings, collabs, or share your deepest darkest secret.</p>
+    <div class="grid" style="margin-top:18px;">
+      <article class="card col-12 reveal">
+        <div class="card-body">
+          <div class="actions" style="gap:14px;flex-wrap:wrap">
+            <a class="icon-btn" href="mailto:hello@example.com" aria-label="Email"><img src="/assets/brands/email.svg" alt=""></a>
+            <a class="icon-btn" href="https://www.facebook.com/declxn" target="_blank" rel="noopener" aria-label="Facebook"><img src="/assets/brands/facebook.svg" alt=""></a>
+            <a class="icon-btn" href="https://twitter.com/daeclan" target="_blank" rel="noopener" aria-label="X/Twitter"><img src="/assets/brands/x.svg" alt=""></a>
+            <a class="icon-btn" href="https://instagram.com/daeclan" target="_blank" rel="noopener" aria-label="Instagram"><img src="/assets/brands/instagram.svg" alt=""></a>
           </div>
-        </article>
-      </div>
-    </section>
+        </div>
+      </article>
+    </div>
+  </section>
 
-    <!-- ACTING -->
-    <section id="acting" class="section container">
-      <h2>Acting</h2>
-      <p class="lead">Resume, headshots, and production stills.</p>
-      <div class="grid" style="margin-top:18px;">
-        <article class="card col-6 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">Resume</h3>
-            <p class="desc">PDF download and web view.</p>
-            <div class="actions">
-              <a class="btn primary" href="#" target="_blank" rel="noopener">View Resume</a>
-              <a class="btn ghost" href="#" download>Download PDF</a>
-            </div>
+  <!-- ACTING (moved to bottom; headshots hidden behind button) -->
+  <section id="acting" class="section container">
+    <h2>Acting</h2>
+    <p class="lead">Resume & (optional) headshots.</p>
+    <div class="grid" style="margin-top:18px;">
+      <article class="card col-6 reveal">
+        <div class="card-body">
+          <h3 class="title-sm">Resume</h3>
+          <p class="desc">PDF web view & download.</p>
+          <div class="actions">
+            <a class="btn primary" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" target="_blank" rel="noopener">View Resume</a>
+            <a class="btn ghost" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" download>Download PDF</a>
           </div>
-        </article>
-        <article class="card col-6 reveal">
-          <div class="card-body">
-            <h3 class="title-sm">Headshots & Photos</h3>
-            <p class="desc">A small gallery of select images.</p>
-            <div class="actions">
-              <a class="btn ghost" href="#" target="_blank" rel="noopener">Open Gallery</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
+        </div>
+      </article>
+      <article class="card col-6 reveal">
+        <div class="card-body">
+          <h3 class="title-sm">Headshots (Hidden)</h3>
+          <p class="desc">These are older; click to open a private gallery modal.</p>
+          <div class="actions"><button class="btn ghost" id="openHeadshots" type="button">View Headshots (Modal)</button></div>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
 
-    <!-- WEB PROJECTS -->
-    <section id="web" class="section container">
-      <h2>Web Projects</h2>
-      <p class="lead">Interfaces, interactive art, and tools.</p>
-      <div class="grid" style="margin-top:18px;">
-        <!-- SLIME.SURF -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop" alt="Code editor on dark background">
-            <span class="tag">Site</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>SLIME.SURF</span></div>
-            <h3 class="title-sm">SLIME.SURF</h3>
-            <p class="desc">(Summary coming soon.)</p>
-            <div class="actions">
-              <a class="btn primary" href="https://www.slime.surf/" target="_blank" rel="noopener">Visit</a>
-            </div>
-          </div>
-        </article>
+<footer class="container"><p>© <span id="year"></span> DAECLAN.COM</p></footer>
 
-        <!-- MIGOS ADLIBS -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs artwork">
-            <span class="tag">Site</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>MIGOS ADLIBS</span></div>
-            <h3 class="title-sm">MIGOS ADLIBS</h3>
-            <p class="desc">Every Single Ad Lib from 2017's Culture Perfectly Synced in the Migos Adlibs Visualizer.</p>
-            <div class="actions">
-              <a class="btn primary" href="http://migosadlibs.com/" target="_blank" rel="noopener">Visit</a>
-              <a class="btn ghost" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank" rel="noopener">Complex</a>
-              <a class="btn ghost" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank" rel="noopener">The Fader</a>
-              <a class="btn ghost" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank" rel="noopener">VICE</a>
-            </div>
-          </div>
-        </article>
+<!-- Headshots Modal -->
+<dialog class="headshots" id="headshotsDlg">
+  <div class="gallery-head">
+    <strong>Headshots (Private Preview)</strong>
+    <button class="close-btn" id="closeHeadshots" type="button">Close</button>
+  </div>
+  <div class="gallery">
+    <img src="/assets/headshot1.jpg" alt="Headshot 1">
+    <img src="/assets/headshot2.jpg" alt="Headshot 2">
+    <img src="/assets/headshot3.jpg" alt="Headshot 3">
+    <img src="/assets/headshot4.jpg" alt="Headshot 4">
+  </div>
+</dialog>
 
-        <!-- SLAM HARRIS -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS avatar">
-            <span class="tag">Audio</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>SLAM HARRIS</span></div>
-            <h3 class="title-sm">SLAM HARRIS</h3>
-            <p class="desc">a parody of sam harris' intro theme & guided meditations</p>
-            <div class="actions">
-              <a class="btn primary" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank" rel="noopener">waking yall up (parody)</a>
-              <a class="btn ghost" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank" rel="noopener">instrumental</a>
-              <a class="btn ghost" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank" rel="noopener">guided meditation (4:20)</a>
-            </div>
-          </div>
-        </article>
+<!-- Core UX scripts -->
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
 
-        <!-- XXXSENSATION -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1518085250887-2f903c200fee?q=80&w=1600&auto=format&fit=crop" alt="Neon signage">
-            <span class="tag">Site</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>XXXSENSATION</span></div>
-            <h3 class="title-sm">XXXSENSATION</h3>
-            <p class="desc">(Summary coming soon.)</p>
-            <div class="actions">
-              <a class="btn primary" href="http://xxxsensation.org/" target="_blank" rel="noopener">Visit</a>
-            </div>
-          </div>
-        </article>
+// Scrollspy
+const secs=[...document.querySelectorAll('main section[id]')];
+const links=[...document.querySelectorAll('header nav.primary a')];
+const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
+const io=new IntersectionObserver(es=>{
+  es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return;
+    if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }
+  });
+},{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
+secs.forEach(s=>io.observe(s));
 
-        <!-- SLIME NO B -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://external-preview.redd.it/1AlUV093E_T8YqmmipXI1AkAVxX1hZIpOUvaMXAl1Sk.jpg?width=640&crop=smart&auto=webp&s=08d31771651c98a8aa316822247924da509822ae" alt="SLIME NO B artwork">
-            <span class="tag">Editorial</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>SLIME NO B</span></div>
-            <h3 class="title-sm">SLIME NO B</h3>
-            <p class="desc">A Young Thug-Only Remake Of Slime & B That Cuts Chris Brown Off The Project.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank" rel="noopener">Read Coverage</a>
-            </div>
-          </div>
-        </article>
+// Mobile menu
+(function(){
+  const btn=document.getElementById('menuToggle'), drawer=document.getElementById('mobileNav');
+  if(!btn||!drawer) return;
+  const setOpen=o=>{ btn.setAttribute('aria-expanded',o?'true':'false'); drawer.hidden=!o; drawer.classList.toggle('open',o); document.documentElement.style.overflow=o?'hidden':''; document.body.style.overflow=o?'hidden':''; };
+  btn.addEventListener('click', ()=>setOpen(btn.getAttribute('aria-expanded')!=='true'));
+  drawer.addEventListener('click', e=>{ if(e.target.closest('a[href^="#"]')) setOpen(false); });
+  window.matchMedia('(min-width:861px)').addEventListener('change',ev=>{ if(ev.matches) setOpen(false); });
+})();
 
-        <!-- MORE LIFE -->
-        <article class="card col-6 reveal">
-          <div class="thumb">
-            <img loading="lazy" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1600&auto=format&fit=crop" alt="More Life alt-sequenced artwork placeholder">
-            <span class="tag">Project</span>
-          </div>
-          <div class="card-body">
-            <div class="meta"><span>MORE LIFE (without Aubrey)</span></div>
-            <h3 class="title-sm">MORE LIFE — Without Aubrey Drake Graham</h3>
-            <p class="desc">Alt-sequenced listening experience.</p>
-            <div class="actions">
-              <a class="btn primary" href="https://imgur.com/gallery/more-chune-fer-ur-breadsticks-moJMU" target="_blank" rel="noopener">Open</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
+// Headshots modal
+(function(){
+  const dlg=document.getElementById('headshotsDlg');
+  const openBtn=document.getElementById('openHeadshots');
+  const closeBtn=document.getElementById('closeHeadshots');
+  if(!dlg||!openBtn||!closeBtn) return;
+  openBtn.addEventListener('click',()=>{ dlg.showModal(); });
+  closeBtn.addEventListener('click',()=>{ dlg.close(); });
+  dlg.addEventListener('click',e=>{ if(e.target===dlg) dlg.close(); });
+})();
+</script>
 
-    <!-- WRITING -->
-    <section id="writing" class="section container">
-      <h2>Writing</h2>
-      <p class="lead">Poems, blurbs, fragments.</p>
-      <div class="grid" style="margin-top:18px;">
-        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #1</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-        <article class="card col-3 reveal"><div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions"><a class="btn ghost" href="#">Read</a></div></div></article>
-      </div>
-    </section>
+<!-- WEBGL2 wormhole (same mid ripple & 2s decay as previous working version) -->
+<script>
+(function(){
+  const mount=document.getElementById('heroScene'); if(!mount) return;
+  const canvas=document.createElement('canvas'); canvas.style.cssText='display:block;width:100%;height:100%';
+  mount.textContent=''; mount.appendChild(canvas);
+  const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true});
+  if(!gl){ mount.innerHTML='<p style="color:#f99">WebGL2 not available</p>'; return; }
 
-    <!-- CONTACT -->
-    <section id="contact" class="section container">
-      <h2>Contact</h2>
-      <p class="lead">Bookings, collabs, or just to say hi.</p>
-      <div class="grid" style="margin-top:18px;">
-        <article class="card col-12 reveal">
-          <div class="card-body">
-            <div class="actions">
-              <a class="btn orange" href="mailto:hello@example.com">Email</a>
-              <a class="btn orange" href="https://www.facebook.com/declxn" target="_blank" rel="noopener">Facebook</a>
-              <a class="btn orange" href="https://twitter.com/daeclan" target="_blank" rel="noopener">Twitter</a>
-              <a class="btn orange" href="https://instagram.com/daeclan" target="_blank" rel="noopener">Instagram</a>
-            </div>
-          </div>
-        </article>
-      </div>
-    </section>
-  </main>
+  const vsrc=`#version 300 es
+  const vec2 V[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));
+  out vec2 vUv; void main(){ vec2 p=V[gl_VertexID]; vUv=.5*(p+1.); gl_Position=vec4(p,0.,1.); }`;
 
-  <footer class="container">
-    <p>© <span id="year"></span> DAECLAN.COM</p>
-  </footer>
+  const fsrc=`#version 300 es
+  precision highp float; in vec2 vUv; out vec4 frag;
+  uniform vec2 uRes; uniform float uTimeSec; uniform float uSpin; uniform float uTravel;
+  uniform int uRippleCount; uniform vec2 uRipplePos[8]; uniform float uRippleStart[8]; uniform float uRippleAmp[8];
+  uniform float uScrollAmp; uniform float uScrollDir;
 
-  <!-- Core UX scripts -->
-  <script>
-    // year
-    document.getElementById('year').textContent = new Date().getFullYear();
+  vec3 roygbiv(float i){
+    if(i<0.5) return vec3(1.,0.,0.);
+    if(i<1.5) return vec3(1.,0.5,0.);
+    if(i<2.5) return vec3(1.,1.,0.);
+    if(i<3.5) return vec3(0.,1.,0.);
+    if(i<4.5) return vec3(0.,0.,1.);
+    if(i<5.5) return vec3(0.294,0.,0.510);
+    return vec3(0.561,0.,1.);
+  }
+  mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
 
-    // Scrollspy
-    const secs=[...document.querySelectorAll('main section[id]')];
-    const links=[...document.querySelectorAll('header nav.primary a')];
-    const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
-    const io=new IntersectionObserver(es=>{
-      es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return;
-        if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }
-      });
-    },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
-    secs.forEach(s=>io.observe(s));
+  void main(){
+    vec2 p=(vUv*uRes-0.5*uRes)/min(uRes.x,uRes.y);
 
-    // Mobile menu
-    (function(){
-      const btn = document.getElementById('menuToggle');
-      const drawer = document.getElementById('mobileNav');
-      if (!btn || !drawer) return;
-      const setOpen = (open) => {
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        drawer.hidden = !open;
-        drawer.classList.toggle('open', open);
-        document.documentElement.style.overflow = open ? 'hidden' : '';
-        document.body.style.overflow = open ? 'hidden' : '';
-      };
-      btn.addEventListener('click', () => {
-        setOpen(btn.getAttribute('aria-expanded') !== 'true');
-      });
-      drawer.addEventListener('click', (e) => {
-        const a = e.target.closest('a[href^="#"]'); if (a) setOpen(false);
-      });
-      const mq = window.matchMedia('(min-width: 861px)');
-      mq.addEventListener('change', (ev) => { if (ev.matches) setOpen(false); });
-    })();
-  </script>
-
-  <!-- ZERO-DEPENDENCY WEBGL2 WORMHOLE (big speed bumps + auto-rotate + click ripples) -->
-  <script>
-  (function(){
-    const mount = document.getElementById('heroScene');
-    if (!mount) return;
-
-    // Canvas & GL
-    const canvas = document.createElement('canvas');
-    canvas.style.display = 'block';
-    canvas.style.width = '100%';
-    canvas.style.height = '100%';
-    mount.textContent = '';
-    mount.appendChild(canvas);
-
-    const gl = canvas.getContext('webgl2', { antialias:false, alpha:true, premultipliedAlpha:true });
-    if (!gl){ mount.innerHTML = '<p style="color:#f99">WebGL2 not available</p>'; return; }
-
-    // Fullscreen triangle
-    const vsrc = `#version 300 es
-    const vec2 V[3] = vec2[3]( vec2(-1.,-1.), vec2(3.,-1.), vec2(-1.,3.) );
-    out vec2 vUv;
-    void main(){
-      vec2 p = V[gl_VertexID];
-      vUv = 0.5 * (p + 1.0);
-      gl_Position = vec4(p, 0.0, 1.0);
-    }`;
-
-    // Fragment shader (ROYGBIV tunnel + ripples)
-    const fsrc = `#version 300 es
-    precision highp float;
-
-    in vec2 vUv;
-    out vec4 frag;
-
-    uniform vec2  uRes;
-    uniform float uTimeSec;
-    uniform float uSpin;     // axial rotation
-    uniform float uTravel;   // accumulated forward travel
-
-    // Ripple uniforms (8 slots)
-    uniform int   uRippleCount;
-    uniform vec2  uRipplePos[8];
-    uniform float uRippleStart[8];
-    uniform float uRippleAmp[8];
-
-    vec3 roygbiv(float i){
-      if(i<0.5) return vec3(1.,0.,0.);
-      if(i<1.5) return vec3(1.,0.5,0.);
-      if(i<2.5) return vec3(1.,1.,0.);
-      if(i<3.5) return vec3(0.,1.,0.);
-      if(i<4.5) return vec3(0.,0.,1.);
-      if(i<5.5) return vec3(0.294,0.,0.510);
-      return vec3(0.561,0.,1.);
-    }
-    mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
-
-    void main(){
-      // aspect-corrected coords
-      vec2 p = (vUv * uRes - 0.5*uRes) / min(uRes.x, uRes.y);
-
-      // Screen-space ripple displacement (before rotation)
-      for (int i=0; i<8; i++){
-        if (i >= uRippleCount) break;
-        vec2 c = (uRipplePos[i] * uRes - 0.5*uRes) / min(uRes.x, uRes.y);
-        vec2 d = p - c;
-        float r = length(d) + 1e-5;
-
-        float t = max(0.0, uTimeSec - uRippleStart[i]);
-        float k = 18.0;        // spatial frequency
-        float w = 9.0;         // temporal frequency
-        float env = exp(-2.2*t) * exp(-2.0*r); // decay
-        float wave = sin(k*r - w*t);
-
-        vec2 dir = d / r;
-        p += dir * (uRippleAmp[i] * wave * env);
-      }
-
-      // axial rotation
-      p = rot(uSpin) * p;
-
-      float r = length(p) + 1e-6;
-
-      // forward coordinate uses accumulated travel for smooth speed changes
-      float z = uTravel + 4.0 / r;
-
-      // Neon rings (ROYGBIV repeating)
-      float stripeDensity = 1.35;
-      float ringIndex = floor(mod(z * stripeDensity, 7.0));
-      float stripe = smoothstep(0.02, 0.0, abs(fract(z*stripeDensity) - 0.5));
-
-      // Keep core open; soft halo
-      float innerFade = smoothstep(0.12, 0.20, r);
-      float glow = pow(1.0 / (1.0 + 6.0*pow(r, 2.2)), 1.2);
-
-      vec3 base = roygbiv(ringIndex);
-      float core = stripe * innerFade;
-      float halo = glow * 0.55;
-      vec3 col = base * (core * 1.7 + halo);
-
-      // vignette
-      float vig = smoothstep(1.4, 0.2, length(p));
-      col *= vig;
-
-      // filmic-ish tonemap
-      col = max(col - 0.004, 0.0);
-      col = (col*(6.2*col+0.5)) / (col*(6.2*col+1.7) + 0.06);
-
-      frag = vec4(col, 1.0);
-    }`;
-
-    // Compile/link
-    function compile(type, src){
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(s));
-        throw new Error('Shader compile failed');
-      }
-      return s;
-    }
-    const prog = gl.createProgram();
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vsrc));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fsrc));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
-      console.error(gl.getProgramInfoLog(prog));
-      throw new Error('Program link failed');
-    }
-    gl.useProgram(prog);
-    gl.bindVertexArray(gl.createVertexArray());
-
-    // Uniforms
-    const uRes        = gl.getUniformLocation(prog, 'uRes');
-    const uTimeSec    = gl.getUniformLocation(prog, 'uTimeSec');
-    const uSpin       = gl.getUniformLocation(prog, 'uSpin');
-    const uTravel     = gl.getUniformLocation(prog, 'uTravel');
-    const uRippleCount= gl.getUniformLocation(prog, 'uRippleCount');
-    const uRipplePos  = gl.getUniformLocation(prog, 'uRipplePos[0]');
-    const uRippleStart= gl.getUniformLocation(prog, 'uRippleStart[0]');
-    const uRippleAmp  = gl.getUniformLocation(prog, 'uRippleAmp[0]');
-
-    // Resize
-    function resize(){
-      const w = mount.clientWidth;
-      const h = mount.clientHeight || Math.round(w/(16/9));
-      const dpr = Math.min(Math.max(1, window.devicePixelRatio || 1), 2.5);
-      canvas.width  = Math.max(1, Math.floor(w * dpr));
-      canvas.height = Math.max(1, Math.floor(h * dpr));
-      canvas.style.width  = w + 'px';
-      canvas.style.height = h + 'px';
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-    }
-    new ResizeObserver(resize).observe(mount);
-    resize();
-
-    // Motion & speed
-    const BASE_SPEED   = 1.6;  // base forward units/sec
-    let   travel       = 0.0;  // integrated forward position
-    const SPIN_SPEED   = 0.6;  // radians/sec auto-rotation
-    let   spinAccum    = 0.0;
-
-    // Extreme but smooth speed bumps (multiplicative)
-    let speedMul    = 1.0;     // current multiplier
-    let speedTarget = 1.0;     // target multiplier (eased to)
-    const SPEED_GROWTH = 1.8;  // per-click multiplier
-    const SPEED_CAP    = 12.0; // max multiplier
-    const SPEED_EASE   = 0.0015; // easing factor (higher = snappier)
-
-    // Ripples
-    const MAX = 8;
-    const ripplePos   = new Float32Array(MAX * 2); // x,y pairs
-    const rippleStart = new Float32Array(MAX);     // start time (sec)
-    const rippleAmp   = new Float32Array(MAX);     // amplitude
-    let rippleCountTotal = 0;
-
-    function pushRipple(uvx, uvy, amp){
-      const idx = rippleCountTotal % MAX;
-      ripplePos[idx*2 + 0] = uvx;
-      ripplePos[idx*2 + 1] = uvy;
-      rippleStart[idx]     = performance.now() * 0.001;
-      rippleAmp[idx]       = amp;
-      rippleCountTotal++;
+    // Mid-strength directional ripple
+    if(uScrollAmp>0.0001){
+      float k = 14.0;
+      float phase = uTimeSec*7.0*uScrollDir;
+      float w = sin(k*p.y + phase);
+      float env = smoothstep(1.35,0.18,abs(p.y));
+      p.x += (w * env) * (uScrollAmp * 0.095);
+      p.y += (cos(k*p.y + phase)*env) * (uScrollAmp * 0.032) * uScrollDir;
     }
 
-    function onClick(e){
-      const r = mount.getBoundingClientRect();
-      const x = ('touches' in e) ? e.touches[0].clientX : e.clientX;
-      const y = ('touches' in e) ? e.touches[0].clientY : e.clientY;
-      const u = (x - r.left) / Math.max(1, r.width);
-      const v = (y - r.top ) / Math.max(1, r.height);
-
-      // Big smooth speed boost (compound)
-      speedTarget = Math.min(SPEED_CAP, speedTarget * SPEED_GROWTH);
-
-      // Water ripple at click
-      pushRipple(u, v, 0.018);
+    // Click ripples
+    for(int i=0;i<8;i++){
+      if(i>=uRippleCount) break;
+      vec2 c=(uRipplePos[i]*uRes-0.5*uRes)/min(uRes.x,uRes.y);
+      vec2 d=p-c; float r=length(d)+1e-5;
+      float t=max(0.0,uTimeSec-uRippleStart[i]);
+      float k=18.0, w=9.0;
+      float env=exp(-2.2*t)*exp(-2.0*r);
+      float wave=sin(k*r-w*t);
+      vec2 dir=d/r; p+=dir*(uRippleAmp[i]*wave*env);
     }
 
-    mount.addEventListener('click', onClick, {passive:true});
-    mount.addEventListener('touchstart', onClick, {passive:true});
+    p=rot(uSpin)*p; float r=length(p)+1e-6;
+    float z=uTravel+4.0/r;
 
-    // Double-click resets speed
-    mount.addEventListener('dblclick', function(){
-      speedTarget = 1.0;
-    }, {passive:true});
+    float stripeDensity=1.35;
+    float ringIndex=floor(mod(z*stripeDensity,7.0));
+    float stripe=smoothstep(0.02,0.0,abs(fract(z*stripeDensity)-0.5));
+    float innerFade=smoothstep(0.12,0.20,r);
+    float glow=pow(1.0/(1.0+6.0*pow(r,2.2)),1.2);
 
-    // Animate
-    let last = performance.now();
-    function animate(){
-      const now = performance.now();
-      const dt  = Math.min((now - last)/1000, 0.033);
-      last = now;
+    vec3 base=roygbiv(ringIndex);
+    float core=stripe*innerFade; float halo=glow*0.55;
+    vec3 col=base*(core*1.7+halo);
 
-      // Ease speed toward target
-      const ease = 1.0 - Math.pow(1.0 - SPEED_EASE, dt * 60.0);
-      speedMul += (speedTarget - speedMul) * ease;
+    float vig=smoothstep(1.4,0.2,length(p)); col*=vig;
 
-      // Integrate motion
-      travel    += BASE_SPEED * speedMul * dt;
-      spinAccum += SPIN_SPEED * dt;
+    col=max(col-0.004,0.0);
+    col=(col*(6.2*col+0.5))/(col*(6.2*col+1.7)+0.06);
+    frag=vec4(col,1.0);
+  }`;
 
-      // Upload uniforms
-      gl.uniform1f(uTimeSec,  now * 0.001);
-      gl.uniform1f(uSpin,     spinAccum);
-      gl.uniform1f(uTravel,   travel);
+  function compile(type,src){ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
+    if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){ console.error(gl.getShaderInfoLog(s)); throw new Error('Shader compile failed'); } return s; }
+  const prog=gl.createProgram(); gl.attachShader(prog,compile(gl.VERTEX_SHADER,vsrc)); gl.attachShader(prog,compile(gl.FRAGMENT_SHADER,fsrc));
+  gl.linkProgram(prog); if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){ console.error(gl.getProgramInfoLog(prog)); throw new Error('Program link failed'); }
+  gl.useProgram(prog); gl.bindVertexArray(gl.createVertexArray());
 
-      const active = Math.min(rippleCountTotal, MAX);
-      gl.uniform1i(uRippleCount, active);
-      gl.uniform2fv(uRipplePos,   ripplePos);
-      gl.uniform1fv(uRippleStart, rippleStart);
-      gl.uniform1fv(uRippleAmp,   rippleAmp);
+  const uRes=gl.getUniformLocation(prog,'uRes'), uTimeSec=gl.getUniformLocation(prog,'uTimeSec');
+  const uSpin=gl.getUniformLocation(prog,'uSpin'), uTravel=gl.getUniformLocation(prog,'uTravel');
+  const uRippleCount=gl.getUniformLocation(prog,'uRippleCount'), uRipplePos=gl.getUniformLocation(prog,'uRipplePos[0]');
+  const uRippleStart=gl.getUniformLocation(prog,'uRippleStart[0]'), uRippleAmp=gl.getUniformLocation(prog,'uRippleAmp[0]');
+  const uScrollAmp=gl.getUniformLocation(prog,'uScrollAmp'), uScrollDir=gl.getUniformLocation(prog,'uScrollDir');
 
-      // Draw
-      gl.disable(gl.DEPTH_TEST);
-      gl.disable(gl.BLEND);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-      requestAnimationFrame(animate);
-    }
-    animate();
-  })();
-  </script>
+  function resize(){
+    const w=mount.clientWidth, h=mount.clientHeight||Math.round(w/(16/9));
+    const dpr=Math.min(Math.max(1,window.devicePixelRatio||1),2.5);
+    canvas.width=Math.max(1,Math.floor(w*dpr)); canvas.height=Math.max(1,Math.floor(h*dpr));
+    canvas.style.width=w+'px'; canvas.style.height=h+'px';
+    gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uRes,canvas.width,canvas.height);
+  }
+  new ResizeObserver(resize).observe(mount); resize();
+
+  // Motion & interactions
+  const BASE_SPEED=1.6; let travel=0; const SPIN_SPEED=0.6; let spin=0;
+  let speedMul=1, speedTarget=1; const SPEED_GROWTH=1.8, SPEED_CAP=12, SPEED_EASE=0.0015;
+
+  const MAX=8; const rPos=new Float32Array(MAX*2), rStart=new Float32Array(MAX), rAmp=new Float32Array(MAX); let rCountTotal=0;
+  function pushRipple(u,v,amp){ const i=rCountTotal%MAX; rPos[i*2]=u; rPos[i*2+1]=v; rStart[i]=performance.now()*0.001; rAmp[i]=amp; rCountTotal++; }
+  function onClick(e){ const r=mount.getBoundingClientRect(); const x=('touches'in e)?e.touches[0].clientX:e.clientX; const y=('touches'in e)?e.touches[0].clientY:e.clientY;
+    const u=(x-r.left)/Math.max(1,r.width), v=(y-r.top)/Math.max(1,r.height);
+    speedTarget=Math.min(SPEED_CAP,speedTarget*SPEED_GROWTH); pushRipple(u,v,0.02);
+  }
+  mount.addEventListener('click',onClick,{passive:true}); mount.addEventListener('touchstart',onClick,{passive:true});
+  mount.addEventListener('dblclick',()=>{speedTarget=1},{passive:true});
+
+  let scrollEnergy=0, scrollDir=1;
+  mount.addEventListener('wheel', e=>{
+    const dy = e.deltaY; scrollDir = dy<0 ? 1 : -1;
+    scrollEnergy = Math.min(1.0, scrollEnergy + Math.min(0.6, Math.abs(dy)*0.003));
+  }, {passive:true});
+
+  let last=performance.now();
+  function animate(){
+    const now=performance.now(); const dt=Math.min((now-last)/1000,0.033); last=now;
+    const ease=1.0-Math.pow(1.0-SPEED_EASE,dt*60.0); speedMul += (speedTarget-speedMul)*ease;
+    travel += BASE_SPEED*speedMul*dt; spin += SPIN_SPEED*dt;
+    scrollEnergy = Math.max(0, scrollEnergy - dt/2);
+
+    gl.uniform1f(uTimeSec, now*0.001); gl.uniform1f(uSpin, spin); gl.uniform1f(uTravel, travel);
+    gl.uniform1f(uScrollAmp, scrollEnergy); gl.uniform1f(uScrollDir, scrollDir);
+
+    const active=Math.min(rCountTotal,MAX);
+    gl.uniform1i(uRippleCount,active); gl.uniform2fv(uRipplePos,rPos); gl.uniform1fv(uRippleStart,rStart); gl.uniform1fv(uRippleAmp,rAmp);
+
+    gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3);
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
 </body>
 </html>
