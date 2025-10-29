@@ -3,32 +3,28 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>DAECLAN.COM — Portfolio</title>
+<title>DAECLAN.COM</title>
 <meta name="theme-color" content="#0a0a0a"/>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,600,700&display=swap" rel="stylesheet">
-<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🧡</text></svg>' type="image/svg+xml"/>
-
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A1%3C/text%3E%3C/svg%3E"/>
 <style>
-:root{
-  --bg:#0a0a0a; --panel:#111215; --fg:#f5f5f6; --muted:#b6b8bf; --line:#1d1e22;
-  --accent:#ff7a18; --accent2:#ffb566; --r:14px; --maxw:1160px; --header:68px;
-  --tight:0.68; --narrow:600px;
-}
-/* Base */
+:root{--bg:#0a0a0a;--panel:#111215;--fg:#f5f5f6;--muted:#b6b8bf;--line:#1d1e22;--accent:#ff7a18;--accent2:#ffb566;--r:14px;--maxw:1160px;--header:68px;--tight:.62;--narrow:600px;--fadein-duration:4s}
+@media (min-width:861px){:root{--tight:.56}}
 *{box-sizing:border-box}
+html,body{height:100%}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column}
 .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 a{text-decoration:none;color:inherit}
 
-/* Page fade-in */
-#fadeIn{position:fixed; inset:0; background:#fff; z-index:9999; pointer-events:none; animation:fadeOut .8s ease forwards}
+/* intro fade */
+#fadeIn{position:fixed;inset:0;background:#fff;z-index:9999;pointer-events:none;animation:fadeOut var(--fadein-duration) ease forwards}
 @keyframes fadeOut{from{opacity:1}to{opacity:0}}
 
-/* Header */
-header{position:sticky;top:0;z-index:100;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
+/* sticky header */
+header{position:sticky;top:0;z-index:3000;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
 .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
-.brand{font-family:"Clash Display",system-ui,sans-serif;font-weight:700;letter-spacing:.3px}
+.brand{font-weight:700;letter-spacing:.3px}
 .brand b{color:var(--accent)}
 nav.primary{display:flex;gap:22px;align-items:center;text-transform:uppercase}
 nav.primary a{color:var(--muted);font-size:15px;padding:8px 0;position:relative;font-weight:600;letter-spacing:.04em}
@@ -36,87 +32,36 @@ nav.primary a:hover{color:var(--fg)}
 nav.primary a.active{color:var(--accent)}
 nav.primary a.active::after{content:"";position:absolute;left:0;right:0;bottom:-6px;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px}
 .menu-btn{display:none}
-@media (max-width:860px){
-  nav.primary{display:none}
-  .menu-btn{
-    display:inline-flex;appearance:none;border:1px solid var(--line);
-    background:#0c0d10;color:var(--accent2);padding:10px 14px;border-radius:12px;font-weight:800;
-    font-family:"Clash Display",system-ui,sans-serif;
-  }
-}
+@media (max-width:860px){nav.primary{display:none}.menu-btn{display:inline-flex;appearance:none;border:1px solid var(--line);background:#0c0d10;color:var(--accent2);padding:10px 14px;border-radius:12px;font-weight:800;font-family:"Clash Display",system-ui,sans-serif}}
 
-/* Mobile nav panel */
-#mobileNav{
-  position:fixed; inset:var(--header) 0 0 0; display:none; z-index:140;
-}
+/* mobile drawer */
+#mobileNav{position:fixed;inset:var(--header) 0 0 0;display:none;z-index:3500;background:rgba(11,12,16,.96);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 #mobileNav.open{display:block}
-#mobileNav .wrap{
-  max-width:var(--maxw);margin:0 auto;padding:20px;
-}
-#mobileNav a{
-  display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;
-  color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2));text-transform:uppercase;
-  font-family:"Clash Display",system-ui,sans-serif;
-}
+#mobileNav .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
+#mobileNav a{display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2));text-transform:uppercase;font-family:"Clash Display",system-ui,sans-serif}
 
-/* Blur/dim everything except header + drawer when menu open */
-.menu-open header{filter:none}
-.menu-open #mobileNav{filter:none}
-@media (max-width:860px){
-  .menu-open main,
-  .menu-open footer,
-  .menu-open #bgScene,
-  .menu-open #heroMarquee,
-  .menu-open .heroSpacer{
-    filter:blur(10px) saturate(.9) brightness(.9);
-    transition:filter .2s ease;
-  }
-  /* Also fade the marquee so it doesn't glow through */
-  .menu-open #heroMarquee{opacity:.15}
-}
+/* blur background only when menu open */
+.menu-open main,.menu-open footer,.menu-open #bgScene,.menu-open #heroMarquee,.menu-open .heroSpacer{
+  filter:blur(10px) saturate(.9) brightness(.9);transition:filter .2s ease;pointer-events:none}
 
-/* Sections */
+/* sections */
 section{scroll-margin-top:calc(var(--header) + 14px)}
 .section{padding:54px 0}
-.section:last-of-type{padding-bottom:8px}
+.section:last-of-type{padding-bottom:0}
+.section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 16px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
+.title{font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
+.subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#f4f4f4;text-align:center;text-transform:lowercase;letter-spacing:.02em}
 
-.section-head{
-  width:calc(var(--tight) * 100%);
-  max-width:min(calc(var(--tight) * var(--maxw)), 720px);
-  margin:0 auto 16px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2
-}
-.title{
-  font-family:"Clash Display",system-ui,sans-serif;
-  font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;
-  font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)
-}
-.subtitle{
-  font-family:"Clash Display",system-ui,sans-serif;font-size:clamp(13px,2vw,16px);
-  margin:0 auto 8px;color:#f4f4f4;text-align:center;text-transform:lowercase;letter-spacing:.02em
-}
-
-/* Keep content above canvases */
-main{position:relative; z-index:2}
-
-/* Wormhole background */
+/* layers */
+main{position:relative;z-index:2;flex:1}
 #bgScene{position:fixed;left:0;right:0;bottom:0;top:var(--header);z-index:0;pointer-events:none}
+#heroMarquee{position:fixed;inset:var(--header) 0 0 0;z-index:1;pointer-events:none;width:100vw;height:calc(100svh - var(--header));transition:opacity .2s ease}
+.heroSpacer{height:calc(100svh - var(--header));min-height:calc(100svh - var(--header));max-width:var(--maxw);margin:0 auto}
 
-/* Fixed marquee so it never hides behind margins */
-#heroMarquee{
-  position:fixed; inset:var(--header) 0 0 0; z-index:1; pointer-events:none;
-  width:100vw; height:calc(100vh - var(--header));
-  transition:opacity .2s ease; /* for menu fade */
-}
-
-/* Spacer so MUSIC starts below the fold */
-.heroSpacer{height:calc(100vh - var(--header));max-width:var(--maxw);margin:0 auto}
-@media (max-width:560px){.heroSpacer{height:calc(100vh - var(--header) - 24px)}}
-
-/* Grid + Cards */
+/* grid + cards */
 .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
 .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
 @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
-
 .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s}
 .card:hover{transform:translateY(-2px);border-color:#2a2c33;box-shadow:0 12px 40px rgba(0,0,0,.55)}
 .thumb{position:relative;aspect-ratio:1/1;background:#0e0f12;display:grid;place-items:center;overflow:hidden;cursor:zoom-in}
@@ -124,62 +69,92 @@ main{position:relative; z-index:2}
 .thumb .tag{position:absolute;left:10px;top:10px;font-size:12px;background:#0c0d10;border:1px solid var(--line);color:var(--accent2);padding:4px 8px;border-radius:999px}
 .card-body{padding:16px}
 .meta{display:flex;gap:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
-.title-sm{font-weight:700;font-size:18px;margin:6px 0}
+.title-sm{font-weight:700;font-size:18px;margin:6px 0;color:var(--accent)}
 .desc{color:#d7d9df;font-size:14px}
 
-/* Buttons */
+/* buttons (orange + compact) */
 .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 .card .actions{width:100%;max-width:none;margin:12px 0 0}
 .actions.center{justify-content:center}
 .actions.left{justify-content:flex-start}
 .actions.center.nowrap{flex-wrap:nowrap}
 @media (max-width:640px){.actions.center.nowrap{flex-wrap:wrap}}
-
-/* Modern pill buttons */
-.btn{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:12px 18px;border-radius:9999px;font-size:15px;letter-spacing:.02em;
-  border:1px solid #262832;background:rgba(16,18,24,.75);backdrop-filter:blur(6px);
-  color:#f3f4f6;font-weight:800;position:relative;isolation:isolate;
-  transition:transform .2s ease, box-shadow .2s ease;
-}
-.btn::before{
-  content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
-  background:linear-gradient(90deg,var(--accent),var(--accent2));
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;opacity:.9;
-}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border-radius:9999px;font-size:15px;letter-spacing:.02em;border:1px solid #262832;background:rgba(16,18,24,.75);backdrop-filter:blur(6px);color:var(--accent);font-weight:800;position:relative;isolation:isolate;transition:transform .2s ease,box-shadow .2s ease;font-family:"Clash Display",system-ui,sans-serif}
+.btn::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.9}
 .btn:hover{transform:translateY(-2px);box-shadow:0 14px 42px rgba(0,0,0,.35)}
-.btn:active{transform:translateY(0)}
-.btn:focus-visible{outline:none;box-shadow:0 0 0 3px rgba(255,122,24,.25)}
-.btn.alt{background:rgba(18,20,26,.75)}
-
-/* Icon buttons */
-.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:#0c0d10;transition:transform .15s}
+.btn.alt{background:rgba(18,20,26,.75);color:var(--accent)}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#0c0d10;transition:transform .15s;color:var(--accent)}
 .icon-btn:hover{transform:translateY(-1px)}
-.icon-btn svg{width:22px;height:22px;fill:currentColor;color:var(--accent)}
-.icon-btn img{width:22px;height:22px;display:block}
-
-/* Masked SVGs -> orange */
 .icon-svg{display:inline-block;width:22px;height:22px;background:var(--accent);-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:contain;mask-repeat:no-repeat;mask-position:center;mask-size:contain}
 .icon-apple{-webkit-mask-image:url('/assets/apple-music.svg');mask-image:url('/assets/apple-music.svg')}
 .icon-tidal{-webkit-mask-image:url('/assets/tidal.svg');mask-image:url('/assets/tidal.svg')}
 
-/* Tape overlays */
+/* tape */
 .taped{position:relative;filter:grayscale(100%) contrast(1.05)}
 .tape{position:absolute;left:30%;top:12%;transform:translateX(-30%) rotate(-12deg);background:#ffd400;color:#111;font-weight:900;letter-spacing:.02em;border:1px solid #111;padding:6px 12px;box-shadow:0 2px 0 #0006;text-transform:uppercase;font-size:12px;line-height:1.1;display:inline-block;z-index:2}
 .tape small{display:block;font-weight:800}
 
-/* Narrow rows */
+/* narrow + video */
 .narrow{max-width:var(--narrow);margin:0 auto}
+.video-card,.mixes-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;z-index:5}
+.video-head,.mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.video-title,.mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
+.video-wrap{position:relative;width:100%;padding-top:56.25%;background:#0e0f12}
+.video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
 
-/* Lightbox */
-#lightbox{position:fixed; inset:0; display:none; place-items:center; background:rgba(0,0,0,.75); z-index:150; padding:24px;}
-#lightbox.open{display:grid}
-#lightbox img{max-width:min(92vw,900px); max-height:80vh; width:auto; height:auto; border-radius:14px; box-shadow:0 18px 70px rgba(0,0,0,.6)}
+/* MIXES: desktop rail + mobile stack (clickable) */
+./* MIXES: single horizontal rail (desktop + mobile) */
+.mixes-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;z-index:5}
+.mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
+.mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}
 
-/* Footer */
-footer{padding:12px 0 16px;color:var(--muted)}
+/* horizontal scroller */
+.mix-rail{
+  display:flex;
+  gap:12px;
+  overflow-x:auto;
+  padding:14px 16px 16px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  scroll-snap-type:x proximity;
+  touch-action:pan-x;
+}
+.mix-rail::-webkit-scrollbar{display:none}
+
+/* embed cards (cover art shows inside Mixcloud) */
+.mix-embed{
+  flex:0 0 320px;
+  height:360px;
+  border:0;
+  border-radius:12px;
+  overflow:hidden;
+  background:#0e0f12;
+  scroll-snap-align:start;
+  pointer-events:auto;
+  position:relative;
+  z-index:6;
+}
+@media (max-width:560px){
+  .mix-embed{flex:0 0 280px;height:340px}
+}
+
+/* remove legacy mobile stack styles if present */
+.mix-stack{display:none !important}
+
+/* center single writing card & edge padding */
+.center-wrap{display:flex;justify-content:center;padding:0 10px}
+.max-380{max-width:380px;width:100%}
+
+/* contact sizing */
+#contact .card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
+#contact .icon-btn{width:40px;height:40px}
+
+/* footer pinned */
+.footer-gap{height:16px}
+footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#000}
+.footer-inner{max-width:var(--maxw);margin:0 auto;padding:10px 20px;display:flex;align-items:center}
+.footer-inner small{font-size:12px;color:var(--accent);font-weight:700}
 </style>
 </head>
 <body>
@@ -208,61 +183,20 @@ footer{padding:12px 0 16px;color:var(--muted)}
   </nav>
 </header>
 
-<!-- Background wormhole -->
+<!-- canvases -->
 <canvas id="bgScene"></canvas>
-
-<!-- Fixed marquee so it never hides behind margins -->
 <canvas id="heroMarquee" aria-label="Welcome marquee"></canvas>
-
-<!-- Spacer so MUSIC starts below the fold -->
+<!-- guaranteed blank space so marquee shows on load -->
 <div class="heroSpacer" aria-hidden="true"></div>
 
 <main id="main">
-  <!-- MUSIC (trilogy stays 3-up on desktop) -->
+
+  <!-- MUSIC -->
   <section id="music" class="section container">
     <div class="section-head"><h2 class="title">MUSIC</h2><p class="subtitle">releases by degh</p></div>
+
     <div class="grid" style="margin-top:18px;">
-      <!-- Loved A Message -->
-      <article class="card col-4">
-        <div class="thumb">
-          <img class="zoomable" loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Declan Loved A Message">
-          <span class="tag">LP</span>
-        </div>
-        <div class="card-body">
-          <h3 class="title-sm">Declan Loved A Message</h3>
-          <p class="desc">Released 09.19.19</p>
-          <div class="actions center">
-            <a class="icon-btn" href="https://open.spotify.com/album/3R0oRVPjz7V53wJ4Nia9pk" target="_blank" aria-label="Spotify">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8" stroke-width="1.6"/><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6" stroke-width="1.6"/><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5" stroke-width="1.6"/></g></svg>
-            </a>
-            <a class="icon-btn" href="https://music.apple.com/us/album/declan-loved-a-message/1479080675" target="_blank" rel="noopener" aria-label="Apple Music"><span class="icon-svg icon-apple" aria-hidden="true"></span></a>
-            <a class="icon-btn" href="https://tidal.com/browse/album/117178044" target="_blank" rel="noopener" aria-label="Tidal"><span class="icon-svg icon-tidal" aria-hidden="true"></span></a>
-            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-loved-a-message" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24"><path d="M6.2 18h10.4l3.4-12H9.6z" fill="currentColor"/></svg></a>
-          </div>
-        </div>
-      </article>
-
-      <!-- Questioned An Image -->
-      <article class="card col-4">
-        <div class="thumb">
-          <img class="zoomable" loading="lazy" src="/assets/DQAI.gif" alt="Declan Questioned An Image">
-          <span class="tag">LP</span>
-        </div>
-        <div class="card-body">
-          <h3 class="title-sm">Declan Questioned An Image</h3>
-          <p class="desc">Released 10.13.23</p>
-          <div class="actions center">
-            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" aria-label="Spotify">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8" stroke-width="1.6"/><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6" stroke-width="1.6"/><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5" stroke-width="1.6"/></g></svg>
-            </a>
-            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><span class="icon-svg icon-apple" aria-hidden="true"></span></a>
-            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><span class="icon-svg icon-tidal" aria-hidden="true"></span></a>
-            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-questioned-an-image" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24"><path d="M6.2 18h10.4l3.4-12H9.6z" fill="currentColor"/></svg></a>
-          </div>
-        </div>
-      </article>
-
-      <!-- Emphasized A Movie -->
+      <!-- Album 1 -->
       <article class="card col-4">
         <div class="thumb">
           <img class="zoomable" loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Declan Emphasized A Movie">
@@ -273,23 +207,192 @@ footer{padding:12px 0 16px;color:var(--muted)}
           <h3 class="title-sm">Declan Emphasized A Movie</h3>
           <p class="desc">Released 07.22.24</p>
           <div class="actions center">
+            <!-- Spotify (restored stroked icon) -->
             <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" aria-label="Spotify">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="1.8"/><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8" stroke-width="1.6"/><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6" stroke-width="1.6"/><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5" stroke-width="1.6"/></g></svg>
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8"></path>
+                <path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6"></path>
+                <path d="M8.3 15.1c2.4-.9 5-.7 6.9.5"></path>
+              </svg>
             </a>
-            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><span class="icon-svg icon-apple" aria-hidden="true"></span></a>
-            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><span class="icon-svg icon-tidal" aria-hidden="true"></span></a>
-            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-emphasized-a-movie" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24"><path d="M6.2 18h10.4l3.4-12H9.6z" fill="currentColor"/></svg></a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><span class="icon-svg icon-apple"></span></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><span class="icon-svg icon-tidal"></span></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-emphasized-a-movie" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6.2 18h10.4l3.4-12H9.6z"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Album 2 -->
+      <article class="card col-4">
+        <div class="thumb">
+          <img class="zoomable" loading="lazy" src="/assets/DQAI.gif" alt="Declan Questioned An Image">
+          <span class="tag">LP</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>DEGH</span></div>
+          <h3 class="title-sm">Declan Questioned An Image</h3>
+          <p class="desc">Released 10.13.23</p>
+          <div class="actions center">
+            <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" aria-label="Spotify">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8"></path><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6"></path><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5"></path></svg>
+            </a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-emphasized-a-movie/1753615378" target="_blank" rel="noopener" aria-label="Apple Music"><span class="icon-svg icon-apple"></span></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/371066965?u" target="_blank" rel="noopener" aria-label="Tidal"><span class="icon-svg icon-tidal"></span></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-questioned-an-image" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6.2 18h10.4l3.4-12H9.6z"/></svg></a>
+          </div>
+        </div>
+      </article>
+
+      <!-- Album 3 -->
+      <article class="card col-4">
+        <div class="thumb">
+          <img class="zoomable" loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Declan Loved A Message">
+          <span class="tag">LP</span>
+        </div>
+        <div class="card-body">
+          <div class="meta"><span>DEGH</span></div>
+          <h3 class="title-sm">Declan Loved A Message</h3>
+          <p class="desc">Released 09.19.19</p>
+          <div class="actions center">
+            <a class="icon-btn" href="https://open.spotify.com/album/3R0oRVPjz7V53wJ4Nia9pk" target="_blank" aria-label="Spotify"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8"></path><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6"></path><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5"></path></svg></a>
+            <a class="icon-btn" href="https://music.apple.com/us/album/declan-loved-a-message/1479080675" target="_blank" rel="noopener" aria-label="Apple Music"><span class="icon-svg icon-apple"></span></a>
+            <a class="icon-btn" href="https://tidal.com/browse/album/117178044" target="_blank" rel="noopener" aria-label="Tidal"><span class="icon-svg icon-tidal"></span></a>
+            <a class="icon-btn" href="https://degh.bandcamp.com/album/declan-loved-a-message" target="_blank" aria-label="Bandcamp"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6.2 18h10.4l3.4-12H9.6z"/></svg></a>
           </div>
         </div>
       </article>
     </div>
+
+    <!-- LATEST VIDEO -->
+    <div class="grid" style="margin-top:22px;">
+      <article class="col-12 video-card">
+        <div class="video-head"><h3 class="video-title">LATEST VIDEO</h3></div>
+        <div class="video-wrap">
+          <iframe src="https://www.youtube.com/embed/XBsp40jGAIk" title="our dream funeral — DEGH" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        </div>
+      </article>
+    </div>
+
+    <!-- MIXES -->
+    <!-- MIXES -->
+<div class="grid" style="margin-top:22px;">
+  <article class="col-12 mixes-card">
+    <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
+
+    <div class="mix-rail">
+      <!-- Newest on the left -->
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fits-all-illusions-winter-24-mix%2F"
+        title="IT'S ALL ILLUSIONS (winter '24 mix)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fdegh-vs-the-unblinking-giants-summer-23-mix%2F"
+        title="DEGH vs the Unblinking Giants (summer '23)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-absurd-spring-22-mini-mix%2F"
+        title="it's absurd (spring '22)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwhat-is-left-winter-mix-21%2F"
+        title="what is left (winter '21)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-a-fucking-feeling-midwinter-mix-20%2F"
+        title="it's a fucking feeling (midwinter '20)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthe-bigger-picture-ss-19-mix%2F"
+        title="the bigger picture (SS '19)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthatll-be-the-danger-fw-18-collection%2F"
+        title="that’ll be the danger (FW '18)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fchicago-summer-breeze-ss-18-mix%2F"
+        title="chicago summer breeze (SS '18)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwear-it-in-health-ss-17-mix%2F"
+        title="wear it in health (SS '17)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwdtm-radio-volume-i%2F"
+        title="WDTM Radio Vol. I"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-imagination-early-summer-mix-16%2F"
+        title="pure imagination (early summer '16)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fleap-of-faith-spring-16-mix%2F"
+        title="leap of faith (spring '16)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fno-meat-just-sauce-mardi-gras-mini-mix-2016%2F"
+        title="no meat just sauce (Mardi Gras '16)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthrow-the-book-winter-15-mini-mix%2F"
+        title="throw the book (winter '15)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-solid-gold-summer-15-mini-mix%2F"
+        title="pure solid gold (summer '15)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fdiane-its-1227pm-winter-15-mini-mix%2F"
+        title="diane it’s 12:27pm (winter '15)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fhallolean-fall-14-mini-mix%2F"
+        title="hallolean (fall '14)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fice-cold-coach-house-winter-14-mini-mix%2F"
+        title="ice cold coach house (winter '14)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwinter-time-temple-november-2013%2F"
+        title="winter time temple (Nov 2013)"></iframe>
+
+      <iframe class="mix-embed" loading="lazy" scrolling="no"
+        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fddgh-radio-1-essental-mix-degh-march-2013%2F"
+        title="DDGH Radio 1 Essential Mix (Mar 2013)"></iframe>
+    </div>
+
+    <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
+  </article>
+</div>
+
   </section>
 
-  <!-- WEB PROJECTS (buttons left) -->
+  <!-- WEB PROJECTS -->
   <section id="web" class="section container">
-    <div class="section-head"><h2 class="title">WEB PROJECTS</h2><p class="subtitle">interfaces, interactive art, and tools</p></div>
+    <div class="section-head"><h2 class="title">WEB PROJECTS</h2><p class="subtitle">interactive art, satire, &amp; parody</p></div>
     <div class="grid" style="margin-top:18px;">
-
       <article class="card col-6">
         <div class="thumb"><img class="zoomable" loading="lazy" src="/assets/tree-of-slime.jpg" alt="THE TREE OF SLIME"><span class="tag">Site</span></div>
         <div class="card-body">
@@ -306,17 +409,18 @@ footer{padding:12px 0 16px;color:var(--muted)}
         <div class="thumb"><img class="zoomable" loading="lazy" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ0bfJdhGXIua_As_7MJh72F1eTj-v1yxYn1A&s" alt="Migos Adlibs"><span class="tag">Site</span></div>
         <div class="card-body">
           <h3 class="title-sm">MIGOS ADLIBS</h3>
-          <p class="desc">Every Single Ad Lib from 2017's Culture perfectly synced in the Migos Adlibs Visualizer.</p>
+          <p class="desc">Every single one of the 1100+ Ad Libs from 2017's Culture, perfectly synced in the Migos Adlibs Visualizer.</p>
           <div class="actions left">
             <a class="btn" href="http://migosadlibs.com/" target="_blank">Check It Out</a>
             <a class="btn alt" href="https://www.complex.com/music/a/aaron-mansfield/visualizer-listen-migos-culture" target="_blank">Complex (Article)</a>
             <a class="btn" href="https://web.archive.org/web/20170204175942/https://noisey.vice.com/en_ca/article/someone-made-a-handy-visualizer-for-every-single-ad-lib-on-migos-culture" target="_blank">VICE (Article)</a>
-            <a class="btn alt" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank">The Fader (Article)</a>
-            <a class="btn" href="https://genius.com/a/every-ad-lib-on-migos-culture-visualized" target="_blank">Genius (Article)</a>
+            <a class="btn alt" href="https://genius.com/a/every-ad-lib-on-migos-culture-visualized" target="_blank">Genius (Article)</a>
+            <a class="btn" href="https://www.thefader.com/2017/02/03/migos-culture-adlib-website" target="_blank">The Fader (Article)</a>
           </div>
         </div>
       </article>
 
+      <!-- XXXSENSATION (restored) -->
       <article class="card col-6">
         <div class="thumb"><img class="zoomable" loading="lazy" src="https://i.scdn.co/image/ab67616d00001e028b4ab0e172584a790ede3ddb" alt="XXXSENSATION"><span class="tag">Site</span></div>
         <div class="card-body">
@@ -328,6 +432,7 @@ footer{padding:12px 0 16px;color:var(--muted)}
         </div>
       </article>
 
+      <!-- SLAM HARRIS -->
       <article class="card col-6">
         <div class="thumb"><img class="zoomable" loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS"><span class="tag">Audio</span></div>
         <div class="card-body">
@@ -349,7 +454,7 @@ footer{padding:12px 0 16px;color:var(--muted)}
         </div>
         <div class="card-body">
           <h3 class="title-sm">SLIME NO B</h3>
-          <p class="desc">A Young Thug-only remake of Slime & B that cuts Chris Brown off the project.</p>
+          <p class="desc">A Young Thug-only remake of Slime &amp; B that cuts Chris Brown off the project.</p>
           <div class="actions left"><a class="btn" href="https://genius.com/a/this-young-thug-only-remake-of-slime-b-cuts-chris-brown-off-the-project" target="_blank">Genius (Article)</a></div>
         </div>
       </article>
@@ -372,22 +477,17 @@ footer{padding:12px 0 16px;color:var(--muted)}
   <!-- WRITING -->
   <section id="writing" class="section container">
     <div class="section-head"><h2 class="title">WRITING</h2><p class="subtitle">poetry, prose, reviews, etc</p></div>
-    <div class="grid" style="margin-top:18px;">
-      <article class="card col-3">
+    <div class="center-wrap" style="margin-top:18px;">
+      <article class="card max-380">
+        <div class="thumb">
+          <img class="zoomable" loading="lazy" src="https://assets0.dostuffmedia.com/uploads/aws_asset/aws_asset/11334994/da6a8705-9490-4e41-a441-ee38d1e6dde8.jpg" alt="Chance The Rapper reunion review art">
+          <span class="tag">Review</span>
+        </div>
         <div class="card-body">
           <div class="meta"><span>2022</span></div>
-          <h3 class="title-sm">My experience at the Chance The Rapper / SaveMoney reunion show [Concert Review]</h3>
+          <h3 class="title-sm">My experience at the Chance The Rapper / SaveMoney reunion show</h3>
           <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">Read</a></div>
         </div>
-      </article>
-      <article class="card col-3">
-        <div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #2</h3><p class="desc">(Add text or link.)</p><div class="actions left"><a class="btn alt" href="#">Read</a></div></div>
-      </article>
-      <article class="card col-3">
-        <div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #3</h3><p class="desc">(Add text or link.)</p><div class="actions left"><a class="btn" href="#">Read</a></div></div>
-      </article>
-      <article class="card col-3">
-        <div class="card-body"><div class="meta"><span>2025</span></div><h3 class="title-sm">Entry #4</h3><p class="desc">(Add text or link.)</p><div class="actions left"><a class="btn alt" href="#">Read</a></div></div>
       </article>
     </div>
   </section>
@@ -396,15 +496,13 @@ footer{padding:12px 0 16px;color:var(--muted)}
   <section id="acting" class="section container">
     <div class="section-head"><h2 class="title">ACTING</h2><p class="subtitle">the art of make ’em ups</p></div>
     <div class="narrow">
-      <div class="card">
-        <div class="card-body">
-          <div class="actions center nowrap" style="gap:12px">
-            <a class="btn" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" target="_blank" rel="noopener">View Resume</a>
-            <a class="btn alt" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" download>Download Resume</a>
-            <button class="btn" id="openHeadshots" type="button">Headshots</button>
-          </div>
+      <div class="card"><div class="card-body">
+        <div class="actions center nowrap" style="gap:12px">
+          <a class="btn" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" target="_blank" rel="noopener">View Resume</a>
+          <a class="btn alt" href="/assets/Declan_Murphy_Theatre_Resume_PerfectOnePage.pdf" download>Download Resume</a>
+          <button class="btn" id="openHeadshots" type="button">Headshots</button>
         </div>
-      </div>
+      </div></div>
     </div>
   </section>
 
@@ -412,27 +510,37 @@ footer{padding:12px 0 16px;color:var(--muted)}
   <section id="contact" class="section container">
     <div class="section-head"><h2 class="title">CONTACT</h2><p class="subtitle">bookings, collabs, or share your deepest darkest secret</p></div>
     <div class="narrow">
-      <div class="card">
-        <div class="card-body">
-          <div class="actions center" style="gap:14px;flex-wrap:wrap">
-            <a class="icon-btn" href="mailto:hello@example.com" aria-label="Email"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v12H3z"/><path d="M3 6l9 7 9-7" fill="none" stroke="#0c0d10" stroke-width="2"/></svg></a>
-            <a class="icon-btn" href="https://www.facebook.com/declxn" target="_blank" aria-label="Facebook"><svg viewBox="0 0 24 24"><path d="M13 22v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2h-3a5 5 0 0 0-5 5v3H6v4h3v8z" fill="currentColor"/></svg></a>
-            <a class="icon-btn" href="https://twitter.com/daeclan" target="_blank" aria-label="X/Twitter"><svg viewBox="0 0 24 24"><path d="M3 3h4.3l5.2 6.8L17.8 3H22l-7.3 9.4L21.3 21H17l-5.1-6.7L6.3 21H2l7.9-8.6L3 3z" fill="currentColor"/></svg></a>
-            <a class="icon-btn" href="https://instagram.com/daeclan" target="_blank" aria-label="Instagram"><svg viewBox="0 0 24 24"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm5 5a5 5 0 1 0 5 5 5 5 0 0 0-5-5Zm6.5-.75a1.25 1.25 0 1 0 1.25 1.25A1.25 1.25 0 0 0 18.5 6.25Z" fill="currentColor"/></svg></a>
-          </div>
+      <div class="card"><div class="card-body">
+        <div class="actions center" style="gap:14px;flex-wrap:wrap">
+          <a class="icon-btn" href="mailto:hello@example.com" aria-label="Email">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.25 6.75h19.5v10.5H2.25z"/><path d="M2.25 6.75 12 13.5l9.75-6.75" fill="none" stroke="#0c0d10" stroke-width="2"/></svg>
+          </a>
+          <a class="icon-btn" href="https://www.facebook.com/declxn" target="_blank" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M13 22v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2h-3a5 5 0 0 0-5 5v3H6v4h3v8z"/></svg>
+          </a>
+          <a class="icon-btn" href="https://twitter.com/daeclan" target="_blank" aria-label="X/Twitter">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M3 3h4.3l5.2 6.8L17.8 3H22l-7.3 9.4L21.3 21H17l-5.1-6.7L6.3 21H2l7.9-8.6L3 3z"/></svg>
+          </a>
+          <a class="icon-btn" href="https://instagram.com/daeclan" target="_blank" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Zm5 5a5 5 0 1 0 5 5 5 5 0 0 0-5-5Zm6.5-.75a1.25 1.25 0 1 0 1.25 1.25A1.25 1.25 0 0 0 18.5 6.25Z"/></svg>
+          </a>
         </div>
-      </div>
+      </div></div>
     </div>
   </section>
+
+  <div class="footer-gap"></div>
 </main>
 
-<footer class="container"><p>© <span id="year"></span> DAECLAN.COM</p></footer>
+<footer role="contentinfo">
+  <div class="footer-inner">
+    <small>DAECLAN.COM v3 - 2025</small>
+  </div>
+</footer>
 
-<!-- Lightbox -->
-<div id="lightbox" role="dialog" aria-modal="true" aria-label="Album art"><img id="lightboxImg" alt=""></div>
-
-<!-- Headshots Modal -->
-<dialog id="headshotsDlg" style="border:1px solid var(--line);background:#0b0c10;max-width:min(980px,94vw);width:94vw;border-radius:16px;color:var(--fg)">
+<!-- lightbox + headshots -->
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Album art" style="display:none"><img id="lightboxImg" alt=""></div>
+<dialog id="headshotsDlg" style="border:1px solid var(--line);background:#0b0c10;max-width:min(980px,94vw);width:94vw;border-radius:16px;color:#fff">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)">
     <strong>Headshots</strong>
     <button class="btn alt" id="closeHeadshots" type="button" style="padding:8px 12px;border-radius:10px">Close</button>
@@ -446,224 +554,151 @@ footer{padding:12px 0 16px;color:var(--muted)}
 </dialog>
 
 <script>
-document.getElementById('year').textContent = new Date().getFullYear();
-
 /* Scrollspy */
 const secs=[...document.querySelectorAll('main section[id]')];
 const links=[...document.querySelectorAll('header nav.primary a')];
 const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
 const io=new IntersectionObserver(es=>{
-  es.forEach(e=>{ const id=e.target.id, link=map(id); if(!link) return;
-    if(e.isIntersecting){ links.forEach(a=>a.classList.remove('active')); link.classList.add('active'); }
+  es.forEach(e=>{
+    const id=e.target.id, link=map(id);
+    if(!link) return;
+    if(e.isIntersecting){
+      links.forEach(a=>a.classList.remove('active'));
+      link.classList.add('active');
+    }
   });
 },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
 secs.forEach(s=>io.observe(s));
 
-/* Mobile menu — lock body on open, restore scroll on close + blur rest of page */
+/* Mobile menu (sticky + restores scroll after click) */
 (function(){
   const btn=document.getElementById('menuToggle');
   const panel=document.getElementById('mobileNav');
   if(!btn||!panel) return;
-  let locked=false, sy=0;
-  function lock(){ if(locked) return; locked=true; sy=window.scrollY||0; document.body.style.position='fixed'; document.body.style.top=`-${sy}px`; document.body.style.width='100%'; }
-  function unlock(){ if(!locked) return; locked=false; document.body.style.position=''; document.body.style.top=''; document.body.style.width=''; window.scrollTo(0, sy); }
+  const headerH=()=>parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
   function open(state){
     btn.setAttribute('aria-expanded', state?'true':'false');
     panel.classList.toggle('open', state);
     panel.setAttribute('aria-hidden', state?'false':'true');
     document.documentElement.classList.toggle('menu-open', state);
-    if(state) lock(); else unlock();
+    document.body.style.overflow = state ? 'hidden' : '';
+    document.body.style.touchAction = state ? 'none' : '';
   }
-  btn.addEventListener('click', ()=> open(btn.getAttribute('aria-expanded')!=='true'));
-  panel.addEventListener('click', e=>{ if(e.target.closest('a[href^="#"]')) open(false); });
-  window.matchMedia('(min-width:861px)').addEventListener('change', ev=>{ if(ev.matches) open(false); });
+  btn.addEventListener('click',()=>open(btn.getAttribute('aria-expanded')!=='true'));
+  panel.addEventListener('click',e=>{
+    const link=e.target.closest('a[href^="#"]');
+    if(!link) return;
+    e.preventDefault();
+    const id=link.getAttribute('href').slice(1);
+    const target=document.getElementById(id);
+    const y=target?(target.getBoundingClientRect().top+window.scrollY-(headerH()+12)):0;
+    open(false);
+    requestAnimationFrame(()=>{requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'smooth'}));});
+  });
+  window.matchMedia('(min-width:861px)').addEventListener('change',ev=>{if(ev.matches) open(false);});
 })();
- 
-/* Headshots modal */
-(function(){const dlg=document.getElementById('headshotsDlg');const openBtn=document.getElementById('openHeadshots');const closeBtn=document.getElementById('closeHeadshots');if(!dlg||!openBtn||!closeBtn)return;openBtn.addEventListener('click',()=>dlg.showModal());closeBtn.addEventListener('click',()=>dlg.close());dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close()})})();
 
-/* Album art lightbox */
-(function(){const lb=document.getElementById('lightbox'), img=document.getElementById('lightboxImg');if(!lb||!img) return;document.querySelectorAll('.thumb .zoomable').forEach(el=>{el.addEventListener('click',()=>{img.src=el.src;img.alt=el.alt||'';lb.classList.add('open')})});lb.addEventListener('click',()=>lb.classList.remove('open'));document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.classList.remove('open')})})();
-</script>
-
-<!-- Marquee (fixed): all-orange neon, dispersion + fade; never hides behind margins -->
-<script>
+/* Lightbox */
 (function(){
-  const canvas = document.getElementById('heroMarquee');
+  const lb=document.getElementById('lightbox'), img=document.getElementById('lightboxImg');
+  if(!lb||!img) return;
+  document.querySelectorAll('.thumb .zoomable').forEach(el=>{
+    el.addEventListener('click',()=>{img.src=el.src;img.alt=el.alt||'';lb.style.display='grid'})
+  });
+  lb.addEventListener('click',()=>lb.style.display='none');
+  document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.style.display='none'})
+})();
+
+/* Marquee */
+(function(){
+  const canvas=document.getElementById('heroMarquee');
   if(!canvas) return;
-  const ctx = canvas.getContext('2d', { alpha: true });
-  const DPR = Math.min(devicePixelRatio || 1, 2);
-  const LINE1 = 'WELCOME TO';
-  const LINE2 = 'DAECLAN . COM';
-  const ORANGE = '#ff7a18';
-  let W=1,H=1,glyphs=[], center={x:0,y:0};
-
+  const ctx=canvas.getContext('2d',{alpha:true});
+  const DPR=Math.min(devicePixelRatio||1,2);
+  const LINE1='WELCOME TO', LINE2='DAECLAN . COM', ORANGE='#ff7a18';
+  let W=1,H=1,glyphs=[],center={x:0,y:0};
   function resize(){
-    const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
-    const w = innerWidth, h = Math.max(1, innerHeight - headerH);
-    W = (w*DPR)|0; H = (h*DPR)|0;
-    canvas.width = W; canvas.height = H;
-    canvas.style.width = w+'px'; canvas.style.height = h+'px';
-    center = { x: W/2, y: H/2 };
-    layout();
+    const headerH=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
+    const w=innerWidth,h=Math.max(1,Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight)-headerH);
+    W=(w*DPR)|0; H=(h*DPR)|0; canvas.width=W; canvas.height=H; canvas.style.width=w+'px'; canvas.style.height=h+'px';
+    center={x:W/2,y:H/2}; layout();
   }
-
   function layout(){
     glyphs.length=0;
-    const isMobile = innerWidth <= 560;
-    const base = Math.min(W, H*0.9);
-    let s1 = base * (isMobile ? 0.09 : 0.11);
-    let s2 = base * (isMobile ? 0.125 : 0.155);
-    let y1 = H * (isMobile ? 0.44 : 0.42);
-    let y2 = H * (isMobile ? 0.62 : 0.58);
-
-    function fit(text, size, spacing){
-      ctx.font = `900 ${size}px "Clash Display",system-ui,sans-serif`;
-      let total=0; for(const ch of text){ total += ctx.measureText(ch).width + spacing; }
-      const limit = W * 0.9; let guard=0;
-      while(total>limit && guard++<60){
-        size *= 0.965; spacing *= 0.965;
-        ctx.font = `900 ${size}px "Clash Display",system-ui,sans-serif`;
-        total=0; for(const ch of text){ total += ctx.measureText(ch).width + spacing; }
-      }
-      return { size, spacing };
-    }
-    let sp1 = s1*(isMobile?0.08:0.10);
-    let sp2 = s2*(isMobile?0.06:0.10);
-    ({size:s1, spacing:sp1} = fit(LINE1, s1, sp1));
-    ({size:s2, spacing:sp2} = fit(LINE2, s2, sp2));
-
-    function pushLine(text,size,y){
-      ctx.font = `900 ${size}px "Clash Display",system-ui,sans-serif`;
-      const spacing = size*0.10;
-      let totalW=0; for(const ch of text){ totalW += ctx.measureText(ch).width + spacing; }
-      let x = (W-totalW)/2;
-      for(const ch of text){
-        const w = ctx.measureText(ch).width;
-        glyphs.push({ch, x:x+w/2, y, size,
-          phase:Math.random()*Math.PI*2,
-          amp:(4 + Math.random()*6)*DPR * 0.6,
-          tilt:(Math.random()*0.04-0.02),
-          color:ORANGE
-        });
-        x += w + spacing;
-      }
-    }
-    pushLine(LINE1,s1,y1);
-    pushLine(LINE2,s2,y2);
+    const isM=innerWidth<=560;
+    const base=Math.min(W,H*.9);
+    let s1=base*(isM?0.09*0.93*0.95:0.11*0.95);
+    let s2=base*(isM?0.125*0.93*0.95:0.155*0.95);
+    let y1=H*(isM?0.43:0.44), y2=H*(isM?0.555:0.60);
+    function fit(t,size,sp){ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;let tot=0;for(const ch of t){tot+=ctx.measureText(ch).width+sp}const lim=W*.9;let g=0;while(tot>lim&&g++<60){size*=.965;sp*=.965;ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;tot=0;for(const ch of t){tot+=ctx.measureText(ch).width+sp}}return{size,sp}}
+    let sp1=s1*(isM?.08:.10), sp2=s2*(isM?.06:.10);
+    ({size:s1,sp:sp1}=fit(LINE1,s1,sp1)); ({size:s2,sp:sp2}=fit(LINE2,s2,sp2));
+    function pushLine(text,size,y){ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;const spacing=size*.10;let totalW=0;for(const ch of text){totalW+=ctx.measureText(ch).width+spacing}let x=(W-totalW)/2;for(const ch of text){const w=ctx.measureText(ch).width;glyphs.push({ch,x:x+w/2,y,size,phase:Math.random()*Math.PI*2,amp:(4+Math.random()*6)*DPR*.6,tilt:(Math.random()*0.04-0.02),color:ORANGE});x+=w+spacing}}
+    pushLine(LINE1,s1,y1); pushLine(LINE2,s2,y2);
   }
-
-  resize(); addEventListener('resize', resize);
-
+  resize(); addEventListener('resize',resize);
   function draw(tms){
-    const t=tms*0.001;
-    ctx.clearRect(0,0,W,H);
-
-    // Dispersion + fade driven by scroll within hero height
-    const headerH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
-    const heroH = Math.max(1, innerHeight - headerH);
-    const s = Math.min(1, Math.max(0, scrollY / (heroH*0.9))); // 0..1
-    const fade = 1 - s;
-
+    const t=tms*.001; ctx.clearRect(0,0,W,H);
+    const headerH=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
+    const heroH=Math.max(1,Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight)-headerH);
+    const s=Math.min(1,Math.max(0,scrollY/(heroH*.9))); const fade=1-s;
     for(const g of glyphs){
-      const buoy = Math.sin(t*1.2 + g.phase) * (g.amp);
-      const dx = (g.x - center.x);
-      const dy = (g.y - center.y);
-      const scatter = 1.2; // outward flight distance
-      const px = g.x + dx * scatter * s;
-      const py = g.y + dy * scatter * s + buoy;
-
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.rotate(g.tilt + Math.sin(t*.5 + g.phase)*0.015);
-      ctx.globalAlpha = Math.max(0.001, fade);
-      ctx.font = `900 ${g.size}px "Clash Display",system-ui,sans-serif`;
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-
-      // Neon glow
-      ctx.fillStyle=g.color;
-      ctx.shadowColor='rgba(255,122,24,0.85)';
-      ctx.shadowBlur=28*DPR; ctx.shadowOffsetY=0;
-      ctx.fillText(g.ch,0,0);
-
-      // Outline
-      ctx.shadowColor='transparent';
-      ctx.lineWidth=Math.max(1.5,g.size*.05);
-      ctx.strokeStyle='rgba(0,0,0,.65)';
-      ctx.strokeText(g.ch,0,0);
-
-      // Highlight
-      ctx.globalCompositeOperation='lighter';
-      const hl = ctx.createLinearGradient(-g.size*.3, -g.size*.25, g.size*.3, -g.size*.25);
-      hl.addColorStop(0,'rgba(255,255,255,0)');
-      hl.addColorStop(.5,'rgba(255,255,255,.28)');
-      hl.addColorStop(1,'rgba(255,255,255,0)');
-      ctx.fillStyle=hl;
-      ctx.fillText(g.ch, 0, -g.size*0.03);
-      ctx.globalCompositeOperation='source-over';
-      ctx.restore();
+      const buoy=Math.sin(t*1.2+g.phase)*(g.amp); const dx=g.x-center.x, dy=g.y-center.y;
+      const px=g.x+dx*1.2*s; const py=g.y+dy*1.2*s+buoy;
+      ctx.save(); ctx.translate(px,py); ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015); ctx.globalAlpha=Math.max(.001,fade);
+      ctx.font=`900 ${g.size}px "Clash Display",system-ui,sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=g.color; ctx.shadowColor='rgba(255,122,24,.85)'; ctx.shadowBlur=28*devicePixelRatio; ctx.fillText(g.ch,0,0);
+      ctx.shadowColor='transparent'; ctx.lineWidth=Math.max(1.5,g.size*.05); ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(g.ch,0,0);
+      ctx.globalCompositeOperation='lighter'; const hl=ctx.createLinearGradient(-g.size*.3,-g.size*.25,g.size*.3,-g.size*.25); hl.addColorStop(0,'rgba(255,255,255,0)'); hl.addColorStop(.5,'rgba(255,255,255,.28)'); hl.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=hl; ctx.fillText(g.ch,0,-g.size*.03);
+      ctx.globalCompositeOperation='source-over'; ctx.restore();
     }
-
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
 })();
-</script>
 
-<!-- Wormhole background (WebGL2 with scroll ripples) -->
-<script>
+/* Wormhole shader */
 (function(){
   const canvas=document.getElementById('bgScene'); if(!canvas) return;
-  const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true});
-  if(!gl){console.warn('WebGL2 not available');return;}
-
+  const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
   const vsrc=`#version 300 es
-const vec2 V[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));
-out vec2 vUv;
-void main(){ vec2 p=V[gl_VertexID]; vUv=.5*(p+1.); gl_Position=vec4(p,0.,1.); }`;
-
+  const vec2 V[3]=vec2[3](vec2(-1.,-1.),vec2(3.,-1.),vec2(-1.,3.));
+  out vec2 vUv; void main(){ vec2 p=V[gl_VertexID]; vUv=.5*(p+1.); gl_Position=vec4(p,0.,1.); }`;
   const fsrc=`#version 300 es
-precision highp float; in vec2 vUv; out vec4 frag; uniform vec2 uRes; uniform float uTime; uniform float uSpin; uniform float uTravel; uniform float uAmp; uniform float uDir;
-vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.48,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.);}
-mat2 r(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c);}
-void main(){
-  vec2 p=(vUv*uRes-0.5*uRes)/min(uRes.x,uRes.y);
-  if(uAmp>0.0001){
-    float k=14., ph=uTime*7.*uDir, w=sin(k*p.y+ph), env=smoothstep(1.35,.18,abs(p.y));
-    p.x += w*env*(0.057*uAmp);
-    p.y += cos(k*p.y+ph)*env*(0.019*uAmp)*uDir;
-  }
-  p=r(uSpin)*p;
-  float rlen=length(p)+1e-6, z=uTravel+4./rlen;
-  float d=1.35, ring=floor(mod(z*d,7.)), stripe=smoothstep(.02,0.,abs(fract(z*d)-.5));
-  float inner=smoothstep(.12,.20,rlen), glow=pow(1./(1.+6.*pow(rlen,2.2)),1.2);
-  vec3 col=roygbiv(ring)*(stripe*inner*1.5 + glow*.55);
-  float vig=smoothstep(1.5,.15,length(p));
-  col*=vig; col=max(col-0.004,0.);
-  col=(col*(6.2*col+.5))/(col*(6.2*col+1.7)+.06);
-  frag=vec4(col,1.0);
-}`;
-
+  precision highp float; in vec2 vUv; out vec4 frag; uniform vec2 uRes; uniform float uTime; uniform float uSpin; uniform float uTravel; uniform float uAmp; uniform float uDir;
+  vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.48,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.);}
+  mat2 r(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c);}
+  void main(){
+    vec2 p=(vUv*uRes-0.5*uRes)/min(uRes.x,uRes.y);
+    if(uAmp>0.0001){
+      float k=14., ph=uTime*7.*uDir, w=sin(k*p.y+ph), env=smoothstep(1.35,.18,abs(p.y));
+      p.x += w*env*(0.057*uAmp);
+      p.y += cos(k*p.y+ph)*env*(0.019*uAmp)*uDir;
+    }
+    p=r(uSpin)*p; float rlen=length(p)+1e-6, z=uTravel+4./rlen;
+    float d=1.35, ring=floor(mod(z*d,7.)), stripe=smoothstep(.02,0.,abs(fract(z*d)-.5));
+    float inner=smoothstep(.12,.20,rlen), glow=pow(1./(1.+6.*pow(rlen,2.2)),1.2);
+    vec3 col=roygbiv(ring)*(stripe*inner*1.5 + glow*.55);
+    float vig=smoothstep(1.5,.15,length(p)); col*=vig; col=max(col-0.004,0.);
+    col=(col*(6.2*col+.5))/(col*(6.2*col+1.7)+.06); frag=vec4(col,1.0);
+  }`;
   function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
-  const pr=gl.createProgram(); gl.attachShader(pr,sh(gl.VERTEX_SHADER,vsrc)); gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fsrc)); gl.linkProgram(pr); if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw gl.getProgramInfoLog(pr);
+  const pr=gl.createProgram(); gl.attachShader(pr,sh(gl.VERTEX_SHADER,vsrc)); gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,fsrc)); gl.linkProgram(pr);
+  if(!gl.getProgramParameter(pr,gl.LINK_STATUS)) throw gl.getProgramInfoLog(pr);
   gl.useProgram(pr); gl.bindVertexArray(gl.createVertexArray());
   const uRes=gl.getUniformLocation(pr,'uRes'),uTime=gl.getUniformLocation(pr,'uTime'),uSpin=gl.getUniformLocation(pr,'uSpin'),uTravel=gl.getUniformLocation(pr,'uTravel'),uAmp=gl.getUniformLocation(pr,'uAmp'),uDir=gl.getUniformLocation(pr,'uDir');
-
   function resize(){
-    const header = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
-    const w=innerWidth, h=Math.max(1, innerHeight-header);
-    const d=Math.min(Math.max(1,devicePixelRatio||1),2.5);
+    const header=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
+    const vh=Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight);
+    const w=innerWidth, h=Math.max(1,vh-header); const d=Math.min(Math.max(1,devicePixelRatio||1),2.5);
     canvas.width=w*d; canvas.height=h*d; canvas.style.width=w+'px'; canvas.style.height=h+'px';
-    gl.viewport(0,0,canvas.width,canvas.height);
-    gl.uniform2f(uRes,canvas.width,canvas.height);
+    gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uRes,canvas.width,canvas.height);
   }
   resize(); addEventListener('resize',resize,{passive:true});
-
-  let spin=0, travel=0, amp=0, dir=1, lastY=scrollY, last=performance.now();
+  let spin=0,travel=0,amp=0,dir=1,lastY=scrollY,last=performance.now();
   addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,amp+Math.min(.6,Math.abs(dy)*.004));}},{passive:true});
-
   (function loop(){
-    const now=performance.now(), dt=Math.min((now-last)/1000,.033); last=now;
+    const now=performance.now(),dt=Math.min((now-last)/1000,.033); last=now;
     travel+=1.2*dt; spin+=.35*dt; amp=Math.max(0,amp-dt/2);
     gl.uniform1f(uTime, now*.001); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
     gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3);
