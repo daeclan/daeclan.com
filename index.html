@@ -7,22 +7,84 @@
 <meta name="theme-color" content="#0a0a0a"/>
 <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,600,700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A7%A1%3C/text%3E%3C/svg%3E"/>
+<script>document.documentElement.classList.add('loading');</script>
+
 <style>
 :root{--bg:#0a0a0a;--panel:#111215;--fg:#f5f5f6;--muted:#b6b8bf;--line:#1d1e22;--accent:#ff7a18;--accent2:#ffb566;--r:14px;--maxw:1160px;--header:68px;--tight:.62;--narrow:600px;--fadein-duration:4s}
 @media (min-width:861px){:root{--tight:.56}}
 *{box-sizing:border-box}
 html,body{height:100%}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column;padding-top:var(--header)}
 .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 a{text-decoration:none;color:inherit}
 
-/* intro fade */
-#fadeIn{position:fixed;inset:0;background:#fff;z-index:9999;pointer-events:none;animation:fadeOut var(--fadein-duration) ease forwards}
+/* ===== FULLSCREEN LOADER ===== */
+html.loading body{overflow:hidden;height:100vh}
+#loader{position:fixed;inset:0;background:#000;z-index:400000;display:grid;place-items:center;pointer-events:auto;opacity:1;transition:opacity .45s ease}
+html.loader-done #loader{opacity:0;pointer-events:none}
+#loaderStage{position:relative;width:100vw;height:100vh;display:grid;place-items:center}
+#loaderGL{position:absolute;inset:0;width:100%;height:100%;display:block}
+.loader-ui{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px}
+.loader-line{display:flex;align-items:baseline;gap:12px}
+#loaderLabel{
+  font-weight:800;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--accent);opacity:.98;
+  font-family:"Clash Display",system-ui,sans-serif
+}
+#loaderPct{
+  font-weight:800;font-size:clamp(28px,7vw,56px);
+  color:var(--accent);letter-spacing:.02em;text-shadow:0 0 18px rgba(255,122,24,.24);
+  display:inline-block;min-width:5ch;text-align:left;
+  font-variant-numeric: tabular-nums; font-feature-settings:"tnum" 1;
+  font-family:"Clash Display",system-ui,sans-serif
+}
+
+/* ✨ Fancy progress bar (left → right fill, shimmer only on orange fill) */
+#loaderBar{
+  --p:0;
+  position:relative;
+  width:min(560px,80vw);height:12px;border-radius:999px;
+  background:#000;border:1px solid #222;overflow:hidden;
+  box-shadow:inset 0 0 0 1px #141414, 0 8px 28px rgba(255,122,24,.08);
+}
+#loaderBar span{
+  position:absolute;left:0;top:0;height:100%;
+  width:calc(var(--p)*100%);border-radius:inherit;
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,0)) ,
+    linear-gradient(90deg,var(--accent) 0%, var(--accent2) 60%, #ffdca7 100%);
+  filter:saturate(1.15);
+  transition:width .16s cubic-bezier(.22,.61,.36,1);
+  box-shadow:0 0 18px rgba(255,122,24,.35), 0 0 2px rgba(255,255,255,.3) inset;
+  overflow:hidden; /* keep shimmer strictly inside the orange fill */
+}
+#loaderBar span::after{
+  content:""; position:absolute; top:-40%; bottom:-40%;
+  width:120px; left:-140px;
+  background:radial-gradient(60px 100% at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);
+  mix-blend-mode:screen; pointer-events:none;
+  animation:spark 1.4s linear infinite;
+  opacity:0; /* default off */
+}
+#loaderBar span.active::after{ opacity:1; } /* only shimmer when we have fill */
+@keyframes spark{to{transform:translateX(calc(100% + 280px));}}
+
+/* ===== SITE HATCH (covers the site, not the loader) ===== */
+#siteHatch{position:fixed;inset:0;z-index:2500;pointer-events:none}
+#siteHatch .door{position:absolute;left:0;right:0;height:50%;background:#000;transform:translateY(0);transition:transform .55s cubic-bezier(.22,.61,.36,1)}
+#siteHatch .door.top{top:0;border-bottom:1px solid #111}
+#siteHatch .door.bot{bottom:0;border-top:1px solid #111}
+#siteHatch.open .door.top{transform:translateY(-100%)}
+#siteHatch.open .door.bot{transform:translateY(100%)}
+
+/* Single intro white fade (no pre-flash) */
+#fadeIn{position:fixed;inset:0;background:#fff;z-index:5000;pointer-events:none;animation:fadeOut var(--fadein-duration) ease forwards}
+html.loading #fadeIn{display:none}
 @keyframes fadeOut{from{opacity:1}to{opacity:0}}
 
-/* sticky header */
-header{position:sticky;top:0;z-index:3000;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
+/* ===== HEADER always visible (fixed) ===== */
+header{position:fixed;left:0;right:0;top:0;z-index:3000;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
 .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
 .brand{font-weight:700;letter-spacing:.3px}
 .brand b{color:var(--accent)}
@@ -58,7 +120,7 @@ main{position:relative;z-index:2;flex:1}
 #heroMarquee{position:fixed;inset:var(--header) 0 0 0;z-index:1;pointer-events:none;width:100vw;height:calc(100svh - var(--header));transition:opacity .2s ease}
 .heroSpacer{height:calc(100svh - var(--header));min-height:calc(100svh - var(--header));max-width:var(--maxw);margin:0 auto}
 
-/* grid + cards */
+/* grid + cards etc. */
 .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
 .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
 @media (max-width:860px){.col-3,.col-4,.col-6{grid-column:span 12}}
@@ -71,8 +133,6 @@ main{position:relative;z-index:2;flex:1}
 .meta{display:flex;gap:12px;color:var(--muted);font-size:13px;flex-wrap:wrap}
 .title-sm{font-weight:700;font-size:18px;margin:6px 0;color:var(--accent)}
 .desc{color:#d7d9df;font-size:14px}
-
-/* buttons (orange + compact) */
 .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 .card .actions{width:100%;max-width:none;margin:12px 0 0}
 .actions.center{justify-content:center}
@@ -88,76 +148,56 @@ main{position:relative;z-index:2;flex:1}
 .icon-svg{display:inline-block;width:22px;height:22px;background:var(--accent);-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:contain;mask-repeat:no-repeat;mask-position:center;mask-size:contain}
 .icon-apple{-webkit-mask-image:url('/assets/apple-music.svg');mask-image:url('/assets/apple-music.svg')}
 .icon-tidal{-webkit-mask-image:url('/assets/tidal.svg');mask-image:url('/assets/tidal.svg')}
-
-/* tape */
 .taped{position:relative;filter:grayscale(100%) contrast(1.05)}
 .tape{position:absolute;left:30%;top:12%;transform:translateX(-30%) rotate(-12deg);background:#ffd400;color:#111;font-weight:900;letter-spacing:.02em;border:1px solid #111;padding:6px 12px;box-shadow:0 2px 0 #0006;text-transform:uppercase;font-size:12px;line-height:1.1;display:inline-block;z-index:2}
 .tape small{display:block;font-weight:800}
-
-/* narrow + video */
 .narrow{max-width:var(--narrow);margin:0 auto}
 .video-card,.mixes-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;z-index:5}
 .video-head,.mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
 .video-title,.mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
 .video-wrap{position:relative;width:100%;padding-top:56.25%;background:#0e0f12}
 .video-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-
-/* MIXES: desktop rail + mobile stack (clickable) */
-./* MIXES: single horizontal rail (desktop + mobile) */
 .mixes-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;z-index:5}
 .mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
 .mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
 .mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}
-
-/* horizontal scroller */
-.mix-rail{
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding:14px 16px 16px;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-x:contain;
-  scroll-snap-type:x proximity;
-  touch-action:pan-x;
-}
+.mix-rail{display:flex;gap:12px;overflow-x:auto;padding:14px 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity;touch-action:pan-x}
 .mix-rail::-webkit-scrollbar{display:none}
-
-/* embed cards (cover art shows inside Mixcloud) */
-.mix-embed{
-  flex:0 0 320px;
-  height:360px;
-  border:0;
-  border-radius:12px;
-  overflow:hidden;
-  background:#0e0f12;
-  scroll-snap-align:start;
-  pointer-events:auto;
-  position:relative;
-  z-index:6;
-}
-@media (max-width:560px){
-  .mix-embed{flex:0 0 280px;height:340px}
-}
-
-/* remove legacy mobile stack styles if present */
-.mix-stack{display:none !important}
-
-/* center single writing card & edge padding */
+.mix-embed{flex:0 0 320px;height:360px;border:0;border-radius:12px;overflow:hidden;background:#0e0f12;scroll-snap-align:start;pointer-events:auto;position:relative;z-index:6}
+@media (max-width:560px){.mix-embed{flex:0 0 280px;height:340px}}
 .center-wrap{display:flex;justify-content:center;padding:0 10px}
 .max-380{max-width:380px;width:100%}
-
-/* contact sizing */
 #contact .card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
 #contact .icon-btn{width:40px;height:40px}
-
-/* footer pinned */
 .footer-gap{height:16px}
 footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#000}
 .footer-inner{max-width:var(--maxw);margin:0 auto;padding:10px 20px;display:flex;align-items:center}
 .footer-inner small{font-size:12px;color:var(--accent);font-weight:700}
 </style>
 </head>
+
 <body>
+<!-- ===== FULLSCREEN LOADER ===== -->
+<div id="loader" aria-label="Site loading">
+  <div id="loaderStage">
+    <canvas id="loaderGL" aria-hidden="true"></canvas>
+    <div class="loader-ui">
+      <div class="loader-line">
+        <span id="loaderLabel">LOADING…</span>
+        <span id="loaderPct">0%</span>
+      </div>
+      <div id="loaderBar"><span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- Hatch sits over the SITE (not covering the loader) -->
+<div id="siteHatch" aria-hidden="true">
+  <div class="door top"></div>
+  <div class="door bot"></div>
+</div>
+
+<!-- Single white fade (no pre-flash) -->
 <div id="fadeIn" aria-hidden="true"></div>
 
 <header>
@@ -186,30 +226,26 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
 <!-- canvases -->
 <canvas id="bgScene"></canvas>
 <canvas id="heroMarquee" aria-label="Welcome marquee"></canvas>
-<!-- guaranteed blank space so marquee shows on load -->
 <div class="heroSpacer" aria-hidden="true"></div>
 
 <main id="main">
-
   <!-- MUSIC -->
   <section id="music" class="section container">
     <div class="section-head"><h2 class="title">MUSIC</h2><p class="subtitle">releases by degh</p></div>
 
     <div class="grid" style="margin-top:18px;">
-      <!-- Album 1 -->
       <article class="card col-4">
         <div class="thumb">
           <img class="zoomable" loading="lazy" src="https://f4.bcbits.com/img/a3715201532_16.jpg" alt="Declan Emphasized A Movie">
           <span class="tag">LP</span>
-        </div>
+        </div> bro
         <div class="card-body">
           <div class="meta"><span>DEGH</span></div>
           <h3 class="title-sm">Declan Emphasized A Movie</h3>
           <p class="desc">Released 07.22.24</p>
           <div class="actions center">
-            <!-- Spotify (restored stroked icon) -->
             <a class="icon-btn" href="https://open.spotify.com/album/6LG5Tnvnmd3801uTbjF6xH?si=kfAMEb1vR-WxINDmxGzQxg" target="_blank" aria-label="Spotify">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8"></path>
                 <path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6"></path>
@@ -223,7 +259,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
         </div>
       </article>
 
-      <!-- Album 2 -->
       <article class="card col-4">
         <div class="thumb">
           <img class="zoomable" loading="lazy" src="/assets/DQAI.gif" alt="Declan Questioned An Image">
@@ -244,7 +279,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
         </div>
       </article>
 
-      <!-- Album 3 -->
       <article class="card col-4">
         <div class="thumb">
           <img class="zoomable" loading="lazy" src="https://f4.bcbits.com/img/a0932996697_16.jpg" alt="Declan Loved A Message">
@@ -275,118 +309,34 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     </div>
 
     <!-- MIXES -->
-    <!-- MIXES -->
-<div class="grid" style="margin-top:22px;">
-  <article class="col-12 mixes-card">
-    <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
-
-    <div class="mix-rail">
-      <!-- Newest on the left -->
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fits-all-illusions-winter-24-mix%2F"
-        title="IT'S ALL ILLUSIONS (winter '24 mix)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fdegh-vs-the-unblinking-giants-summer-23-mix%2F"
-        title="DEGH vs the Unblinking Giants (summer '23)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-absurd-spring-22-mini-mix%2F"
-        title="it's absurd (spring '22)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwhat-is-left-winter-mix-21%2F"
-        title="what is left (winter '21)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-a-fucking-feeling-midwinter-mix-20%2F"
-        title="it's a fucking feeling (midwinter '20)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthe-bigger-picture-ss-19-mix%2F"
-        title="the bigger picture (SS '19)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthatll-be-the-danger-fw-18-collection%2F"
-        title="that’ll be the danger (FW '18)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fchicago-summer-breeze-ss-18-mix%2F"
-        title="chicago summer breeze (SS '18)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwear-it-in-health-ss-17-mix%2F"
-        title="wear it in health (SS '17)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwdtm-radio-volume-i%2F"
-        title="WDTM Radio Vol. I"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-imagination-early-summer-mix-16%2F"
-        title="pure imagination (early summer '16)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fleap-of-faith-spring-16-mix%2F"
-        title="leap of faith (spring '16)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fno-meat-just-sauce-mardi-gras-mini-mix-2016%2F"
-        title="no meat just sauce (Mardi Gras '16)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthrow-the-book-winter-15-mini-mix%2F"
-        title="throw the book (winter '15)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-solid-gold-summer-15-mini-mix%2F"
-        title="pure solid gold (summer '15)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fdiane-its-1227pm-winter-15-mini-mix%2F"
-        title="diane it’s 12:27pm (winter '15)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fhallolean-fall-14-mini-mix%2F"
-        title="hallolean (fall '14)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fice-cold-coach-house-winter-14-mini-mix%2F"
-        title="ice cold coach house (winter '14)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwinter-time-temple-november-2013%2F"
-        title="winter time temple (Nov 2013)"></iframe>
-
-      <iframe class="mix-embed" loading="lazy" scrolling="no"
-        allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-        src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fddgh-radio-1-essental-mix-degh-march-2013%2F"
-        title="DDGH Radio 1 Essential Mix (Mar 2013)"></iframe>
+    <div class="grid" style="margin-top:22px;">
+      <article class="col-12 mixes-card">
+        <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
+        <div class="mix-rail">
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fits-all-illusions-winter-24-mix%2F" title="IT'S ALL ILLUSIONS (winter '24 mix)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fdegh-vs-the-unblinking-giants-summer-23-mix%2F" title="DEGH vs the Unblinking Giants (summer '23)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-absurd-spring-22-mini-mix%2F" title="it's absurd (spring '22)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwhat-is-left-winter-mix-21%2F" title="what is left (winter '21)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-a-fucking-feeling-midwinter-mix-20%2F" title="it's a fucking feeling (midwinter '20)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthe-bigger-picture-ss-19-mix%2F" title="the bigger picture (SS '19)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthatll-be-the-danger-fw-18-collection%2F" title="that’ll be the danger (FW '18)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fchicago-summer-breeze-ss-18-mix%2F" title="chicago summer breeze (SS '18)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwear-it-in-health-ss-17-mix%2F" title="wear it in health (SS '17)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwdtm-radio-volume-i%2F" title="WDTM Radio Vol. I"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-imagination-early-summer-mix-16%2F" title="pure imagination (early summer '16)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fleap-of-faith-spring-16-mix%2F" title="leap of faith (spring '16)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fno-meat-just-sauce-mardi-gras-mini-mix-2016%2F" title="no meat just sauce (Mardi Gras '16)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthrow-the-book-winter-15-mini-mix%2F" title="throw the book (winter '15)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-solid-gold-summer-15-mini-mix%2F" title="pure solid gold (summer '15)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fdiane-its-1227pm-winter-15-mini-mix%2F" title="diane it’s 12:27pm (winter '15)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fhallolean-fall-14-mini-mix%2F" title="hallolean (fall '14)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fice-cold-coach-house-winter-14-mini-mix%2F" title="ice cold coach house (winter '14)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwinter-time-temple-november-2013%2F" title="winter time temple (Nov 2013)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fddgh-radio-1-essental-mix-degh-march-2013%2F" title="DDGH Radio 1 Essential Mix (Mar 2013)"></iframe>
+        </div>
+        <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
+      </article>
     </div>
-
-    <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
-  </article>
-</div>
-
   </section>
 
   <!-- WEB PROJECTS -->
@@ -420,7 +370,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
         </div>
       </article>
 
-      <!-- XXXSENSATION (restored) -->
       <article class="card col-6">
         <div class="thumb"><img class="zoomable" loading="lazy" src="https://i.scdn.co/image/ab67616d00001e028b4ab0e172584a790ede3ddb" alt="XXXSENSATION"><span class="tag">Site</span></div>
         <div class="card-body">
@@ -432,7 +381,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
         </div>
       </article>
 
-      <!-- SLAM HARRIS -->
       <article class="card col-6">
         <div class="thumb"><img class="zoomable" loading="lazy" src="https://i1.sndcdn.com/avatars-000573770682-9iw8t5-t1080x1080.jpg" alt="SLAM HARRIS"><span class="tag">Audio</span></div>
         <div class="card-body">
@@ -538,7 +486,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
   </div>
 </footer>
 
-<!-- lightbox + headshots -->
 <div id="lightbox" role="dialog" aria-modal="true" aria-label="Album art" style="display:none"><img id="lightboxImg" alt=""></div>
 <dialog id="headshotsDlg" style="border:1px solid var(--line);background:#0b0c10;max-width:min(980px,94vw);width:94vw;border-radius:16px;color:#fff">
   <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line)">
@@ -552,6 +499,8 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     <img src="/assets/headshot4.jpg" alt="Headshot 4" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
   </div>
 </dialog>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
 <script>
 /* Scrollspy */
@@ -570,7 +519,7 @@ const io=new IntersectionObserver(es=>{
 },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
 secs.forEach(s=>io.observe(s));
 
-/* Mobile menu (sticky + restores scroll after click) */
+/* Mobile menu */
 (function(){
   const btn=document.getElementById('menuToggle');
   const panel=document.getElementById('mobileNav');
@@ -622,6 +571,7 @@ secs.forEach(s=>io.observe(s));
     const w=innerWidth,h=Math.max(1,Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight)-headerH);
     W=(w*DPR)|0; H=(h*DPR)|0; canvas.width=W; canvas.height=H; canvas.style.width=w+'px'; canvas.style.height=h+'px';
     center={x:W/2,y:H/2}; layout();
+    window.dispatchEvent(new Event('marquee:ready'));
   }
   function layout(){
     glyphs.length=0;
@@ -657,7 +607,7 @@ secs.forEach(s=>io.observe(s));
   requestAnimationFrame(draw);
 })();
 
-/* Wormhole shader */
+/* Wormhole shader (unchanged) */
 (function(){
   const canvas=document.getElementById('bgScene'); if(!canvas) return;
   const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
@@ -699,11 +649,149 @@ secs.forEach(s=>io.observe(s));
   addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,amp+Math.min(.6,Math.abs(dy)*.004));}},{passive:true});
   (function loop(){
     const now=performance.now(),dt=Math.min((now-last)/1000,.033); last=now;
-    travel+=1.2*dt; spin+=.35*dt; amp=Math.max(0,amp-dt/2);
+    travel+=0.25*dt;  spin+=0.08*dt;  amp=Math.max(0,amp-dt/2);
     gl.uniform1f(uTime, now*.001); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
     gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3);
+    if(!window.__wormReady){ window.__wormReady=true; window.dispatchEvent(new Event('worm:ready')); }
     requestAnimationFrame(loop);
   })();
+})();
+
+/* ----------------- LOADER ----------------- */
+(function(){
+  const siteHatch=document.getElementById('siteHatch');
+  const pctEl=document.getElementById('loaderPct');
+  const barEl=document.querySelector('#loaderBar span');
+
+  // springy % display + bar width
+  let display=0,target=0,vel=0,last=performance.now(), raf=null;
+  function spring(dt){const k=18,c=24;const x=display-target;const a=-k*x-c*vel;vel+=a*dt;display=Math.min(1,Math.max(0,display+vel*dt))}
+  function tick(now=performance.now()){
+    const dt=Math.min((now-last)/1000,0.033); last=now; spring(dt);
+    pctEl.textContent=Math.round(display*100)+'%';
+    barEl.style.setProperty('--p', String(display));
+    // shimmer only when there is visible fill
+    if(display>0.02){ barEl.classList.add('active'); } else { barEl.classList.remove('active'); }
+    if (Math.abs(display-target)>0.001 || Math.abs(vel)>0.001) raf=requestAnimationFrame(tick); else raf=null;
+  }
+  function setTarget(v){target=Math.max(target, Math.min(1,v)); if(!raf) raf=requestAnimationFrame(tick);}
+
+  /* ==== Loader background shader: rotate -30° + 5x zoom-out ==== */
+  const canvas=document.getElementById('loaderGL');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false,preserveDrawingBuffer:false});
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+  const quad=new THREE.PlaneGeometry(2,2);
+  const uniforms={uRes:{value:new THREE.Vector2(1,1)},uTime:{value:0},uProg:{value:0},uScale:{value:5.0}};
+  const material=new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position,1.0); }`,
+    fragmentShader:`
+      precision highp float;
+      uniform vec2  uRes;
+      uniform float uTime;
+      uniform float uProg; // 0..1
+      uniform float uScale; // larger => tighter pattern (zoomed out)
+
+      vec3 hsv2rgb(vec3 c){
+        vec3 p = abs(fract(c.x + vec3(0., 2./3., 1./3.)) * 6. - 3.);
+        vec3 rgb = clamp(p - 1., 0., 1.);
+        return c.z * mix(vec3(1.), rgb, c.y);
+      }
+
+      float bands(vec2 uv, float t, float prog){
+        float baseSpeed = mix(0.15, 1.6, prog);
+        float kx = 18.0, ky = 14.0;
+        float wig = 0.22*sin(uv.x*kx - t*baseSpeed*1.6) + 0.18*sin(uv.y*ky - t*baseSpeed*1.2);
+        float w = uv.y + wig;              // flow axis = +y
+        float stripe = smoothstep(0.03, 0.0, abs(fract(w*8.5) - 0.5));
+        return stripe;
+      }
+
+      void main(){
+        vec2 uv = gl_FragCoord.xy / uRes;
+        uv = (uv - 1.5) * vec2(uRes.x/uRes.y, 7000.0);
+
+        // rotate by -30 degrees, then zoom out 5x
+        float a = -0.05; // -pi/6
+        mat2 R = mat2(cos(a), -sin(a), sin(a), cos(a));
+        uv = R * (uv * uScale);
+
+        float m = bands(uv, uTime, uProg);
+
+        // start B/W, ramp to color; shimmer travels upward along +y
+        float gray = m;
+        float hue   = fract( (uv.y*0.22) + (uTime*0.08) );
+        vec3  color = hsv2rgb(vec3(hue, 0.98, 1.7)) * m;
+        float p = smoothstep(0.0, 1.0, uProg);
+        vec3 col = mix(vec3(gray), color, p);
+
+        gl_FragColor = vec4(col, 1.0);
+      }`,
+    depthWrite:false, depthTest:false
+  });
+  scene.add(new THREE.Mesh(quad,material));
+
+  function resize(){
+    const d=Math.min(Math.max(1,window.devicePixelRatio||1),2.5);
+    const w=innerWidth, h=innerHeight;
+    renderer.setPixelRatio(d); renderer.setSize(w,h,false);
+    uniforms.uRes.value.set(w*d,h*d);
+  }
+  resize(); addEventListener('resize',resize,{passive:true});
+  (function loop(){uniforms.uTime.value=performance.now()*0.001; uniforms.uProg.value=target; renderer.render(scene,camera); requestAnimationFrame(loop);})();
+
+  // LoadingManager to drive progress
+  const manager=new THREE.LoadingManager();
+  manager.onProgress=(url,loaded,total)=>{
+    const p = total? loaded/total : (loaded?0.5:0.2);
+    setTarget(Math.min(0.85, p*0.85));
+  };
+  manager.onError=()=>setTarget(Math.min(0.85, target+0.05));
+
+  // Count a few assets
+  const texLoader=new THREE.TextureLoader(manager);
+  ["https://f4.bcbits.com/img/a3715201532_16.jpg","/assets/DQAI.gif","https://f4.bcbits.com/img/a0932996697_16.jpg"].forEach(src=>texLoader.load(src,()=>{},()=>{},()=>{}));
+
+  // Fonts gate nudges
+  (document.fonts && document.fonts.ready)
+    ? document.fonts.ready.then(()=>setTarget(0.92))
+    : setTarget(0.92);
+
+  // Early “alive” nudge so it never looks frozen
+  setTimeout(()=>{ if(target<0.25) setTarget(0.25); }, 250);
+
+  function waitFor(name, timeout=6000){
+    return new Promise(res=>{
+      let done=false;
+      const h=()=>{done=true; removeEventListener(name,h); res(true);};
+      addEventListener(name,h,{once:true});
+      setTimeout(()=>{ if(!done){ removeEventListener(name,h); res(false);} }, timeout);
+    });
+  }
+
+  Promise.all([
+    new Promise(r=>manager.onLoad=r),
+    (document.fonts?document.fonts.ready:Promise.resolve()),
+    waitFor('marquee:ready'),
+    waitFor('worm:ready')
+  ]).then(()=>{
+    setTarget(1.0);
+    const revealWhenReady = () =>{
+      if (Math.round(display*100) < 100) { requestAnimationFrame(revealWhenReady); return; }
+      siteHatch.classList.add('open');
+      setTimeout(()=>{
+        document.documentElement.classList.remove('loading'); // single white fade
+        document.documentElement.classList.add('loader-done');
+        // cleanup
+        setTimeout(()=>{
+          const l=document.getElementById('loader'); if(l&&l.parentNode) l.parentNode.removeChild(l);
+          const h=siteHatch; if(h&&h.parentNode) h.parentNode.removeChild(h);
+        }, 420);
+      }, 560);
+    };
+    revealWhenReady();
+  });
 })();
 </script>
 </body>
