@@ -591,7 +591,7 @@ secs.forEach(s=>io.observe(s));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.style.display='none'})
 })();
 
-/* Marquee — mobile-proof fade based on heroSpacer position */
+/* Marquee — tie orange fill + neon to the SAME fade, no initial expansion */
 (function(){
   const canvas=document.getElementById('heroMarquee');
   if(!canvas) return;
@@ -601,9 +601,7 @@ secs.forEach(s=>io.observe(s));
   const spacer=document.querySelector('.heroSpacer');
   let W=1,H=1,glyphs=[],center={x:0,y:0};
 
-  function headerH(){
-    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
-  }
+  function headerH(){return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;}
   function resize(){
     const hH=headerH();
     const w=innerWidth;
@@ -619,36 +617,87 @@ secs.forEach(s=>io.observe(s));
     let s1=base*(isM?0.09*0.93*0.95:0.11*0.95);
     let s2=base*(isM?0.125*0.93*0.95:0.155*0.95);
     let y1=H*(isM?0.43:0.44), y2=H*(isM?0.555:0.60);
-    function fit(t,size,sp){ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;let tot=0;for(const ch of t){tot+=ctx.measureText(ch).width+sp}const lim=W*.9;let g=0;while(tot>lim&&g++<60){size*=.965;sp*=.965;ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;tot=0;for(const ch of t){tot+=ctx.measureText(ch).width+sp}}return{size,sp}}
+
+    function fit(t,size,sp){
+      ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;
+      let tot=0; for(const ch of t){tot+=ctx.measureText(ch).width+sp}
+      const lim=W*.9; let g=0;
+      while(tot>lim&&g++<60){size*=.965;sp*=.965;ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;tot=0;for(const ch of t){tot+=ctx.measureText(ch).width+sp}}
+      return{size,sp}
+    }
     let sp1=s1*(isM?.08:.10), sp2=s2*(isM?.06:.10);
     ({size:s1,sp:sp1}=fit(LINE1,s1,sp1)); ({size:s2,sp:sp2}=fit(LINE2,s2,sp2));
-    function pushLine(text,size,y){ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;const spacing=size*.10;let totalW=0;for(const ch of text){totalW+=ctx.measureText(ch).width+spacing}let x=(W-totalW)/2;for(const ch of text){const w=ctx.measureText(ch).width;glyphs.push({ch,x:x+w/2,y,size,phase:Math.random()*Math.PI*2,amp:(4+Math.random()*6)*DPR*.6,tilt:(Math.random()*0.04-0.02),color:ORANGE});x+=w+spacing}}
+
+    function pushLine(text,size,y){
+      ctx.font=`900 ${size}px "Clash Display",system-ui,sans-serif`;
+      const spacing=size*.10; let totalW=0;
+      for(const ch of text){totalW+=ctx.measureText(ch).width+spacing}
+      let x=(W-totalW)/2;
+      for(const ch of text){
+        const w=ctx.measureText(ch).width;
+        glyphs.push({ch,x:x+w/2,y,size,phase:Math.random()*Math.PI*2,amp:(4+Math.random()*6)*DPR*.6,tilt:(Math.random()*0.04-0.02),color:ORANGE});
+        x+=w+spacing
+      }
+    }
     pushLine(LINE1,s1,y1); pushLine(LINE2,s2,y2);
   }
   resize(); addEventListener('resize',resize,{passive:true});
   addEventListener('orientationchange',()=>setTimeout(resize,150),{passive:true});
 
+  // progress: 0 at top of hero, 1 after you've scrolled past hero
   function fadeProgress(){
     if(!spacer) return 0;
     const rect=spacer.getBoundingClientRect();
     const hH=headerH();
-    const scrolledPx=Math.min(rect.height, Math.max(0, (hH - rect.top)));
-    return Math.min(1, scrolledPx / (rect.height*0.9));
+    const heroTop = window.scrollY + rect.top - hH;
+    const heroH   = rect.height || 1;
+    const y       = window.scrollY;
+    const s = (y - heroTop) / (heroH*0.9);
+    return Math.max(0, Math.min(1, s));
   }
 
   function draw(tms){
     const t=tms*.001; ctx.clearRect(0,0,W,H);
-    const s=fadeProgress(); const fade=1-s; // 1 → 0 as you scroll through the hero
+    const s = fadeProgress();         // 0 → 1 as you leave hero
+    const a = Math.max(0, 1 - s*1.25);// alpha for BOTH orange + neon
+
     for(const g of glyphs){
-      const buoy=Math.sin(t*1.2+g.phase)*(g.amp); const dx=g.x-center.x, dy=g.y-center.y;
-      const px=g.x+dx*1.2*s; const py=g.y+dy*1.2*s+buoy;
-      ctx.save(); ctx.translate(px,py); ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015); ctx.globalAlpha=Math.max(.001,fade);
-      ctx.font=`900 ${g.size}px "Clash Display",system-ui,sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillStyle=g.color; ctx.shadowColor='rgba(255,122,24,.85)'; ctx.shadowBlur=28*devicePixelRatio; ctx.fillText(g.ch,0,0);
-      ctx.shadowColor='transparent'; ctx.lineWidth=Math.max(1.5,g.size*.05); ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(g.ch,0,0);
-      ctx.globalCompositeOperation='lighter'; const hl=ctx.createLinearGradient(-g.size*.3,-g.size*.25,g.size*.3,-g.size*.25); hl.addColorStop(0,'rgba(255,255,255,0)'); hl.addColorStop(.5,'rgba(255,255,255,.28)'); hl.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=hl; ctx.fillText(g.ch,0,-g.size*.03);
-      ctx.globalCompositeOperation='source-over'; ctx.restore();
+      const buoy=Math.sin(t*1.2+g.phase)*(g.amp);
+      const px=g.x;                    // no expansion/shift at load
+      const py=g.y+buoy;
+
+      ctx.save();
+      ctx.translate(px,py);
+      ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015);
+      ctx.globalAlpha=a;
+
+      // orange fill
+      ctx.font=`900 ${g.size}px "Clash Display",system-ui,sans-serif`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillStyle=g.color;
+      ctx.shadowColor='rgba(255,122,24,.85)'; ctx.shadowBlur=28*devicePixelRatio;
+      ctx.fillText(g.ch,0,0);
+
+      // outline
+      ctx.shadowColor='transparent';
+      ctx.lineWidth=Math.max(1.5,g.size*.05); ctx.strokeStyle='rgba(0,0,0,.65)';
+      ctx.strokeText(g.ch,0,0);
+
+      // neon face highlight — shares same alpha
+      ctx.globalCompositeOperation='lighter';
+      const hl=ctx.createLinearGradient(-g.size*.3,-g.size*.25,g.size*.3,-g.size*.25);
+      hl.addColorStop(0,'rgba(255,255,255,0)');
+      hl.addColorStop(.5,'rgba(255,255,255,.28)');
+      hl.addColorStop(1,'rgba(255,255,255,0)');
+      ctx.fillStyle=hl; ctx.fillText(g.ch,0,-g.size*.03);
+      ctx.globalCompositeOperation='source-over';
+
+      ctx.restore();
     }
+
+    // hard-hide canvas when effectively invisible (prevents mobile ghosting)
+    canvas.style.opacity = a <= 0.02 ? '0' : '1';
+
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
@@ -731,7 +780,6 @@ secs.forEach(s=>io.observe(s));
     // Make the loader cells start TINY and become VERY HUGE by 100%
     const t = easeOutCubic(display);
     if (window.__loaderUniforms) {
-      // Bigger at end => smaller uScale value. Tweak the 0.03 lower-bound to go even bigger (e.g., 0.02 or 0.015)
       window.__loaderUniforms.uScale.value = lerp(2400.0, 0.001, t);
     }
 
@@ -775,7 +823,6 @@ secs.forEach(s=>io.observe(s));
         vec2 uv = gl_FragCoord.xy / uRes;
         uv = (uv - 1.5) * vec2(uRes.x/uRes.y, 8000.0);
 
-        // rotate by ~-30 degrees, then apply dynamic zoom via uScale
         float a = -0.05;
         mat2 R = mat2(cos(a), -sin(a), sin(a), cos(a));
         uv = R * (uv * uScale);
@@ -792,7 +839,7 @@ secs.forEach(s=>io.observe(s));
     depthWrite:false, depthTest:false
   });
   scene.add(new THREE.Mesh(quad,material));
-  // Expose uniforms so tick() can set uScale as progress animates
+  // Expose uniforms
   window.__loaderUniforms = uniforms;
 
   function resize(){
