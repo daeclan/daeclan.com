@@ -591,7 +591,7 @@ secs.forEach(s=>io.observe(s));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.style.display='none'})
 })();
 
-/* Marquee — tie orange fill + neon to the SAME fade, no initial expansion */
+/* ==== MARQUEE: restore push-out + tie orange alpha to same fade (desktop + mobile) ==== */
 (function(){
   const canvas=document.getElementById('heroMarquee');
   if(!canvas) return;
@@ -644,7 +644,7 @@ secs.forEach(s=>io.observe(s));
   resize(); addEventListener('resize',resize,{passive:true});
   addEventListener('orientationchange',()=>setTimeout(resize,150),{passive:true});
 
-  // progress: 0 at top of hero, 1 after you've scrolled past hero
+  // 0 at hero top, 1 after leaving the hero; use same alpha for orange + neon
   function fadeProgress(){
     if(!spacer) return 0;
     const rect=spacer.getBoundingClientRect();
@@ -658,20 +658,23 @@ secs.forEach(s=>io.observe(s));
 
   function draw(tms){
     const t=tms*.001; ctx.clearRect(0,0,W,H);
-    const s = fadeProgress();         // 0 → 1 as you leave hero
-    const a = Math.max(0, 1 - s*1.25);// alpha for BOTH orange + neon
+    const s = fadeProgress();
+    const fade = Math.max(0, 1 - s*1.05);   // shared alpha for both layers
+    const isM = innerWidth<=560;
+    const k = isM ? 2.25 : 1.20;            // push-out multiplier (bigger on mobile)
 
     for(const g of glyphs){
       const buoy=Math.sin(t*1.2+g.phase)*(g.amp);
-      const px=g.x;                    // no expansion/shift at load
-      const py=g.y+buoy;
+      const dx=g.x-center.x, dy=g.y-center.y;
+      const px=g.x + dx*k*s;
+      const py=g.y + dy*k*s + buoy;
 
       ctx.save();
       ctx.translate(px,py);
       ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015);
-      ctx.globalAlpha=a;
+      ctx.globalAlpha=fade;
 
-      // orange fill
+      // orange fill (shares alpha)
       ctx.font=`900 ${g.size}px "Clash Display",system-ui,sans-serif`;
       ctx.textAlign='center'; ctx.textBaseline='middle';
       ctx.fillStyle=g.color;
@@ -683,7 +686,7 @@ secs.forEach(s=>io.observe(s));
       ctx.lineWidth=Math.max(1.5,g.size*.05); ctx.strokeStyle='rgba(0,0,0,.65)';
       ctx.strokeText(g.ch,0,0);
 
-      // neon face highlight — shares same alpha
+      // neon highlight (same alpha)
       ctx.globalCompositeOperation='lighter';
       const hl=ctx.createLinearGradient(-g.size*.3,-g.size*.25,g.size*.3,-g.size*.25);
       hl.addColorStop(0,'rgba(255,255,255,0)');
@@ -695,8 +698,8 @@ secs.forEach(s=>io.observe(s));
       ctx.restore();
     }
 
-    // hard-hide canvas when effectively invisible (prevents mobile ghosting)
-    canvas.style.opacity = a <= 0.02 ? '0' : '1';
+    // hard hide when effectively invisible (prevents mobile ghosting)
+    canvas.style.opacity = fade <= 0.02 ? '0' : '1';
 
     requestAnimationFrame(draw);
   }
@@ -755,7 +758,6 @@ secs.forEach(s=>io.observe(s));
 
 /* ----------------- LOADER ----------------- */
 (function(){
-  // helpers
   const clamp=(x,min,max)=>Math.max(min,Math.min(max,x));
   const lerp=(a,b,t)=>a+(b-a)*t;
   const easeOutCubic=t=>1-Math.pow(1-t,3);
@@ -764,20 +766,17 @@ secs.forEach(s=>io.observe(s));
   const pctEl=document.getElementById('loaderPct');
   const barEl=document.querySelector('#loaderBar span');
 
-  // springy % display + bar width
   let display=0,target=0,vel=0,last=performance.now(), raf=null;
   function spring(dt){const k=18,c=24;const x=display-target;const a=-k*x-c*vel;vel+=a*dt;display=Math.min(1,Math.max(0,display+vel*dt))}
   function tick(now=performance.now()){
     const dt=Math.min((now-last)/1000,0.033); last=now; spring(dt);
 
-    // Update text/Bar
     pctEl.textContent=Math.round(display*100)+'%';
     pctEl.style.setProperty('--prog', display);
     pctEl.setAttribute('data-prog','');
     barEl.style.setProperty('--p', String(display));
     if(display>0.02){ barEl.classList.add('active'); } else { barEl.classList.remove('active'); }
 
-    // Make the loader cells start TINY and become VERY HUGE by 100%
     const t = easeOutCubic(display);
     if (window.__loaderUniforms) {
       window.__loaderUniforms.uScale.value = lerp(2400.0, 0.001, t);
@@ -787,7 +786,6 @@ secs.forEach(s=>io.observe(s));
   }
   function setTarget(v){target=Math.max(target, Math.min(1,v)); if(!raf) raf=requestAnimationFrame(tick);}
 
-  /* Loader background shader */
   const canvas=document.getElementById('loaderGL');
   const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false,preserveDrawingBuffer:false});
   const scene=new THREE.Scene();
@@ -839,7 +837,6 @@ secs.forEach(s=>io.observe(s));
     depthWrite:false, depthTest:false
   });
   scene.add(new THREE.Mesh(quad,material));
-  // Expose uniforms
   window.__loaderUniforms = uniforms;
 
   function resize(){
@@ -856,7 +853,6 @@ secs.forEach(s=>io.observe(s));
     requestAnimationFrame(loop);
   })();
 
-  // LoadingManager to drive progress
   const manager=new THREE.LoadingManager();
   manager.onProgress=(url,loaded,total)=>{
     const p = total? loaded/total : (loaded?0.5:0.2);
@@ -864,15 +860,12 @@ secs.forEach(s=>io.observe(s));
   };
   manager.onError=()=>setTarget(Math.min(0.85, target+0.05));
 
-  // Count a few assets (gate some site assets so the loader is real)
   const texLoader=new THREE.TextureLoader(manager);
   ["https://f4.bcbits.com/img/a3715201532_16.jpg","/assets/DQAI.gif","https://f4.bcbits.com/img/a0932996697_16.jpg"].forEach(src=>texLoader.load(src,()=>{},()=>{},()=>{}));
 
-  // Gate the UI on fonts (prevents FOUT)
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>document.documentElement.classList.add('fonts-ready')); }
   else { document.documentElement.classList.add('fonts-ready'); }
 
-  // Early “alive” nudge so it never looks frozen
   setTimeout(()=>{ if(target<0.25) setTarget(0.25); }, 250);
 
   function waitFor(name, timeout=6000){
@@ -895,9 +888,8 @@ secs.forEach(s=>io.observe(s));
       if (Math.round(display*100) < 100) { requestAnimationFrame(revealWhenReady); return; }
       siteHatch.classList.add('open');
       setTimeout(()=>{
-        document.documentElement.classList.remove('loading'); // single white fade
+        document.documentElement.classList.remove('loading');
         document.documentElement.classList.add('loader-done');
-        // cleanup
         setTimeout(()=>{
           const l=document.getElementById('loader'); if(l&&l.parentNode) l.parentNode.removeChild(l);
           const h=siteHatch; if(h&&h.parentNode) h.parentNode.removeChild(h);
@@ -913,7 +905,6 @@ secs.forEach(s=>io.observe(s));
   const rail=document.getElementById('mixRail');
   if(!rail) return;
 
-  // Remaining slugs in order:
   const slugs=[
     "%2Fdegh%2Fthe-bigger-picture-ss-19-mix%2F",
     "%2Fdegh%2Fthatll-be-the-danger-fw-18-collection%2F",
