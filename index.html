@@ -57,6 +57,17 @@ html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forw
 #loaderPct{font-size: clamp(120px,22vw,360px);font-weight:900;line-height:.9;letter-spacing:-.01em;color:var(--accent);display:block;text-align:center;font-variant-numeric:tabular-nums;-webkit-text-stroke:1px rgba(0,0,0,.45);text-shadow:0 0 24px rgba(255,122,24,.3),0 0 60px rgba(255,122,24,.22);font-family:"Clash Display",system-ui,sans-serif;}
 #loaderPct[data-prog]{filter:brightness(calc(.72 + (var(--prog,0) * .65))) drop-shadow(0 0 calc(18px + 46px * var(--prog,0)) rgba(255,122,24,.5));transition:filter .22s ease,text-shadow .22s ease}
 
+/* Pre-numbers blinking LOADING... */
+#preloadMsg{
+  position:absolute; inset:0; display:grid; place-items:center; z-index:3;
+  font: 700 28px/1.1 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  letter-spacing:.08em; text-transform:uppercase; color:#000;
+  animation: blink 2s steps(1,end) infinite; /* 1s on, 1s off */
+}
+@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+/* hide the placeholder once real loader UI is ready */
+html.fonts-ready #preloadMsg{display:none}
+
 /* Progress bar */
 #loaderBar{--p:0;position:relative;width:min(560px,80vw);height:12px;border-radius:999px;background:#000;border:1px solid #222;overflow:hidden;box-shadow:inset 0 0 0 1px #141414, 0 8px 28px rgba(255,122,24,.08);opacity:0;transform:translateY(4px)}
 html.fonts-ready #loaderBar{animation:barIn .28s .05s cubic-bezier(.22,.61,.36,1) forwards}
@@ -172,7 +183,13 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
 #music .desc{text-transform:lowercase}
 
 /* ==== WORMHOLE CONTROL SECTION ==== */
-#control{min-height:calc(100svh - var(--header));display:flex;align-items:center}
+#control .control-spacer{
+  height:calc(100svh - var(--header));
+  min-height:calc(100svh - var(--header));
+  width:100%;
+}
+
+/* keep the old control-panel style unused (preserved) */
 .control-wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;width:100%}
 .control-panel{background:#000;border:1px solid var(--line);border-radius:12px;padding:22px}
 .control-panel h2{margin:0 0 8px;font-size:22px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
@@ -185,9 +202,14 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
 <div id="loader" aria-label="Site loading">
   <div id="loaderStage">
     <canvas id="loaderGL" aria-hidden="true"></canvas>
-    <div class="loader-ui">
+
+    <!-- Only this shows first: blinking LOADING... -->
+    <div id="preloadMsg">LOADING...</div>
+
+    <!-- Real loader UI appears when ready; replaces the placeholder -->
+    <div class="loader-ui" aria-live="polite">
       <div class="loader-stack">
-        <span id="loaderPct" aria-live="polite">0%</span>
+        <span id="loaderPct">0%</span>
         <span id="loaderLabel">THANK YOU FOR WAITING :)</span>
       </div>
       <div id="loaderBar" aria-hidden="true"><span></span></div>
@@ -212,6 +234,7 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
       <a href="#web">WEB&nbsp;PROJECTS</a>
       <a href="#writing">WRITING</a>
       <a href="#acting">ACTING</a>
+      <a href="#control">WORMHOLE</a>
       <a href="#contact">CONTACT</a>
     </nav>
     <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false">Menu</button>
@@ -222,6 +245,7 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
       <a href="#web">WEB PROJECTS</a>
       <a href="#writing">WRITING</a>
       <a href="#acting">ACTING</a>
+      <a href="#control">WORMHOLE</a>
       <a href="#contact">CONTACT</a>
     </div>
   </nav>
@@ -455,7 +479,13 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     </div>
   </section>
 
-  <!-- CONTACT -->
+  <!-- WORMHOLE CONTROL (section head + full-viewport interaction zone) -->
+  <section id="control" class="section">
+    <div class="section-head"><h2 class="title">WORMHOLE CONTROL ↓</h2><p class="subtitle">the more you tap, the faster we go…</p></div>
+    <div class="control-spacer" aria-hidden="true"></div>
+  </section>
+
+  <!-- CONTACT (moved after WORMHOLE) -->
   <section id="contact" class="section container">
     <div class="section-head"><h2 class="title">CONTACT</h2><p class="subtitle">bookings, collabs, or share your deepest darkest secret</p></div>
     <div class="narrow">
@@ -475,16 +505,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
           </a>
         </div>
       </div></div>
-    </div>
-  </section>
-
-  <!-- WORMHOLE CONTROL (full-screen view / interaction zone) -->
-  <section id="control" class="section">
-    <div class="control-wrap">
-      <div class="control-panel">
-        <h2>WORMHOLE CONTROL</h2>
-        <p>the more you tap, the faster we go&hellip; (tap anywhere to make ripples. speed persists as you scroll.)</p>
-      </div>
     </div>
   </section>
 
@@ -569,7 +589,7 @@ secs.forEach(s=>io.observe(s));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.style.display='none'})
 })();
 
-/* ==== MARQUEE: stronger mobile push-out + hard fade ==== */
+/* ==== MARQUEE ==== (unchanged except layout tweaks earlier) */
 (function(){
   const canvas=document.getElementById('heroMarquee');
   if(!canvas) return;
@@ -637,9 +657,9 @@ secs.forEach(s=>io.observe(s));
   function draw(tms){
     const t=tms*.001; ctx.clearRect(0,0,W,H);
     const s = fadeProgress();
-    const fade = Math.max(0, 1 - s*1.15); // stronger fade
+    const fade = Math.max(0, 1 - s*1.15);
     const isM = innerWidth<=560;
-    const k = isM ? 3.0 : 1.25;           // stronger mobile push-out
+    const k = isM ? 3.0 : 1.25;
 
     for(const g of glyphs){
       const buoy=Math.sin(t*1.2+g.phase)*(g.amp);
@@ -669,14 +689,13 @@ secs.forEach(s=>io.observe(s));
       ctx.globalCompositeOperation='source-over';
       ctx.restore();
     }
-    // hard hide to guarantee it's gone on mobile
     canvas.style.opacity = fade <= 0.01 ? '0' : '1';
     requestAnimationFrame(draw);
   }
   requestAnimationFrame(draw);
 })();
 
-/* Wormhole shader + CONTROL/tap ripples & much faster speed */
+/* Wormhole shader + CONTROL/tap ripples (localized) + permanent speed boost */
 (function(){
   const canvas=document.getElementById('bgScene'); if(!canvas) return;
   const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
@@ -686,24 +705,24 @@ secs.forEach(s=>io.observe(s));
   const fsrc=`#version 300 es
   precision highp float; in vec2 vUv; out vec4 frag;
   uniform vec2 uRes; uniform float uTime; uniform float uSpin; uniform float uTravel; uniform float uAmp; uniform float uDir;
-  uniform int uRippleCount; uniform vec3 uRipples[8]; // xy in pixels, z = startTime
+  uniform int uRippleCount; uniform vec3 uRipples[8]; // xy in pixels (bottom-left origin), z = startTime
 
   vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.48,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.);}
   mat2 r(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c);}
 
-  // stronger, longer ripples
+  // localized, longer ripples (~7s)
   vec2 rippleOffset(vec2 fragPx){
     vec2 off = vec2(0.0);
     for(int i=0;i<8;i++){
       if(i>=uRippleCount) break;
       vec3 rp = uRipples[i];
       float age = uTime - rp.z;
-      if(age>6.0) continue;                // lifetime up to 6s
+      if(age>7.0) continue;
       float d = distance(fragPx, rp.xy);
-      float w = 0.010 + age*0.014;         // slower spreading
-      float env = exp(-d*(0.0022 + age*0.0012)); // slower falloff
+      float w = 0.010 + age*0.014;
+      float env = exp(-d*(0.0022 + age*0.0012));
       float wave = sin(d*w - age*8.5);
-      off += env*wave*vec2(0.020,0.010);   // bigger displacement
+      off += env*wave*vec2(0.022,0.012);   // displacement
     }
     return off;
   }
@@ -742,7 +761,7 @@ secs.forEach(s=>io.observe(s));
   }
   resize(); addEventListener('resize',resize,{passive:true});
 
-  // scroll reactive
+  // scroll reactive (unchanged)
   let spin=0,travel=0,amp=0,dir=1,lastY=scrollY;
   addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,Math.min(.75,Math.abs(dy)*.005)+amp);}}, {passive:true});
 
@@ -772,30 +791,31 @@ secs.forEach(s=>io.observe(s));
     while(ripples.length>8) ripples.shift();
   }
 
-  // way faster speed boost
+  // permanent speed boost
   let boost=0;
   function tap(e){
     if(!(document.documentElement.classList.contains('at-bottom') || document.documentElement.classList.contains('in-control'))) return;
     const rect=canvas.getBoundingClientRect();
     const dpr = Math.min(Math.max(1,devicePixelRatio||1),2.5);
-    const x=(e.clientX-rect.left)*dpr, y=(e.clientY-rect.top)*dpr;
+    // Map to canvas pixels; flip Y to bottom-left origin for shader coords
+    let x=(e.clientX-rect.left)*dpr;
+    let y=(e.clientY-rect.top)*dpr;
+    y = (canvas.height) - y; // flip Y so ripple is exactly at tap
     addRipple(x,y);
-    boost = Math.min(12.0, boost + 0.9); // bigger kick per tap
+    boost = Math.min(9999.0, boost + 1.2); // dramatic, accumulative
   }
   addEventListener('pointerdown',tap,{passive:true});
 
   (function loop(){
     const now=performance.now()*0.001;
-    // faster base + slower decay so it's noticeable
-    boost *= 0.992;                               // lingers longer
-    const base = 0.35;
-    const rate = base * (1.0 + boost*1.25);       // much faster
+    // no decay — keep speed gained from taps
+    const rate = 0.35 * (1.0 + boost*1.25);
     travel += rate * (1/60);
     spin   += 0.10 * (1/60);
     amp = Math.max(0,amp-(1/60)/2);
 
-    // purge old ripples
-    for(let i=ripples.length-1;i>=0;i--){ if(now - ripples[i].start > 6.2) ripples.splice(i,1); }
+    // purge old ripples (~7s)
+    for(let i=ripples.length-1;i>=0;i--){ if(now - ripples[i].start > 7.05) ripples.splice(i,1); }
 
     // uniforms
     gl.uniform1f(uTime, now); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
