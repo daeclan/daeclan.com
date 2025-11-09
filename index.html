@@ -13,9 +13,10 @@
 :root{--bg:#0a0a0a;--panel:#111215;--fg:#f5f5f6;--muted:#b6b8bf;--line:#1d1e22;--accent:#ff7a18;--accent2:#ffb566;--r:14px;--maxw:1160px;--header:68px;--tight:.62;--narrow:600px;--fadein-duration:4s}
 @media (min-width:861px){:root{--tight:.56}}
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{min-height:100dvh;background:#000}
+@supports(min-height:100svh){html,body{min-height:100svh}}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column;padding-top:var(--header)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column;padding-top:var(--header);overscroll-behavior-y:contain}
 .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 a{text-decoration:none;color:inherit}
 
@@ -30,77 +31,18 @@ html.bg-ready #loaderGL{opacity:1}
 html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forwards}
 @keyframes uiIn{to{opacity:1;transform:none}}
 .loader-stack{display:flex;flex-direction:column;align-items:center;gap:6px}
-
-#loaderLabel{
-  font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--accent);opacity:.98;
-  font-family:"Clash Display",system-ui,sans-serif;
-  font-size:12px;
-}
-/* Loader % — restored cinematic scale & glow */
-#loaderPct{
- font-size: clamp(120px,22vw,360px);
-  font-weight: 900;
-  line-height: .9;
-  letter-spacing: -.01em;
-  color: var(--accent);
-  display:block; min-width:auto; text-align:center;
-
-  /* crisp numerals */
-  font-variant-numeric: tabular-nums;
-  font-feature-settings:"tnum" 1;
-
-  /* optical polish */
-  -webkit-text-stroke: 1px rgba(0,0,0,.45);
-  text-shadow:
-    0 0 24px rgba(255,122,24,.30),
-    0 0 60px rgba(255,122,24,.22);
-  font-family:"Clash Display",system-ui,sans-serif;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-}
-
-/* dynamic brightness tied to progress (kept) */
-#loaderPct[data-prog]{
-  filter: brightness(calc(.72 + (var(--prog,0) * .65)))
-          drop-shadow(0 0 calc(18px + 46px * var(--prog,0)) rgba(255,122,24,.50));
-  transition: filter .22s ease, text-shadow .22s ease;
-}
-
-/* ✨ Fancy progress bar (left → right fill, shimmer only on orange fill) */
-#loaderBar{
-  --p:0;
-  position:relative;
-  width:min(560px,80vw);height:12px;border-radius:999px;
-  background:#000;border:1px solid #222;overflow:hidden;
-  box-shadow:inset 0 0 0 1px #141414, 0 8px 28px rgba(255,122,24,.08);
-  opacity:0;transform:translateY(4px)
-}
+#loaderLabel{font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);opacity:.98;font-family:"Clash Display",system-ui,sans-serif;font-size:12px}
+#loaderPct{font-size:clamp(120px,22vw,360px);font-weight:900;line-height:.9;letter-spacing:-.01em;color:var(--accent);display:block;min-width:auto;text-align:center;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;-webkit-text-stroke:1px rgba(0,0,0,.45);text-shadow:0 0 24px rgba(255,122,24,.30),0 0 60px rgba(255,122,24,.22);font-family:"Clash Display",system-ui,sans-serif;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+#loaderPct[data-prog]{filter:brightness(calc(.72 + (var(--prog,0) * .65))) drop-shadow(0 0 calc(18px + 46px * var(--prog,0)) rgba(255,122,24,.50));transition:filter .22s ease, text-shadow .22s ease}
+#loaderBar{--p:0;position:relative;width:min(560px,80vw);height:12px;border-radius:999px;background:#000;border:1px solid #222;overflow:hidden;box-shadow:inset 0 0 0 1px #141414,0 8px 28px rgba(255,122,24,.08);opacity:0;transform:translateY(4px)}
 html.fonts-ready #loaderBar{animation:barIn .28s .05s cubic-bezier(.22,.61,.36,1) forwards}
 @keyframes barIn{to{opacity:1;transform:none}}
-#loaderBar span{
-  position:absolute;left:0;top:0;height:100%;
-  width:calc(var(--p)*100%);border-radius:inherit;
-  background:
-    linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,0)) ,
-    linear-gradient(90deg,var(--accent) 0%, var(--accent2) 60%, #ffdca7 100%);
-  filter:saturate(1.15);
-  transition:width .16s cubic-bezier(.22,.61,.36,1);
-  box-shadow:0 0 18px rgba(255,122,24,.35), 0 0 2px rgba(255,255,255,.3) inset;
-  overflow:hidden;
-}
-#loaderBar span::after{
-  content:""; position:absolute; top:-40%; bottom:-40%;
-  width:120px; left:-140px;
-  background:radial-gradient(60px 100% at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);
-  mix-blend-mode:screen; pointer-events:none;
-  animation:spark 1.4s linear infinite;
-  opacity:0;
-}
-#loaderBar span.active::after{ opacity:1; }
+#loaderBar span{position:absolute;left:0;top:0;height:100%;width:calc(var(--p)*100%);border-radius:inherit;background:linear-gradient(90deg,rgba(255,255,255,.12),rgba(255,255,255,0)),linear-gradient(90deg,var(--accent) 0%,var(--accent2) 60%,#ffdca7 100%);filter:saturate(1.15);transition:width .16s cubic-bezier(.22,.61,.36,1);box-shadow:0 0 18px rgba(255,122,24,.35),0 0 2px rgba(255,255,255,.3) inset;overflow:hidden}
+#loaderBar span::after{content:"";position:absolute;top:-40%;bottom:-40%;width:120px;left:-140px;background:radial-gradient(60px 100% at 50% 50%,rgba(255,255,255,.65),rgba(255,255,255,0) 70%);mix-blend-mode:screen;pointer-events:none;animation:spark 1.4s linear infinite;opacity:0}
+#loaderBar span.active::after{opacity:1}
 @keyframes spark{to{transform:translateX(calc(100% + 280px));}}
 
-/* ===== SITE HATCH (covers the site, not the loader) ===== */
+/* ===== SITE HATCH ===== */
 #siteHatch{position:fixed;inset:0;z-index:2500;pointer-events:none}
 #siteHatch .door{position:absolute;left:0;right:0;height:50%;background:#000;transform:translateY(0);transition:transform .55s cubic-bezier(.22,.61,.36,1)}
 #siteHatch .door.top{top:0;border-bottom:1px solid #111}
@@ -108,12 +50,12 @@ html.fonts-ready #loaderBar{animation:barIn .28s .05s cubic-bezier(.22,.61,.36,1
 #siteHatch.open .door.top{transform:translateY(-100%)}
 #siteHatch.open .door.bot{transform:translateY(100%)}
 
-/* Single intro white fade (no pre-flash) */
+/* Intro white fade */
 #fadeIn{position:fixed;inset:0;background:#fff;z-index:5000;pointer-events:none;animation:fadeOut var(--fadein-duration) ease forwards}
 html.loading #fadeIn{display:none}
 @keyframes fadeOut{from{opacity:1}to{opacity:0}}
 
-/* ===== HEADER always visible (fixed) ===== */
+/* ===== HEADER ===== */
 header{position:fixed;left:0;right:0;top:0;z-index:3000;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
 .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
 .brand{font-weight:700;letter-spacing:.3px}
@@ -132,7 +74,7 @@ nav.primary a.active::after{content:"";position:absolute;left:0;right:0;bottom:-
 #mobileNav .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
 #mobileNav a{display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2));text-transform:uppercase;font-family:"Clash Display",system-ui,sans-serif}
 
-/* blur background only when menu open */
+/* blur bg when menu open */
 .menu-open main,.menu-open footer,.menu-open #bgScene,.menu-open #heroMarquee,.menu-open .heroSpacer{filter:blur(10px) saturate(.9) brightness(.9);transition:filter .2s ease;pointer-events:none}
 
 /* sections */
@@ -146,8 +88,10 @@ section{scroll-margin-top:calc(var(--header) + 14px)}
 /* layers */
 main{position:relative;z-index:2;flex:1}
 #bgScene{position:fixed;left:0;right:0;bottom:0;top:var(--header);z-index:0;pointer-events:none}
-#heroMarquee{position:fixed;inset:var(--header) 0 0 0;z-index:1;pointer-events:none;width:100vw;height:calc(100svh - var(--header));transition:opacity .2s ease}
-.heroSpacer{height:calc(100svh - var(--header));min-height:calc(100svh - var(--header));max-width:var(--maxw);margin:0 auto}
+#heroMarquee{position:fixed;inset:var(--header) 0 0 0;z-index:1;pointer-events:none;width:100vw;height:calc(100dvh - var(--header));transition:opacity .2s ease}
+@supports(height:100svh){#heroMarquee{height:calc(100svh - var(--header))}}
+.heroSpacer{height:calc(100dvh - var(--header));min-height:calc(100dvh - var(--header));max-width:var(--maxw);margin:0 auto}
+@supports(height:100svh){.heroSpacer{height:calc(100svh - var(--header));min-height:calc(100svh - var(--header))}}
 
 /* grid + cards etc. */
 .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
@@ -199,9 +143,18 @@ main{position:relative;z-index:2;flex:1}
 #contact .card{background:var(--panel);border:1px solid var(--line);border-radius:14px}
 #contact .icon-btn{width:40px;height:40px}
 .footer-gap{height:16px}
+@media (max-width:860px){.footer-gap{height:96px}}
 footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#000}
-.footer-inner{max-width:var(--maxw);margin:0 auto;padding:10px 20px;display:flex;align-items:center}
-.footer-inner small{font-size:12px;color:var(--accent);font-weight:700}
+.footer-inner{max-width:var(--maxw);margin:0 auto;padding:10px 20px calc(10px + env(safe-area-inset-bottom,0px));display:flex;align-items:center}
+.footer-inner small{font-size:12px;color:#ff7a18;font-weight:700}
+
+/* Bottom mask: hidden by default; only shows at page bottom */
+#bottomMask{
+  position:fixed;left:0;right:0;bottom:0;
+  height:0; opacity:0;
+  background:#000; z-index:1; /* under main (2) & footer (3), above bgScene(0) */
+  pointer-events:none; transition:opacity .15s ease;
+}
 </style>
 </head>
 
@@ -220,13 +173,13 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
   </div>
 </div>
 
-<!-- Hatch sits over the SITE (not covering the loader) -->
+<!-- Hatch over site -->
 <div id="siteHatch" aria-hidden="true">
   <div class="door top"></div>
   <div class="door bot"></div>
 </div>
 
-<!-- Single white fade (no pre-flash) -->
+<!-- Single white fade -->
 <div id="fadeIn" aria-hidden="true"></div>
 
 <header>
@@ -341,11 +294,29 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     <div class="grid" style="margin-top:22px;">
       <article class="col-12 mixes-card">
         <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
-        <div class="mix-rail">
+        <div class="mix-rail" id="mixRail">
+          <!-- First 5 eager-loaded -->
           <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fits-all-illusions-winter-24-mix%2F" title="IT'S ALL ILLUSIONS (winter '24 mix)"></iframe>
           <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fdegh-vs-the-unblinking-giants-summer-23-mix%2F" title="DEGH vs the Unblinking Giants (summer '23)"></iframe>
           <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-absurd-spring-22-mini-mix%2F" title="it's absurd (spring '22)"></iframe>
-          <!-- ...rest unchanged... -->
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwhat-is-left-winter-mix-21%2F" title="what is left (winter '21)"></iframe>
+          <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-a-fucking-feeling-midwinter-mix-20%2F" title="it's a fucking feeling (midwinter '20)"></iframe>
+          <!-- Deferred -->
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthe-bigger-picture-ss-19-mix%2F" title="the bigger picture (SS '19)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthatll-be-the-danger-fw-18-collection%2F" title="that’ll be the danger (FW '18)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fchicago-summer-breeze-ss-18-mix%2F" title="chicago summer breeze (SS '18)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwear-it-in-health-ss-17-mix%2F" title="wear it in health (SS '17)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwdtm-radio-volume-i%2F" title="WDTM Radio Vol. I"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-imagination-early-summer-mix-16%2F" title="pure imagination (early summer '16)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fleap-of-faith-spring-16-mix%2F" title="leap of faith (spring '16)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fno-meat-just-sauce-mardi-gras-mini-mix-2016%2F" title="no meat just sauce (Mardi Gras '16)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fthrow-the-book-winter-15-mini-mix%2F" title="throw the book (winter '15)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fpure-solid-gold-summer-15-mini-mix%2F" title="pure solid gold (summer '15)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fdiane-its-1227pm-winter-15-mini-mix%2F" title="diane it’s 12:27pm (winter '15)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fhallolean-fall-14-mini-mix%2F" title="hallolean (fall '14)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fice-cold-coach-house-winter-14-mini-mix%2F" title="ice cold coach house (winter '14)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fwinter-time-temple-november-2013%2F" title="winter time temple (Nov 2013)"></iframe>
+          <iframe class="mix-embed deferred" loading="lazy" data-src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fddgh-radio-1-essental-mix-degh-march-2013%2F" title="DDGH Radio 1 Essential Mix (Mar 2013)"></iframe>
         </div>
         <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
       </article>
@@ -473,7 +444,7 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     <div class="narrow">
       <div class="card"><div class="card-body">
         <div class="actions center" style="gap:14px;flex-wrap:wrap">
-          <a class="icon-btn" href="mailto:hello@example.com" aria-label="Email">
+          <a class="icon-btn" href="mailto:declxn@gmail.com" aria-label="Email">
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M2.25 6.75h19.5v10.5H2.25z"/><path d="M2.25 6.75 12 13.5l9.75-6.75" fill="none" stroke="#0c0d10" stroke-width="2"/></svg>
           </a>
           <a class="icon-btn" href="https://www.facebook.com/declxn" target="_blank" aria-label="Facebook">
@@ -512,6 +483,9 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     <img src="/assets/headshot4.jpg" alt="Headshot 4" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;border:1px solid var(--line)">
   </div>
 </dialog>
+
+<!-- bottom mask (hidden by default; only shows at page bottom) -->
+<div id="bottomMask" aria-hidden="true"></div>
 
 <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
@@ -571,7 +545,7 @@ secs.forEach(s=>io.observe(s));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.style.display='none'})
 })();
 
-/* Marquee — mobile-proof fade based on heroSpacer position */
+/* Marquee */
 (function(){
   const canvas=document.getElementById('heroMarquee');
   if(!canvas) return;
@@ -581,13 +555,11 @@ secs.forEach(s=>io.observe(s));
   const spacer=document.querySelector('.heroSpacer');
   let W=1,H=1,glyphs=[],center={x:0,y:0};
 
-  function headerH(){
-    return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
-  }
+  function headerH(){return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;}
   function resize(){
     const hH=headerH();
-    const w=innerWidth;
-    const h=Math.max(1,Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight)-hH);
+    const baseH = Math.max(innerHeight, (window.visualViewport?visualViewport.height:innerHeight));
+    const w=innerWidth, h=Math.max(1,baseH-hH);
     W=(w*DPR)|0; H=(h*DPR)|0; canvas.width=W; canvas.height=H; canvas.style.width=w+'px'; canvas.style.height=h+'px';
     center={x:W/2,y:H/2}; layout();
     window.dispatchEvent(new Event('marquee:ready'));
@@ -618,7 +590,7 @@ secs.forEach(s=>io.observe(s));
 
   function draw(tms){
     const t=tms*.001; ctx.clearRect(0,0,W,H);
-    const s=fadeProgress(); const fade=1-s; // 1 → 0 as you scroll through the hero
+    const s=fadeProgress(); const fade=1-s;
     for(const g of glyphs){
       const buoy=Math.sin(t*1.2+g.phase)*(g.amp); const dx=g.x-center.x, dy=g.y-center.y;
       const px=g.x+dx*1.2*s; const py=g.y+dy*1.2*s+buoy;
@@ -634,7 +606,7 @@ secs.forEach(s=>io.observe(s));
   requestAnimationFrame(draw);
 })();
 
-/* Wormhole shader (unchanged) */
+/* Wormhole shader */
 (function(){
   const canvas=document.getElementById('bgScene'); if(!canvas) return;
   const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
@@ -673,10 +645,16 @@ secs.forEach(s=>io.observe(s));
   }
   resize(); addEventListener('resize',resize,{passive:true});
   let spin=0,travel=0,amp=0,dir=1,lastY=scrollY,last=performance.now();
-  addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,amp+Math.min(.6,Math.abs(dy)*.004));}},{passive:true});
+  addEventListener('scroll', () => {
+    const y = scrollY, dy = y - lastY; lastY = y;
+    if (dy) {
+      dir = dy < 0 ? 1 : -1;
+      amp = Math.min(1, amp + Math.min(.6, Math.abs(dy) * .004));
+    }
+  }, { passive: true });
   (function loop(){
     const now=performance.now(),dt=Math.min((now-last)/1000,.033); last=now;
-    travel+=0.25*dt;  spin+=0.08*dt;  amp=Math.max(0,amp-dt/2);
+    travel+=0.25*dt; spin+=0.08*dt; amp=Math.max(0,amp-dt/2);
     gl.uniform1f(uTime, now*.001); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
     gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3);
     if(!window.__wormReady){ window.__wormReady=true; window.dispatchEvent(new Event('worm:ready')); }
@@ -690,7 +668,6 @@ secs.forEach(s=>io.observe(s));
   const pctEl=document.getElementById('loaderPct');
   const barEl=document.querySelector('#loaderBar span');
 
-  // springy % display + bar width
   let display=0,target=0,vel=0,last=performance.now(), raf=null;
   function spring(dt){const k=18,c=24;const x=display-target;const a=-k*x-c*vel;vel+=a*dt;display=Math.min(1,Math.max(0,display+vel*dt))}
   function tick(now=performance.now()){
@@ -704,7 +681,6 @@ secs.forEach(s=>io.observe(s));
   }
   function setTarget(v){target=Math.max(target, Math.min(1,v)); if(!raf) raf=requestAnimationFrame(tick);}
 
-  /* Loader background shader */
   const canvas=document.getElementById('loaderGL');
   const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:false,preserveDrawingBuffer:false});
   const scene=new THREE.Scene();
@@ -720,38 +696,31 @@ secs.forEach(s=>io.observe(s));
       uniform float uTime;
       uniform float uProg;
       uniform float uScale;
-
       vec3 hsv2rgb(vec3 c){
         vec3 p = abs(fract(c.x + vec3(0., 2./3., 1./3.)) * 6. - 3.);
         vec3 rgb = clamp(p - 1., 0., 1.);
         return c.z * mix(vec3(1.), rgb, c.y);
       }
-
       float bands(vec2 uv, float t, float prog){
         float baseSpeed = mix(0.15, 1.6, prog);
         float kx = 18.0, ky = 14.0;
         float wig = 0.22*sin(uv.x*kx - t*baseSpeed*1.6) + 0.18*sin(uv.y*ky - t*baseSpeed*1.2);
-        float w = uv.y + wig;              // flow axis = +y
+        float w = uv.y + wig;
         float stripe = smoothstep(0.03, 0.0, abs(fract(w*8.5) - 0.5));
         return stripe;
       }
-
       void main(){
         vec2 uv = gl_FragCoord.xy / uRes;
         uv = (uv - 1.5) * vec2(uRes.x/uRes.y, 8000.0);
-
-        // rotate by ~-30 degrees, then zoom out 5x
         float a = -0.05;
         mat2 R = mat2(cos(a), -sin(a), sin(a), cos(a));
         uv = R * (uv * uScale);
-
         float m = bands(uv, uTime, uProg);
         float gray = m;
         float hue   = fract( (uv.y*0.22) + (uTime*0.08) );
         vec3  color = hsv2rgb(vec3(hue, 0.98, 1.7)) * m;
         float p = smoothstep(0.0, 1.0, uProg);
         vec3 col = mix(vec3(gray), color, p);
-
         gl_FragColor = vec4(col, 1.0);
       }`,
     depthWrite:false, depthTest:false
@@ -772,7 +741,6 @@ secs.forEach(s=>io.observe(s));
     requestAnimationFrame(loop);
   })();
 
-  // LoadingManager to drive progress
   const manager=new THREE.LoadingManager();
   manager.onProgress=(url,loaded,total)=>{
     const p = total? loaded/total : (loaded?0.5:0.2);
@@ -780,15 +748,12 @@ secs.forEach(s=>io.observe(s));
   };
   manager.onError=()=>setTarget(Math.min(0.85, target+0.05));
 
-  // Count a few assets
   const texLoader=new THREE.TextureLoader(manager);
   ["https://f4.bcbits.com/img/a3715201532_16.jpg","/assets/DQAI.gif","https://f4.bcbits.com/img/a0932996697_16.jpg"].forEach(src=>texLoader.load(src,()=>{},()=>{},()=>{}));
 
-  // Gate the UI on fonts (prevents FOUT)
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(()=>document.documentElement.classList.add('fonts-ready')); }
   else { document.documentElement.classList.add('fonts-ready'); }
 
-  // Early “alive” nudge so it never looks frozen
   setTimeout(()=>{ if(target<0.25) setTarget(0.25); }, 250);
 
   function waitFor(name, timeout=6000){
@@ -811,9 +776,8 @@ secs.forEach(s=>io.observe(s));
       if (Math.round(display*100) < 100) { requestAnimationFrame(revealWhenReady); return; }
       siteHatch.classList.add('open');
       setTimeout(()=>{
-        document.documentElement.classList.remove('loading'); // single white fade
+        document.documentElement.classList.remove('loading');
         document.documentElement.classList.add('loader-done');
-        // cleanup
         setTimeout(()=>{
           const l=document.getElementById('loader'); if(l&&l.parentNode) l.parentNode.removeChild(l);
           const h=siteHatch; if(h&&h.parentNode) h.parentNode.removeChild(h);
@@ -822,6 +786,78 @@ secs.forEach(s=>io.observe(s));
     };
     revealWhenReady();
   });
+})();
+
+/* MixCloud deferred loader */
+(function(){
+  const rail=document.getElementById('mixRail');
+  if(!rail) return;
+  const toLoad=[...rail.querySelectorAll('iframe.mix-embed.deferred')];
+  if(!toLoad.length) return;
+
+  const loadIframe=ifr=>{
+    if(ifr.dataset.src && !ifr.src){
+      ifr.src=ifr.dataset.src;
+      ifr.removeAttribute('data-src');
+      ifr.classList.remove('deferred');
+    }
+  };
+
+  const io=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) loadIframe(e.target);
+    });
+  },{root:rail,threshold:0.2});
+
+  toLoad.forEach(el=>io.observe(el));
+
+  let ticking=false;
+  rail.addEventListener('scroll',()=>{
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{
+      const r=rail.getBoundingClientRect();
+      toLoad.slice().forEach(ifr=>{
+        const b=ifr.getBoundingClientRect();
+        const vis = (b.right > r.left) && (b.left < r.right - r.width*0.2);
+        if(vis) loadIframe(ifr);
+      });
+      ticking=false;
+    });
+  },{passive:true});
+})();
+
+/* Bottom mask: only visible at bottom (covers rubber-band area) */
+(function(){
+  const mask=document.getElementById('bottomMask');
+  const footer=document.querySelector('footer');
+  if(!mask||!footer) return;
+
+  const getVH=()=>Math.max(innerHeight,(window.visualViewport?visualViewport.height:innerHeight));
+  const getDocH=()=>Math.max(
+    document.documentElement.scrollHeight,
+    document.body.scrollHeight,
+    document.documentElement.offsetHeight
+  );
+
+  let ticking=false;
+  const update=()=>{
+    const footerH=footer.getBoundingClientRect().height||60;
+    const bottomY=window.scrollY + getVH();
+    const atBottom = bottomY >= (getDocH() - 1); // within 1px of bottom
+    if(atBottom){
+      mask.style.height=footerH+'px';
+      mask.style.opacity='1';
+    }else{
+      mask.style.height='0px';
+      mask.style.opacity='0';
+    }
+  };
+
+  const onScroll=()=>{ if(ticking) return; ticking=true; requestAnimationFrame(()=>{ update(); ticking=false; }); };
+  addEventListener('scroll', onScroll, {passive:true});
+  addEventListener('resize', onScroll, {passive:true});
+  new ResizeObserver(onScroll).observe(footer);
+  update();
 })();
 </script>
 </body>
