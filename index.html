@@ -38,7 +38,7 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;display:flex;flex-direction:column;padding-top:var(--header)}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Clash Display",system-ui,-apple-system, Segoe UI, Roboto, Helvetica, Arial;display:flex;flex-direction:column;padding-top:var(--header)}
 .container{max-width:var(--maxw);margin:0 auto;padding:0 20px}
 a{text-decoration:none;color:inherit}
 
@@ -49,6 +49,21 @@ html.loader-done #loader{opacity:0;pointer-events:none}
 #loaderStage{position:relative;width:100vw;height:100vh;display:grid;place-items:center}
 #loaderGL{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .6s ease}
 html.bg-ready #loaderGL{opacity:1}
+
+/* ==== WARP SPEED (in-section card) — kept but hidden per your new request ==== */
+.warpPanel{display:none}
+
+/* INSTANT placeholder: blinking LOADING... */
+.preload-msg{
+  position:absolute; z-index:3; inset:0; display:grid; place-items:center;
+  font: 700 28px/1.1 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  color:#000; letter-spacing:.08em; text-transform:uppercase;
+  animation:blink 2s steps(2, start) infinite;
+}
+@keyframes blink { 0%{opacity:1} 50%{opacity:0} 100%{opacity:1} }
+/* hide placeholder when the real loader UI is ready */
+html.ui-ready .preload-msg{display:none}
+
 .loader-ui{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;opacity:0;transform:translateY(6px)}
 html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forwards}
 @keyframes uiIn{to{opacity:1;transform:none}}
@@ -56,17 +71,6 @@ html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forw
 #loaderLabel{font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);opacity:.98;font-family:"Clash Display",system-ui,sans-serif;font-size:12px;}
 #loaderPct{font-size: clamp(120px,22vw,360px);font-weight:900;line-height:.9;letter-spacing:-.01em;color:var(--accent);display:block;text-align:center;font-variant-numeric:tabular-nums;-webkit-text-stroke:1px rgba(0,0,0,.45);text-shadow:0 0 24px rgba(255,122,24,.3),0 0 60px rgba(255,122,24,.22);font-family:"Clash Display",system-ui,sans-serif;}
 #loaderPct[data-prog]{filter:brightness(calc(.72 + (var(--prog,0) * .65))) drop-shadow(0 0 calc(18px + 46px * var(--prog,0)) rgba(255,122,24,.5));transition:filter .22s ease,text-shadow .22s ease}
-
-/* Pre-numbers blinking LOADING... */
-#preloadMsg{
-  position:absolute; inset:0; display:grid; place-items:center; z-index:3;
-  font: 700 28px/1.1 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  letter-spacing:.08em; text-transform:uppercase; color:#000;
-  animation: blink 2s steps(1,end) infinite; /* 1s on, 1s off */
-}
-@keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-/* hide the placeholder once real loader UI is ready */
-html.fonts-ready #preloadMsg{display:none}
 
 /* Progress bar */
 #loaderBar{--p:0;position:relative;width:min(560px,80vw);height:12px;border-radius:999px;background:#000;border:1px solid #222;overflow:hidden;box-shadow:inset 0 0 0 1px #141414, 0 8px 28px rgba(255,122,24,.08);opacity:0;transform:translateY(4px)}
@@ -117,11 +121,11 @@ html.in-control #bgScene{pointer-events:auto;cursor:crosshair}
 #heroMarquee{position:fixed;inset:var(--header) 0 0 0;z-index:1;pointer-events:none;width:100vw;height:calc(100svh - var(--header));transition:opacity .2s ease}
 .heroSpacer{height:calc(100svh - var(--header));min-height:calc(100svh - var(--header));max-width:var(--maxw);margin:0 auto}
 
-/* sections */
+/* sections — spacing HALVED */
 section{scroll-margin-top:calc(var(--header) + 14px)}
-.section{padding:54px 0}
+.section{padding:27px 0}
 .section:last-of-type{padding-bottom:0}
-.section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 16px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
+.section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 12px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
 .title{font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
 .subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#f4f4f4;text-align:center;text-transform:lowercase;letter-spacing:.02em}
 
@@ -153,6 +157,9 @@ section{scroll-margin-top:calc(var(--header) + 14px)}
 .icon-svg{display:inline-block;width:22px;height:22px;background:var(--accent);-webkit-mask-repeat:no-repeat;-webkit-mask-position:center;-webkit-mask-size:contain;mask-repeat:no-repeat;mask-position:center;mask-size:contain}
 .icon-apple{-webkit-mask-image:url('/assets/apple-music.svg');mask-image:url('/assets/apple-music.svg')}
 .icon-tidal{-webkit-mask-image:url('/assets/tidal.svg');mask-image:url('/assets/tidal.svg')}
+.icon-soundcloud{-webkit-mask-image:url('/assets/soundcloud.svg');mask-image:url('/assets/soundcloud.svg')}
+.icon-youtube{-webkit-mask-image:url('/assets/youtube.svg');mask-image:url('/assets/youtube.svg')}
+
 .taped{position:relative;filter:grayscale(100%) contrast(1.05)}
 .tape{position:absolute;left:30%;top:12%;transform:translateX(-30%) rotate(-12deg);background:#ffd400;color:#111;font-weight:900;letter-spacing:.02em;border:1px solid #111;padding:6px 12px;box-shadow:0 2px 0 #0006;text-transform:uppercase;font-size:12px;line-height:1.1;display:inline-block;z-index:2}
 .tape small{display:block;font-weight:800}
@@ -183,14 +190,29 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
 #music .desc{text-transform:lowercase}
 
 /* ==== WORMHOLE CONTROL SECTION ==== */
-#control .control-spacer{
-  height:calc(100svh - var(--header));
-  min-height:calc(100svh - var(--header));
-  width:100%;
-}
-
-/* keep the old control-panel style unused (preserved) */
+#control{min-height:calc(100svh - var(--header));display:block}
 .control-wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;width:100%}
+.control-spacer{height:calc(100svh - var(--header));}
+
+/* ===== FIXED SIDE CONTROLLERS ===== */
+.sideControls{position:fixed;inset:var(--header) 0 0 0;pointer-events:none;z-index:2;opacity:0; transition:opacity .18s ease}
+html.in-control .sideControls, html.at-bottom .sideControls{opacity:1}
+.ctrlCol{position:absolute;top:50%;transform:translateY(-50%);width:64px;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
+.ctrlCol .card{background:#000;border:1px solid var(--line);border-radius:14px;padding:10px;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.ctrlCol .label{font:800 10px/1.1 "Clash Display",system-ui,sans-serif;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.ctrlCol .readout{font:800 11px/1.1 "Clash Display",system-ui,sans-serif;color:#eaecef}
+.ctrlCol.left{left:10px}
+.ctrlCol.right{right:10px}
+
+/* Vertical range styling (cross-browser) */
+.vrange{width:36px;height:220px;display:flex;align-items:center;justify-content:center;position:relative}
+.vrange input[type=range]{writing-mode: bt-lr; -webkit-appearance: slider-vertical; appearance: slider-vertical; width:36px; height:200px; background:transparent; outline:none; pointer-events:auto}
+.vrange input[type=range]::-webkit-slider-runnable-track{width:6px;height:200px;border-radius:999px;background:linear-gradient(180deg,var(--accent),var(--accent2))}
+.vrange input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:#000;border:2px solid #111;box-shadow:0 0 0 1px #000,0 2px 10px #0008;margin-top:-6px}
+.vrange input[type=range]::-moz-range-track{width:6px;height:200px;border-radius:999px;background:linear-gradient(180deg,var(--accent),var(--accent2))}
+.vrange input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:#000;border:2px solid #111;box-shadow:0 0 0 1px #000,0 2px 10px #0008}
+
+/* keep original (hidden) panel style for future additions */
 .control-panel{background:#000;border:1px solid var(--line);border-radius:12px;padding:22px}
 .control-panel h2{margin:0 0 8px;font-size:22px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
 .control-panel p{margin:0;color:#d7d9df;font-size:14px}
@@ -202,14 +224,10 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
 <div id="loader" aria-label="Site loading">
   <div id="loaderStage">
     <canvas id="loaderGL" aria-hidden="true"></canvas>
-
-    <!-- Only this shows first: blinking LOADING... -->
-    <div id="preloadMsg">LOADING...</div>
-
-    <!-- Real loader UI appears when ready; replaces the placeholder -->
-    <div class="loader-ui" aria-live="polite">
+    <div id="preLoadMsg" class="preload-msg">LOADING...</div>
+    <div class="loader-ui">
       <div class="loader-stack">
-        <span id="loaderPct">0%</span>
+        <span id="loaderPct" aria-live="polite">0%</span>
         <span id="loaderLabel">THANK YOU FOR WAITING :)</span>
       </div>
       <div id="loaderBar" aria-hidden="true"><span></span></div>
@@ -255,6 +273,32 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
 <canvas id="bgScene"></canvas>
 <canvas id="heroMarquee" aria-label="Welcome marquee"></canvas>
 <div class="heroSpacer" aria-hidden="true"></div>
+
+<!-- ===== FIXED SIDE CONTROLS ===== -->
+<div class="sideControls" aria-hidden="false">
+  <!-- Left: Warp Speed -->
+  <div class="ctrlCol left">
+    <div class="card" role="group" aria-label="Warp speed">
+      <div class="label">Warp</div>
+      <div class="readout" id="warpReadout">1.00×</div>
+      <div class="vrange">
+        <!-- top = 100 (fast) · bottom = 0 (slow) -->
+        <input id="warpRangeV" type="range" min="0" max="100" step="1" value="20" aria-label="Warp speed vertical">
+      </div>
+    </div>
+  </div>
+  <!-- Right: Zoom -->
+  <div class="ctrlCol right">
+    <div class="card" role="group" aria-label="Zoom">
+      <div class="label">Zoom</div>
+      <div class="readout" id="zoomReadout">1.00×</div>
+      <div class="vrange">
+        <!-- top=0 => 0.0005× (zoomed in); bottom=100 => 500× (zoomed out) -->
+        <input id="zoomRangeV" type="range" min="0" max="100" step="1" value="0" aria-label="Zoom vertical">
+      </div>
+    </div>
+  </div>
+</div>
 
 <main id="main">
   <!-- MUSIC -->
@@ -321,7 +365,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
       </article>
     </div>
 
-    <!-- LATEST VIDEO -->
     <div class="grid" style="margin-top:22px;">
       <article class="col-12 video-card">
         <div class="video-head"><h3 class="video-title">LATEST VIDEO</h3></div>
@@ -331,7 +374,6 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
       </article>
     </div>
 
-    <!-- MIXES -->
     <div class="grid" style="margin-top:22px;">
       <article class="col-12 mixes-card">
         <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
@@ -402,6 +444,13 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
           <p class="desc">a mind-bending social satire and parody project with millions of views worldwide</p>
           <div class="actions left">
             <a class="btn" href="http://xxxsensation.org/" target="_blank" rel="noopener">xxxsensation.org</a>
+            <a class="icon-btn" href="https://www.youtube.com/@XXXSENSATION" target="_blank" aria-label="YouTube"><span class="icon-svg icon-youtube"></span></a>
+            <a class="icon-btn" href="https://soundcloud.com/XXXSENSATION" target="_blank" aria-label="SoundCloud"><span class="icon-svg icon-soundcloud"></span></a>
+            <a class="icon-btn" href="https://open.spotify.com/artist/4Wv7dAochHCJFUcbdm947v" target="_blank" aria-label="Spotify">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M7 9.2c3.9-1.5 8.3-1.2 11.7.8"></path><path d="M7.6 12.2c3.2-1.2 6.7-1 9.6.6"></path><path d="M8.3 15.1c2.4-.9 5-.7 6.9.5"></path></svg>
+            </a>
+            <a class="icon-btn" href="https://music.apple.com/us/artist/xxxsensation/1272482261?l=es-MX" target="_blank" aria-label="Apple Music"><span class="icon-svg icon-apple"></span></a>
+            <a class="icon-btn" href="https://tidal.com/artist/9039012/u" target="_blank" aria-label="Tidal"><span class="icon-svg icon-tidal"></span></a>
           </div>
         </div>
       </article>
@@ -415,6 +464,7 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
             <a class="btn" href="https://soundcloud.com/slamharris/waking-yall-up" target="_blank">waking y'all up (rap)</a>
             <a class="btn alt" href="https://soundcloud.com/slamharris/waking-yall-up-instrumental" target="_blank">instrumental</a>
             <a class="btn" href="https://soundcloud.com/slamharris/the-waking-yall-up-course-day-one" target="_blank">guided meditation</a>
+            <a class="btn alt" href="https://www.youtube.com/watch?v=2fzMX_51Q5Y" target="_blank" rel="noopener">youtube</a>
           </div>
         </div>
       </article>
@@ -479,13 +529,26 @@ footer{position:relative;z-index:3;border-top:1px solid var(--line);background:#
     </div>
   </section>
 
-  <!-- WORMHOLE CONTROL (section head + full-viewport interaction zone) -->
+  <!-- WORMHOLE CONTROL -->
   <section id="control" class="section">
-    <div class="section-head"><h2 class="title">WORMHOLE CONTROL ↓</h2><p class="subtitle">the more you tap, the faster we go…</p></div>
+    <div class="section-head">
+      <h2 class="title">WORMHOLE CONTROL ↓</h2>
+      <p class="subtitle">the more you tap, the faster we go…</p>
+    </div>
+
+    <!-- (Hidden) legacy Warp Speed Panel kept for safety -->
+    <div class="warpPanel" id="warpPanel" role="group" aria-label="Warp speed (legacy)">
+      <div class="row">
+        <strong class="label">Warp Speed</strong>
+        <span class="val" id="warpVal_legacy">1.00×</span>
+      </div>
+      <input id="warpRange_legacy" type="range" min="0" max="100" step="1" value="20" aria-label="Warp speed fader (legacy)">
+    </div>
+
     <div class="control-spacer" aria-hidden="true"></div>
   </section>
 
-  <!-- CONTACT (moved after WORMHOLE) -->
+  <!-- CONTACT -->
   <section id="contact" class="section container">
     <div class="section-head"><h2 class="title">CONTACT</h2><p class="subtitle">bookings, collabs, or share your deepest darkest secret</p></div>
     <div class="narrow">
@@ -589,7 +652,7 @@ secs.forEach(s=>io.observe(s));
   document.addEventListener('keydown',e=>{if(e.key==='Escape') lb.style.display='none'})
 })();
 
-/* ==== MARQUEE ==== (unchanged except layout tweaks earlier) */
+/* ==== MARQUEE (unchanged) ==== */
 (function(){
   const canvas=document.getElementById('heroMarquee');
   if(!canvas) return;
@@ -695,7 +758,7 @@ secs.forEach(s=>io.observe(s));
   requestAnimationFrame(draw);
 })();
 
-/* Wormhole shader + CONTROL/tap ripples (localized) + permanent speed boost */
+/* Wormhole shader + CONTROL/tap ripples (21-cap, persistent boost) */
 (function(){
   const canvas=document.getElementById('bgScene'); if(!canvas) return;
   const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
@@ -705,32 +768,44 @@ secs.forEach(s=>io.observe(s));
   const fsrc=`#version 300 es
   precision highp float; in vec2 vUv; out vec4 frag;
   uniform vec2 uRes; uniform float uTime; uniform float uSpin; uniform float uTravel; uniform float uAmp; uniform float uDir;
-  uniform int uRippleCount; uniform vec3 uRipples[8]; // xy in pixels (bottom-left origin), z = startTime
+  uniform float uZoom; // huge range
+
+  const int MAX_RIPPLES = 21;
+  uniform int uRippleCount;
+  uniform vec3 uRipples[MAX_RIPPLES];
 
   vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.48,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.);}
   mat2 r(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c);}
 
-  // localized, longer ripples (~7s)
   vec2 rippleOffset(vec2 fragPx){
     vec2 off = vec2(0.0);
-    for(int i=0;i<8;i++){
+    const float LIFE=7.0, FADE_DUR=2.0, PI=3.14159265;
+    for(int i=0;i<MAX_RIPPLES;i++){
       if(i>=uRippleCount) break;
-      vec3 rp = uRipples[i];
-      float age = uTime - rp.z;
-      if(age>7.0) continue;
-      float d = distance(fragPx, rp.xy);
-      float w = 0.010 + age*0.014;
-      float env = exp(-d*(0.0022 + age*0.0012));
-      float wave = sin(d*w - age*8.5);
-      off += env*wave*vec2(0.022,0.012);   // displacement
+      vec3 rp=uRipples[i];
+      float age=uTime-rp.z;
+      if(age>LIFE+FADE_DUR) continue;
+      float d=distance(fragPx,rp.xy);
+      float falloff=0.0020 + age*0.0010;
+      float env=exp(-d*falloff);
+      float w=0.008 + age*0.010;
+      float speed=mix(9.0,6.0,smoothstep(3.0,LIFE,age));
+      float wave=sin(d*w - age*speed);
+      float damp=exp(-age*0.22);
+      float tail=(age<LIFE)?1.0:0.5*(1.0+cos(PI*clamp((age-LIFE)/FADE_DUR,0.0,1.0)));
+      float amp=damp*tail;
+      off += (env*amp)*wave*vec2(0.020,0.010);
     }
     return off;
   }
 
   void main(){
-    vec2 fragPx = vUv*uRes;
+    vec2 fragPx=vUv*uRes;
     vec2 p=(fragPx-0.5*uRes)/min(uRes.x,uRes.y);
     p += rippleOffset(fragPx);
+
+    // Zoom (>=1 = out, <1 = in), allowing 0.0005..500
+    p *= uZoom;
 
     if(uAmp>0.0001){
       float k=14., ph=uTime*7.*uDir, w=sin(k*p.y+ph), env=smoothstep(1.35,.18,abs(p.y));
@@ -751,6 +826,7 @@ secs.forEach(s=>io.observe(s));
   const uRes=gl.getUniformLocation(pr,'uRes'),uTime=gl.getUniformLocation(pr,'uTime'),uSpin=gl.getUniformLocation(pr,'uSpin'),uTravel=gl.getUniformLocation(pr,'uTravel'),uAmp=gl.getUniformLocation(pr,'uAmp'),uDir=gl.getUniformLocation(pr,'uDir');
   const uRippleCount=gl.getUniformLocation(pr,'uRippleCount');
   const uRipples=gl.getUniformLocation(pr,'uRipples');
+  const uZoom=gl.getUniformLocation(pr,'uZoom');
 
   function resize(){
     const header=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
@@ -761,73 +837,165 @@ secs.forEach(s=>io.observe(s));
   }
   resize(); addEventListener('resize',resize,{passive:true});
 
-  // scroll reactive (unchanged)
   let spin=0,travel=0,amp=0,dir=1,lastY=scrollY;
   addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,Math.min(.75,Math.abs(dy)*.005)+amp);}}, {passive:true});
 
-  // enable interactions at page bottom or when control section in view
   function checkBottom(){
-    const atBottom = (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 2);
-    document.documentElement.classList.toggle('at-bottom', atBottom);
+    const atBottom=(window.scrollY+window.innerHeight)>=(document.documentElement.scrollHeight-2);
+    document.documentElement.classList.toggle('at-bottom',atBottom);
   }
   addEventListener('scroll',checkBottom,{passive:true}); addEventListener('resize',checkBottom,{passive:true}); checkBottom();
 
-  // observe control section
+  // Stricter: only show controls when at least 35% of the control section is visible
   (function(){
-    const ctrl = document.getElementById('control');
+    const ctrl=document.getElementById('control');
     if(!ctrl) return;
-    const o = new IntersectionObserver((ents)=>{
-      const vis = ents.some(e=>e.isIntersecting && e.intersectionRatio>0);
-      document.documentElement.classList.toggle('in-control', vis);
-    }, {threshold:[0,0.01,0.5,1], rootMargin:'-10% 0px -10% 0px'});
+    const o=new IntersectionObserver((ents)=>{
+      const vis=ents.some(e=>e.isIntersecting && e.intersectionRatio>=0.35);
+      document.documentElement.classList.toggle('in-control',vis);
+    },{threshold:[0,0.35,0.75,1],rootMargin:'0px 0px 0px 0px'});
     o.observe(ctrl);
   })();
 
-  // ripple storage (max 8)
   const ripples=[];
+  const MAX_RIPPLES=21;
   function addRipple(px,py){
     const now=performance.now()*0.001;
-    ripples.push({x:px,y:py,start:now});
-    while(ripples.length>8) ripples.shift();
+    ripples.push({x:px,y:gl.canvas.height - py,start:now});
+    while(ripples.length>MAX_RIPPLES) ripples.shift();
   }
 
-  // permanent speed boost
+  // persistent speed boost
   let boost=0;
-  function tap(e){
-    if(!(document.documentElement.classList.contains('at-bottom') || document.documentElement.classList.contains('in-control'))) return;
+  addEventListener('pointerdown',e=>{
+    const allow = document.documentElement.classList.contains('at-bottom') || document.documentElement.classList.contains('in-control');
+    if(!allow) return;
     const rect=canvas.getBoundingClientRect();
-    const dpr = Math.min(Math.max(1,devicePixelRatio||1),2.5);
-    // Map to canvas pixels; flip Y to bottom-left origin for shader coords
-    let x=(e.clientX-rect.left)*dpr;
-    let y=(e.clientY-rect.top)*dpr;
-    y = (canvas.height) - y; // flip Y so ripple is exactly at tap
+    const dpr=Math.min(Math.max(1,devicePixelRatio||1),2.5);
+    const x=(e.clientX-rect.left)*dpr, y=(e.clientY-rect.top)*dpr;
     addRipple(x,y);
-    boost = Math.min(9999.0, boost + 1.2); // dramatic, accumulative
+    boost = Math.min(60.0, boost + 1.4);
+  },{passive:true});
+
+  // ===== NEW: Zoom + Warp bindings =====
+  let zoom=1.0;
+  function setZoom(z){ zoom=Math.max(0.0005, Math.min(500.0, z)); }
+  function warpFactorFromSlider(v){
+    // exponential: 0..100 -> 0.10x .. 1,000,000x
+    const MIN=0.10, MAX=1000000.0; const K=Math.log(MAX/MIN);
+    const t=v/100; return MIN*Math.exp(K*t);
   }
-  addEventListener('pointerdown',tap,{passive:true});
 
   (function loop(){
     const now=performance.now()*0.001;
-    // no decay — keep speed gained from taps
-    const rate = 0.35 * (1.0 + boost*1.25);
-    travel += rate * (1/60);
-    spin   += 0.10 * (1/60);
-    amp = Math.max(0,amp-(1/60)/2);
+    const base=0.35;
+    const rate=base*(1.0 + boost)*(window.__wormWarp || 1);
+    travel += rate*(1/60);
+    spin   += 0.10*(1/60);
+    amp = Math.max(0, amp - (1/60)/2);
 
-    // purge old ripples (~7s)
-    for(let i=ripples.length-1;i>=0;i--){ if(now - ripples[i].start > 7.05) ripples.splice(i,1); }
+    for(let i=ripples.length-1;i>=0;i--){ if(now - ripples[i].start > 9.1) ripples.splice(i,1); }
 
-    // uniforms
-    gl.uniform1f(uTime, now); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
-    gl.uniform1i(uRippleCount, ripples.length);
-    const buf=new Float32Array(8*3);
-    for(let i=0;i<ripples.length && i<8;i++){ buf[i*3+0]=ripples[i].x; buf[i*3+1]=ripples[i].y; buf[i*3+2]=ripples[i].start; }
+    gl.uniform1f(uTime,now); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
+    gl.uniform1i(uRippleCount, Math.min(ripples.length, MAX_RIPPLES));
+    const buf=new Float32Array(MAX_RIPPLES*3);
+    for(let i=0;i<ripples.length && i<MAX_RIPPLES;i++){
+      buf[i*3+0]=ripples[i].x; buf[i*3+1]=ripples[i].y; buf[i*3+2]=ripples[i].start;
+    }
     gl.uniform3fv(uRipples, buf);
+
+    gl.uniform1f(uZoom, zoom);
 
     gl.disable(gl.DEPTH_TEST); gl.disable(gl.BLEND); gl.drawArrays(gl.TRIANGLES,0,3);
     if(!window.__wormReady){ window.__wormReady=true; window.dispatchEvent(new Event('worm:ready')); }
     requestAnimationFrame(loop);
   })();
+
+  // UI wires (vertical sliders)
+  (function(){
+    const warpRangeV=document.getElementById('warpRangeV');
+    const warpReadout=document.getElementById('warpReadout');
+    const zoomRangeV=document.getElementById('zoomRangeV');
+    const zoomReadout=document.getElementById('zoomReadout');
+
+    function fmtWarp(x){
+      if(x>=100000) return (x/1000|0)+'k×';
+      if(x>=10000)  return (x/1000).toFixed(1)+'k×';
+      if(x>=1000)   return (x/1000).toFixed(2)+'k×';
+      if(x>=100)    return x.toFixed(0)+'×';
+      if(x>=10)     return x.toFixed(1)+'×';
+      return x.toFixed(2)+'×';
+    }
+    // zoom readout: show more precision near <1
+    function fmtZoom(z){
+      if(z>=100) return z.toFixed(0)+'×';
+      if(z>=10)  return z.toFixed(1)+'×';
+      if(z>=1)   return z.toFixed(2)+'×';
+      if(z>=0.1) return z.toFixed(3)+'×';
+      if(z>=0.01)return z.toFixed(4)+'×';
+      return z.toFixed(5)+'×';
+    }
+
+    // Initialize warp
+    const initWarp = warpFactorFromSlider(parseInt(warpRangeV.value||'20',10));
+    window.__wormWarp = initWarp;
+    warpReadout.textContent = fmtWarp(initWarp);
+
+    warpRangeV.addEventListener('input', e=>{
+      const v = parseInt(e.target.value,10);
+      const w = warpFactorFromSlider(v);
+      window.__wormWarp = w;
+      warpReadout.textContent = fmtWarp(w);
+    });
+
+    // Zoom mapping (log scale): 0..100 -> 0.0005..500, top is 0 (zoomed in)
+    const Z_MIN=0.0005, Z_MAX=500.0, ZK=Math.log(Z_MAX/Z_MIN);
+    function sliderToZoom(v){
+      const t=v/100;        // 0..1 bottom
+      return Z_MIN*Math.exp(ZK*t);
+    }
+    function seekZoomFromPointer(evt, inputEl){
+      const rect=inputEl.getBoundingClientRect();
+      const y=evt.clientY-rect.top;
+      const t = Math.max(0, Math.min(1, y/rect.height));
+      const val = Math.round(t*100);
+      inputEl.value = String(val);
+      inputEl.dispatchEvent(new Event('input', {bubbles:true}));
+    }
+
+    // init at top (0 => 0.0005×)
+    const initZ = sliderToZoom(parseInt(zoomRangeV.value||'0',10));
+    setZoom(initZ);
+    zoomReadout.textContent = fmtZoom(initZ);
+
+    zoomRangeV.addEventListener('input', e=>{
+      const v = parseInt(e.target.value,10);
+      const z = sliderToZoom(v);
+      setZoom(z);
+      zoomReadout.textContent = fmtZoom(z);
+    });
+
+    // Click/tap anywhere on the track to jump (both sliders)
+    document.querySelectorAll('.vrange input[type=range]').forEach((input)=>{
+      const wrap = input.parentElement;
+      if(!wrap) return;
+      wrap.addEventListener('pointerdown',(evt)=>{
+        evt.preventDefault();
+        seekZoomFromPointer(evt, input); // works for both; warp uses same mapping trick via input event
+      });
+    });
+
+    // Optional keyboard nudges when in play area
+    window.addEventListener('keydown', (e)=>{
+      const active = document.documentElement.classList.contains('in-control') || document.documentElement.classList.contains('at-bottom');
+      if(!active) return;
+      if(e.key==='['){ warpRangeV.value = Math.max(0, parseInt(warpRangeV.value,10)-1); warpRangeV.dispatchEvent(new Event('input')); }
+      if(e.key===']'){ warpRangeV.value = Math.min(100, parseInt(warpRangeV.value,10)+1); warpRangeV.dispatchEvent(new Event('input')); }
+      if(e.key==='-'){ zoomRangeV.value = Math.max(0, parseInt(zoomRangeV.value,10)-1); zoomRangeV.dispatchEvent(new Event('input')); }
+      if(e.key==='='){ zoomRangeV.value = Math.min(100, parseInt(zoomRangeV.value,10)+1); zoomRangeV.dispatchEvent(new Event('input')); }
+    }, {passive:true});
+  })();
+
 })();
 
 /* ----------------- LOADER ----------------- */
@@ -839,7 +1007,7 @@ secs.forEach(s=>io.observe(s));
   const pctEl=document.getElementById('loaderPct');
   const barEl=document.querySelector('#loaderBar span');
 
-  let display=0,target=0,vel=0,last=performance.now(), raf=null;
+  let display=0,target=0,vel=0,last=performance.now(), raf=null, uiReady=false;
   function spring(dt){const k=18,c=24;const x=display-target;const a=-k*x-c*vel;vel+=a*dt;display=Math.min(1,Math.max(0,display+vel*dt))}
   function tick(now=performance.now()){
     const dt=Math.min((now-last)/1000,0.033); last=now; spring(dt);
@@ -847,7 +1015,8 @@ secs.forEach(s=>io.observe(s));
     pctEl.style.setProperty('--prog', display);
     pctEl.setAttribute('data-prog','');
     barEl.style.setProperty('--p', String(display));
-    if(display>0.02){ barEl.classList.add('active'); } else { barEl.classList.remove('active'); }
+    if(display>0.02){ barEl.classList.add('active'); }
+    if(!uiReady && display>0.01){ document.documentElement.classList.add('ui-ready'); uiReady=true; }
 
     const t = easeOutCubic(display);
     if (window.__loaderUniforms) {
@@ -925,7 +1094,6 @@ secs.forEach(s=>io.observe(s));
     requestAnimationFrame(loop);
   })();
 
-  // asset gating
   const manager=new THREE.LoadingManager();
   manager.onProgress=(url,loaded,total)=>{
     const p = total? loaded/total : (loaded?0.5:0.2);
@@ -1021,5 +1189,6 @@ secs.forEach(s=>io.observe(s));
   placeholders.forEach(ph=>io.observe(ph));
 })();
 </script>
+
 </body>
 </html>
