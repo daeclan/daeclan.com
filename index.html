@@ -59,7 +59,9 @@
     @keyframes uiIn{to{opacity:1;transform:none}}
     .loader-stack{display:flex;flex-direction:column;align-items:center;gap:6px}
     #loaderLabel{font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);opacity:.98;font-family:"Clash Display",system-ui,sans-serif;font-size:12px;}
-    #loaderPct{font-size: clamp(120px,22vw,360px);font-weight:900;line-height:.9;letter-spacing:-.01em;color:var(--accent);display:block;text-align:center;font-variant-numeric:tabular-nums;-webkit-text-stroke:1px rgba(0,0,0,.45);text-shadow:0 0 24px rgba(255,122,24,.3),0 0 60px rgba(255,122,24,.22);font-family:"Clash Display",system-ui,sans-serif;}
+    #loaderPct{font-size:clamp(120px,22vw,360px);font-weight:900;line-height:.9;letter-spacing:-.01em;color:var(--accent);display:block;text-align:center;font-variant-numeric:tabular-nums;-webkit-text-stroke:1px rgba(0,0,0,.45);text-shadow:0 0 6px rgba(255,122,24,.55),0 0 20px rgba(255,122,24,.55),0 0 60px rgba(255,122,24,.45),0 0 100px rgba(255,180,100,.35);animation:pctGlow 3.4s ease-in-out infinite alternate;font-family:"Clash Display",system-ui,sans-serif;}
+    @keyframes pctGlow{0%{text-shadow:0 0 4px rgba(255,122,24,.3),0 0 10px rgba(255,122,24,.3),0 0 30px rgba(255,122,24,.25),0 0 60px rgba(255,180,100,.2);}100%{text-shadow:0 0 8px rgba(255,122,24,.9),0 0 26px rgba(255,122,24,.9),0 0 70px rgba(255,122,24,.7),0 0 120px rgba(255,180,100,.6);}}
+
     #loaderBar{--p:0;position:relative;width:min(560px,80vw);height:12px;border-radius:999px;background:#000;border:1px solid #222;overflow:hidden;box-shadow:inset 0 0 0 1px #141414, 0 8px 28px rgba(255,122,24,.08);opacity:0;transform:translateY(4px)}
     html.fonts-ready #loaderBar{animation:barIn .28s .05s cubic-bezier(.22,.61,.36,1) forwards}
     @keyframes barIn{to{opacity:1;transform:none}}
@@ -535,7 +537,7 @@
     <section id="control" class="section">
       <div class="section-head">
         <h2 class="title">WORMHOLE CONTROL ↓</h2>
-        <p class="subtitle">the more you tap, the faster we go…</p>
+        <p class="subtitle">there's no earthly way of knowinggg…</p>
       </div>
 
       <!-- hidden legacy fallback -->
@@ -869,19 +871,19 @@
       while(ripples.length>MAX_RIPPLES) ripples.shift();
     }
 
-    // Tap-to-boost + ripple (ignore clicks on UI controls)
-    let boost=0;
-    addEventListener('pointerdown',e=>{
-      const allow = document.documentElement.classList.contains('at-bottom') || document.documentElement.classList.contains('in-control');
-      if(!allow) return;
-      if (e.target && e.target.closest && e.target.closest('.sideControls')) return;
-      const rect=canvas.getBoundingClientRect();
-      const dpr=Math.min(Math.max(1,devicePixelRatio||1),2.5);
-      const x=(e.clientX-rect.left)*dpr, y=(e.clientY-rect.top)*dpr;
-      addRipple(x,y);
-      boost = Math.min(60.0, boost + 1.4);
-      reflectWarpToSlider();
-    },{passive:true});
+    let boost = 0; // kept for compatibility but unused
+addEventListener('pointerdown', e => {
+  // Always allow — even over UI
+  const rect = canvas.getBoundingClientRect();
+  const dpr  = Math.min(Math.max(1, devicePixelRatio || 1), 2.5);
+  const x    = (e.clientX - rect.left) * dpr;
+  const y    = (e.clientY - rect.top)  * dpr;
+
+  // Add multiple ripples for stronger "universal waviness"
+  for (let i = 0; i < 3; i++) addRipple(x, y);
+
+  // No boost, no slider reflection — pure ripple visuals
+}, { passive: true });
 
     // Zoom + Warp mapping
     let zoom=1.0; function setZoom(z){ zoom=Math.max(0.000000333, Math.min(333.0, z)); }
