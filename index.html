@@ -69,6 +69,36 @@
     #loaderBar span.active::after{content:"";position:absolute;top:-40%;bottom:-40%;width:120px;left:-140px;background:radial-gradient(60px 100% at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);mix-blend-mode:screen;pointer-events:none;animation:spark 1.4s linear infinite;opacity:1}
     @keyframes spark{to{transform:translateX(calc(100% + 280px));}}
 
+    /* Mobile: blur background when the drawer is open */
+@media (max-width: 860px) {
+  html.menu-open body > *:not(header):not(#mobileNav) {
+    filter: blur(10px) brightness(0.9) saturate(0.9);
+    transition: filter .2s ease;
+  }
+  /* Keep canvas layers and footer in the blur too */
+  html.menu-open #bgScene,
+  html.menu-open #heroMarquee,
+  html.menu-open main,
+  html.menu-open footer {
+    filter: blur(10px) brightness(0.9) saturate(0.9);
+  }
+  /* Avoid interacting with blurred content */
+  html.menu-open main,
+  html.menu-open #bgScene,
+  html.menu-open #heroMarquee,
+  html.menu-open footer {
+    pointer-events: none;
+  }
+
+  /* Optional: a bit more glass for the drawer itself */
+  #mobileNav {
+    background: rgba(11,12,16,0.85);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    transition: backdrop-filter .2s ease, background .2s ease;
+  }
+}
+
     /* Hatch */
     #siteHatch{position:fixed;inset:0;z-index:2500;pointer-events:none}
     #siteHatch .door{position:absolute;left:0;right:0;height:50%;background:#000;transform:translateY(0);transition:transform .55s cubic-bezier(.22,.61,.36,1)}
