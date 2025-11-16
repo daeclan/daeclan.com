@@ -69,7 +69,7 @@
     #loaderBar span.active::after{content:"";position:absolute;top:-40%;bottom:-40%;width:120px;left:-140px;background:radial-gradient(60px 100% at 50% 50%, rgba(255,255,255,.65), rgba(255,255,255,0) 70%);mix-blend-mode:screen;pointer-events:none;animation:spark 1.4s linear infinite;opacity:1}
     @keyframes spark{to{transform:translateX(calc(100% + 280px));}}
 
-    /* Mobile blur when drawer open */
+    /* Mobile: blur background when the drawer is open */
     @media (max-width: 860px) {
       html.menu-open body > *:not(header):not(#mobileNav) {
         filter: blur(10px) brightness(0.9) saturate(0.9);
@@ -106,11 +106,14 @@
 
     /* ===== HEADER ===== */
     header{position:fixed;left:0;right:0;top:0;z-index:3000;border-bottom:1px solid var(--line);backdrop-filter:blur(6px);background:#0b0b0cbf}
-    :fullscreen header{display:none !important}
+    :fullscreen header{background:#000000e6;backdrop-filter:blur(10px)}
     .bar{height:var(--header);display:flex;align-items:center;justify-content:space-between}
     .brand{font-weight:700;letter-spacing:.3px}
     .brand b{color:var(--accent)}
-    nav.primary{display:flex;gap:22px;align-items:center;text-transform:uppercase;margin-left:auto}
+    nav.primary{display:flex;gap:22px;align-items:center;text-transform:uppercase}
+    @media (min-width:861px){
+      nav.primary{margin-left:auto;}
+    }
     nav.primary a{color:var(--muted);font-size:15px;padding:8px 0;position:relative;font-weight:600;letter-spacing:.04em}
     nav.primary a:hover{color:var(--fg)}
     nav.primary a.active{color:var(--accent)}
@@ -124,6 +127,12 @@
     #mobileNav .wrap{max-width:var(--maxw);margin:0 auto;padding:20px}
     #mobileNav a{display:block;font-size:18px;font-weight:800;padding:14px 12px;border-radius:12px;margin-bottom:10px;color:#111;background:linear-gradient(90deg,var(--accent),var(--accent2));text-transform:uppercase;font-family:"Clash Display",system-ui,sans-serif}
 
+    /* Fullscreen button */
+    .fs-btn{appearance:none;border:1px solid var(--line);background:#0b0c10;color:var(--accent);
+      padding:8px 12px;border-radius:10px;font-weight:800;font-family:"Clash Display",system-ui,sans-serif}
+    @media (max-width:860px){.fs-btn{padding:10px 14px}}
+    .fs-cta{display:flex;justify-content:center;margin-top:10px;}
+
     /* layers + marquee */
     main{position:relative;z-index:2;flex:1}
     #bgScene{position:fixed;left:0;right:0;bottom:0;top:var(--header);z-index:0;pointer-events:none}
@@ -135,9 +144,9 @@
     section{scroll-margin-top:calc(var(--header) + 14px)}
     .section{padding:27px 0}
     .section:last-of-type{padding-bottom:0}
-    .section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 12px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
+    .section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 12px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:400}
     .title{font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
-    .subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#e8e9ff;text-align:center;text-transform:lowercase;letter-spacing:.02em}
+    .subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#f4f4f4;text-align:center;text-transform:lowercase;letter-spacing:.02em}
 
     /* grid + cards etc. */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
@@ -203,16 +212,16 @@
     .control-spacer{height:calc(100svh - var(--header));}
 
     /* ===== FIXED SIDE CONTROLLERS ===== */
-    .sideControls{position:fixed;inset:var(--header) 0 0 0;pointer-events:none;z-index:5;opacity:0;transition:opacity .18s ease}
+    .sideControls{position:fixed;inset:var(--header) 0 0 0;pointer-events:auto;z-index:5;opacity:0;transition:opacity .18s ease}
     .ctrlCol{position:absolute;top:50%;transform:translateY(-50%);width:70px;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
-    .ctrlCol .card{background:#000;border:1px solid var(--line);border-radius:14px;padding:10px;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:10pxwidth:64px;margin:0 auto;text-align:center;}
-    .ctrlCol .label{font-weight:800;font-size:0.7em;line-height:1.2;font-family:"Clash Display",system-ui,sans-serif;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center;white-space:normal;}
+    .ctrlCol .card{background:#000;border:1px solid var(--line);border-radius:14px;padding:10px;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+    .ctrlCol .label{font:800 10px/1.1 "Clash Display",system-ui,sans-serif;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
     .ctrlCol .readout{font:800 11px/1.1 "Clash Display",system-ui,sans-serif;color:#eaecef}
     .ctrlCol.left{left:8px}
     .ctrlCol.right{right:8px}
 
     /* ===== CUSTOM VERTICAL SLIDERS ===== */
-    .vslider{position:relative;width:28px;height:220px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;cursor:default}
+    .vslider{position:relative;width:36px;height:220px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;cursor:default}
     .vslider .track{position:relative;width:8px;height:200px;border-radius:999px;background:linear-gradient(180deg,var(--accent),var(--accent2));box-shadow:inset 0 0 0 1px #141414;touch-action:none;cursor:default}
     .vslider .thumb{position:absolute;left:50%;width:22px;height:22px;transform:translate(-50%,-50%);border-radius:50%;background:#000;border:2px solid #111;box-shadow:0 2px 10px #0008;touch-action:none;will-change:transform;cursor:grab}
     .vslider[data-grabbing="1"] .thumb{box-shadow:0 6px 18px #000c;cursor:grabbing}
@@ -226,12 +235,6 @@
     .tiny-btn:active{transform:translateY(1px)}
     .tiny-btn svg{width:14px;height:14px}
     .tiny-btn.active{outline:2px solid var(--accent2)}
-
-    /* ===== FS controls (enter/exit) ===== */
-    .fs-btn{appearance:none;border:1px solid var(--line);background:#0b0c10;color:var(--accent);
-      padding:10px 14px;border-radius:10px;font-weight:800;font-family:"Clash Display",system-ui,sans-serif;pointer-events:auto}
-    #fsExit{position:fixed;top:12px;right:12px;z-index:4500;display:none}
-    :fullscreen #fsExit{display:inline-flex}
   </style>
 </head>
 
@@ -270,9 +273,7 @@
         <a href="#control">WORMHOLE</a>
         <a href="#contact">CONTACT</a>
       </nav>
-      <div style="display:flex;gap:10px;align-items:center">
-        <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false">Menu</button>
-      </div>
+      <button class="menu-btn" id="menuToggle" aria-controls="mobileNav" aria-expanded="false">Menu</button>
     </div>
     <nav id="mobileNav" aria-label="Mobile Navigation" aria-hidden="true">
       <div class="wrap">
@@ -286,76 +287,69 @@
     </nav>
   </header>
 
-  <!-- ========= WORMHOLE WRAP (canvas + side controls; goes fullscreen) ========= -->
-  <div id="wormholeWrap" aria-hidden="false">
-    <canvas id="bgScene"></canvas>
+  <!-- canvases -->
+  <canvas id="bgScene"></canvas>
+  <canvas id="heroMarquee" aria-label="Welcome marquee"></canvas>
+  <div class="heroSpacer" aria-hidden="true"></div>
 
-    <!-- ===== FIXED SIDE CONTROLS ===== -->
-    <div class="sideControls" id="sideControls" aria-hidden="false" style="opacity:0">
-      <!-- Left: Warp + Ripple Size -->
-      <div class="ctrlCol left">
-        <div class="card" role="group" aria-label="Warp speed">
-          <div class="label">Warp</div>
-          <div class="readout" id="warpReadout">1.00×</div>
-          <div class="vslider" id="warpSlider" role="slider" aria-label="Warp speed"
-            aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20"
-            data-min="0" data-max="100" data-value="20">
-            <div class="track"></div><div class="thumb"></div>
-          </div>
-          <div class="ctrlRow">
-            <button class="tiny-btn" type="button" data-action="pause" title="Pause/Play" aria-label="Pause/Play">
-              <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
-            </button>
-          </div>
+  <!-- ===== FIXED SIDE CONTROLS ===== -->
+  <div class="sideControls" id="sideControls" aria-hidden="false" style="opacity:0">
+    <!-- Left: Warp + Ripple Size -->
+    <div class="ctrlCol left">
+      <div class="card" role="group" aria-label="Warp speed">
+        <div class="label">Warp</div>
+        <div class="readout" id="warpReadout">1.00×</div>
+        <div class="vslider" id="warpSlider" role="slider" aria-label="Warp speed"
+          aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="20"
+          data-min="0" data-max="100" data-value="20">
+          <div class="track"></div><div class="thumb"></div>
         </div>
-
-        <div class="card" role="group" aria-label="Ripple Size">
-          <div class="label">Ripple Size</div>
-          <div class="readout" id="rSizeReadout">1.00×</div>
-          <div class="vslider" id="rSizeSlider" role="slider" aria-label="Ripple size"
-            aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
-            data-min="0" data-max="100" data-value="50">
-            <div class="track"></div><div class="thumb"></div>
-          </div>
+        <div class="ctrlRow">
+          <button class="tiny-btn" type="button" data-action="pause" title="Pause/Play" aria-label="Pause/Play">
+            <svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg>
+          </button>
         </div>
       </div>
 
-      <!-- Right: Zoom + RIPPLE INTENSITY -->
-      <div class="ctrlCol right">
-        <div class="card" role="group" aria-label="Zoom">
-          <div class="label">Zoom</div>
-          <div class="readout" id="zoomReadout">1.00×</div>
-          <div class="vslider" id="zoomSlider" role="slider" aria-label="Zoom"
-            aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
-            data-min="0" data-max="100" data-value="50">
-            <div class="track"></div><div class="thumb"></div>
-          </div>
-          <div class="ctrlRow">
-            <button class="tiny-btn" type="button" data-action="reset" title="Reset" aria-label="Reset">
-              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v4L7 4l5-5v4a8 8 0 1 1-8 8H2a10 10 0 1 0 10-10z"/></svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="card" role="group" aria-label="Ripple Zest">
-          <div class="label">RIPPLE ZEST</div>
-          <div class="readout" id="rIntReadout">1.00×</div>
-          <div class="vslider" id="rIntSlider" role="slider" aria-label="Ripple intensity"
-            aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
-            data-min="0" data-max="100" data-value="50">
-            <div class="track"></div><div class="thumb"></div>
-          </div>
+      <div class="card" role="group" aria-label="Ripple Size">
+        <div class="label">Ripple Size</div>
+        <div class="readout" id="rSizeReadout">1.00×</div>
+        <div class="vslider" id="rSizeSlider" role="slider" aria-label="Ripple size"
+          aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+          data-min="0" data-max="100" data-value="50">
+          <div class="track"></div><div class="thumb"></div>
         </div>
       </div>
     </div>
 
-    <!-- Exit Fullscreen button (shows only in :fullscreen) -->
-    <button id="fsExit" class="fs-btn" type="button" aria-label="Exit fullscreen">EXIT FULL SCREEN</button>
-  </div>
+    <!-- Right: Zoom + Ripple Intensity -->
+    <div class="ctrlCol right">
+      <div class="card" role="group" aria-label="Zoom">
+        <div class="label">Zoom</div>
+        <div class="readout" id="zoomReadout">1.00×</div>
+        <div class="vslider" id="zoomSlider" role="slider" aria-label="Zoom"
+          aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+          data-min="0" data-max="100" data-value="50">
+          <div class="track"></div><div class="thumb"></div>
+        </div>
+        <div class="ctrlRow">
+          <button class="tiny-btn" type="button" data-action="reset" title="Reset" aria-label="Reset">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5v4L7 4l5-5v4a8 8 0 1 1-8 8H2a10 10 0 1 0 10-10z"/></svg>
+          </button>
+        </div>
+      </div>
 
-  <!-- canvases for marquee -->
-  <canvas id="heroMarquee" aria-label="Welcome marquee"></canvas>
-  <div class="heroSpacer" aria-hidden="true"></div>
+      <div class="card" role="group" aria-label="Ripple Intensity">
+        <div class="label">RIPPLE INTENSITY</div>
+        <div class="readout" id="rIntReadout">1.00×</div>
+        <div class="vslider" id="rIntSlider" role="slider" aria-label="Ripple intensity"
+          aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
+          data-min="0" data-max="100" data-value="50">
+          <div class="track"></div><div class="thumb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <main id="main">
     <!-- MUSIC -->
@@ -423,7 +417,7 @@
       </div>
 
       <div class="grid" style="margin-top:22px;">
-        <article class="card col-12 video-card">
+        <article class="col-12 video-card">
           <div class="video-head"><h3 class="video-title">LATEST VIDEO</h3></div>
           <div class="video-wrap">
             <iframe src="https://www.youtube.com/embed/XBsp40jGAIk" title="our dream funeral — DEGH" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -566,7 +560,7 @@
           <div class="card-body">
             <div class="meta"><span>2022</span></div>
             <h3 class="title-sm">my experience at the chance the rapper / savemoney reunion show</h3>
-            <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90k/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">read</a></div>
+            <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">read</a></div>
           </div>
         </article>
       </div>
@@ -591,8 +585,8 @@
       <div class="section-head">
         <h2 class="title">WORMHOLE CONTROL ↓</h2>
         <p class="subtitle">there's no earthly way of knowing…</p>
-        <div class="center-wrap" style="margin-top:10px">
-          <button class="fs-btn" id="fsEnter" type="button" aria-pressed="false" title="Fullscreen wormhole">ENTER FULL SCREEN</button>
+        <div class="fs-cta">
+          <button class="fs-btn" id="fsToggle" type="button" aria-pressed="false" title="Fullscreen">ENTER FULLSCREEN</button>
         </div>
       </div>
       <div class="control-spacer" aria-hidden="true"></div>
@@ -626,7 +620,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.2+ - 2025</small>
+      <small>DAECLAN.COM v4 - 2025</small>
     </div>
   </footer>
 
@@ -644,59 +638,27 @@
     </div>
   </dialog>
 
-  <!-- Three.js (r160+) -->
+  <!-- Three.js (r160+, using build is OK but warned; keeping until ESM refactor) -->
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
   <script>
-  
   /* Scrollspy */
-  (function(){
-    const secs=[...document.querySelectorAll('main section[id]')];
-    const links=[...document.querySelectorAll('header nav.primary a')];
-    const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
-
-    function setActiveById(id){
-      const link = map(id);
+  const secs=[...document.querySelectorAll('main section[id]')];
+  const links=[...document.querySelectorAll('header nav.primary a')];
+  const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      const id=e.target.id, link=map(id);
       if(!link) return;
-      links.forEach(a=>a.classList.remove('active'));
-      link.classList.add('active');
-    }
-
-    const io=new IntersectionObserver(es=>{
-      es.forEach(e=>{
-        const id=e.target.id, link=map(id);
-        if(!link) return;
-        if(e.isIntersecting){
-          links.forEach(a=>a.classList.remove('active'));
-          link.classList.add('active');
-        }
-      });
-    },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
-    secs.forEach(s=>io.observe(s));
-
-    // Force CONTACT active near bottom of page
-    function checkBottom(){
-      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      const vh = window.innerHeight || 1;
-      const docH = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const bottomThreshold = docH - vh*0.6;
-      if (scrollY + vh >= bottomThreshold){
-        setActiveById('contact');
+      if(e.isIntersecting){
+        links.forEach(a=>a.classList.remove('active'));
+        link.classList.add('active');
       }
-    }
-
-    window.addEventListener('scroll',checkBottom,{passive:true});
-    window.addEventListener('resize',checkBottom,{passive:true});
-
-    // Also when clicking CONTACT, immediately reflect in nav
-    links.forEach(a=>{
-      a.addEventListener('click',()=>{
-        const href=a.getAttribute('href')||'';
-        if(href==='#contact') setActiveById('contact');
-      });
     });
-  })();
-/* Mobile menu */
+  },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
+  secs.forEach(s=>io.observe(s));
+
+  /* Mobile menu */
   (function(){
     const btn=document.getElementById('menuToggle');
     const panel=document.getElementById('mobileNav');
@@ -724,6 +686,27 @@
     window.matchMedia('(min-width:861px)').addEventListener('change',ev=>{if(ev.matches) open(false);});
   })();
 
+  /* Fullscreen toggle */
+  (function(){
+    const btn=document.getElementById('fsToggle');
+    if(!btn) return;
+    function fsActive(){ return !!(document.fullscreenElement); }
+    function updateBtn(){
+      const active = fsActive();
+      btn.setAttribute('aria-pressed', active?'true':'false');
+      btn.textContent = active ? 'EXIT FULLSCREEN' : 'ENTER FULLSCREEN';
+    }
+    btn.addEventListener('click', async ()=>{
+      try{
+        if(!fsActive()){ await document.documentElement.requestFullscreen({ navigationUI: "hide" }); }
+        else{ await document.exitFullscreen(); }
+      }catch(e){ console.warn('Fullscreen error:', e); }
+      updateBtn();
+    });
+    document.addEventListener('fullscreenchange', updateBtn);
+    updateBtn();
+  })();
+
   /* Lightbox */
   (function(){
     const lb=document.getElementById('lightbox'), img=document.getElementById('lightboxImg');
@@ -736,50 +719,15 @@
   })();
   </script>
 
-  <!-- HEADSHOTS dialog wiring -->
   <script>
-  (function(){
-    const openBtn = document.getElementById('openHeadshots');
-    const dlg     = document.getElementById('headshotsDlg');
-    const closeBtn= document.getElementById('closeHeadshots');
-    if(!openBtn || !dlg || !closeBtn) return;
-
-    function openModal(){
-      if (typeof dlg.showModal === 'function') {
-        dlg.showModal();
-      } else {
-        dlg.setAttribute('open','');
-      }
-    }
-    function closeModal(){
-      if (dlg.hasAttribute('open') && typeof dlg.close === 'function') {
-        dlg.close();
-      } else {
-        dlg.removeAttribute('open');
-      }
-    }
-
-    openBtn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); openModal(); });
-    closeBtn.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); closeModal(); });
-
-    dlg.addEventListener('click', (e)=>{
-      const rect = dlg.getBoundingClientRect();
-      if (e.clientX < rect.left || e.clientX > rect.right || e.clientY < rect.top || e.clientY > rect.bottom) {
-        closeModal();
-      }
-    });
-    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && dlg.hasAttribute('open')) closeModal(); });
-  })();
-  </script>
-
-  <script>
-  /* ==== MARQUEE ==== */
+  /* ==== MARQUEE (same behavior) ==== */
   (function(){
     const canvas=document.getElementById('heroMarquee');
     if(!canvas) return;
     const ctx=canvas.getContext('2d',{alpha:true});
     const DPR=Math.min(devicePixelRatio||1,2);
     const LINE1='WELCOME TO', LINE2='DAECLAN . COM', ORANGE='#ff7a18';
+    const spacer=document.querySelector('.heroSpacer');
     let W=1,H=1,glyphs=[],center={x:0,y:0};
 
     function headerH(){return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;}
@@ -824,6 +772,7 @@
       pushLine(LINE1,s1,y1); pushLine(LINE2,s2,y2);
     }
     resize(); addEventListener('resize',resize,{passive:true});
+    addEventListener('orientationchange',()=>setTimeout(resize,150),{passive:true});
 
     function fadeProgress(){
       const rect=document.querySelector('.heroSpacer').getBoundingClientRect();
@@ -842,7 +791,6 @@
       const isM = innerWidth<=560;
       const k = isM ? 3.0 : 1.25;
 
-      const center={x:W/2,y:H/2};
       for(const g of glyphs){
         const buoy=Math.sin(t*1.2+g.phase)*(g.amp);
         const dx=g.x-center.x, dy=g.y-center.y;
@@ -879,9 +827,8 @@
   </script>
 
   <script>
-  /* Wormhole shader + controls */
+  /* Wormhole shader + controls (tap ripples universal, FS friendly) */
   (function(){
-    const wrap = document.getElementById('wormholeWrap');
     const canvas=document.getElementById('bgScene'); if(!canvas) return;
     const gl=canvas.getContext('webgl2',{antialias:false,alpha:true,premultipliedAlpha:true}); if(!gl){console.warn('WebGL2 not available');return;}
     const vsrc=`#version 300 es
@@ -891,14 +838,13 @@
     precision highp float; in vec2 vUv; out vec4 frag;
     uniform vec2 uRes; uniform float uTime; uniform float uSpin; uniform float uTravel; uniform float uAmp; uniform float uDir;
     uniform float uZoom;
-    uniform float uRippleSize;      
-    uniform float uRippleIntensity; 
-    uniform float uRippleGain;      
-    const int MAX_RIPPLES = 256;
+    uniform float uRippleSize;      // NEW: user size scale
+    uniform float uRippleIntensity; // NEW: user intensity scale
+    const int MAX_RIPPLES = 256;    // more ripples, yay
     uniform int uRippleCount;
-    uniform vec3 uRipples[MAX_RIPPLES]; // (x,y,startTime)
+    uniform vec3 uRipples[MAX_RIPPLES]; // (x,y,startTime) in pixels + seconds
 
-    vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.48,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.);} 
+    vec3 roygbiv(float i){ if(i<0.5)return vec3(1.,0.,0.); if(i<1.5)return vec3(1.,.48,0.); if(i<2.5)return vec3(1.,1.,0.); if(i<3.5)return vec3(0.,1.,0.); if(i<4.5)return vec3(0.,0.,1.); if(i<5.5)return vec3(.294,0.,.510); return vec3(.561,0.,1.);}
     mat2 r(float a){ float c=cos(a),s=sin(a); return mat2(c,-s,s,c);}  
 
     vec2 rippleOffset(vec2 fragPx){
@@ -911,6 +857,7 @@
         if(age>LIFE+FADE_DUR) continue;
         float d=distance(fragPx,rp.xy);
 
+        // size scaling: bigger size = lower frequency & wider envelope
         float size = clamp(uRippleSize, 0.25, 4.0);
         float falloff = (0.0020/size) + age*(0.0010/size);
         float env = exp(-d*falloff);
@@ -922,7 +869,8 @@
         float damp=exp(-age*0.22);
         float tail=(age<LIFE)?1.0:0.5*(1.0+cos(PI*clamp((age-LIFE)/FADE_DUR,0.0,1.0)));
 
-        float amp = damp*tail * clamp(uRippleIntensity, 0.2, 6.0) * uRippleGain;
+        // intensity scaling multiplies amplitude
+        float amp = damp*tail * clamp(uRippleIntensity, 0.2, 6.0);
 
         off += (env*amp)*wave*vec2(0.020,0.010);
       }
@@ -934,6 +882,7 @@
       vec2 p=(fragPx-0.5*uRes)/min(uRes.x,uRes.y);
       p += rippleOffset(fragPx);
 
+      // Zoom (>=1 = out, <1 = in)
       p *= uZoom;
 
       if(uAmp>0.0001){
@@ -958,120 +907,82 @@
     const uZoom=gl.getUniformLocation(pr,'uZoom');
     const uRippleSize=gl.getUniformLocation(pr,'uRippleSize');
     const uRippleIntensity=gl.getUniformLocation(pr,'uRippleIntensity');
-    const uRippleGain=gl.getUniformLocation(pr,'uRippleGain');
 
     function resize(){
       const header=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;
-      const isFS = !!document.fullscreenElement;
-      const topPad = isFS ? 0 : header;
       const vh=Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight);
-      const w=innerWidth, h=Math.max(1,vh-topPad); const d=Math.min(Math.max(1,devicePixelRatio||1),2.5);
+      const w=innerWidth, h=Math.max(1,vh-header); const d=Math.min(Math.max(1,devicePixelRatio||1),2.5);
       canvas.width=w*d; canvas.height=h*d; canvas.style.width=w+'px'; canvas.style.height=h+'px';
       gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uRes,canvas.width,canvas.height);
     }
-    resize(); addEventListener('resize',resize,{passive:true}); document.addEventListener('fullscreenchange',()=>{ resize(); setRippleGain(); });
+    resize(); addEventListener('resize',resize,{passive:true});
 
     let spin=0,travel=0,amp=0,dir=1,lastY=scrollY;
-    let shaderTime = 0.0;
+    addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,Math.min(.75,Math.abs(dy)*.005)+amp);}}, {passive:true});
 
-    addEventListener('scroll',()=>{ 
-      if (window.__wormPaused) return;
-      const y=scrollY,dy=y-lastY;lastY=y;
-      if(dy){
-        dir=dy<0?1:-1;
-        amp=Math.min(1,Math.min(.75,Math.abs(dy)*.005)+amp);
-      }
-    }, {passive:true});
+    function checkBottom(){
+      const atBottom=(window.scrollY+window.innerHeight)>=(document.documentElement.scrollHeight-2);
+      document.documentElement.classList.toggle('at-bottom',atBottom);
+    }
+    addEventListener('scroll',checkBottom,{passive:true}); addEventListener('resize',checkBottom,{passive:true}); checkBottom();
 
-    // Ripple buffer
-    const ripples=[]; const MAX_R=256;
+    // Observe WORMHOLE for enabling canvas pointer
+    (function(){
+      const ctrl=document.getElementById('control');
+      if(!ctrl) return;
+      const o=new IntersectionObserver((ents)=>{
+        const vis=ents.some(e=>e.isIntersecting && e.intersectionRatio>=0.35);
+        document.documentElement.classList.toggle('in-control',vis);
+      },{threshold:[0,0.35,0.75,1]});
+      o.observe(ctrl);
+    })();
+
+    // Ripple ring buffer (256)
+    const ripples=[]; const MAX_RIPPLES=256;
     function addRipple(px,py){
-      const now=shaderTime;
-      ripples.push({x:Math.max(0,Math.min(px,gl.canvas.width)), y:Math.max(0,Math.min(gl.canvas.height - py, gl.canvas.height)), start:now});
-      while(ripples.length>MAX_R) ripples.shift();
+      const now=performance.now()*0.001;
+      ripples.push({x:px,y:gl.canvas.height - py,start:now});
+      while(ripples.length>MAX_RIPPLES) ripples.shift();
     }
 
-    // === GLOBAL RIPPLE HANDLERS ===
-    let dragging=false, lastX=0, lastYp=0, lastT=0;
-    const blocksRippleSelector = [
-      '.vslider','.fs-btn','button','.btn','a','nav','header','.ctrlCol','.card',
-      '#mobileNav','dialog','[role="dialog"]','.mix-embed','#loader','#siteHatch'
-    ].join(',');
-
-    function isUIClick(target){ return !!target && !!target.closest && target.closest(blocksRippleSelector); }
-
-    function toCanvasXY(clientX, clientY){
+    // Universal tap-to-ripple (no boost)
+    addEventListener('pointerdown', e => {
       const rect = canvas.getBoundingClientRect();
       const dpr  = Math.min(Math.max(1, devicePixelRatio || 1), 2.5);
-      const x    = (clientX - rect.left) * dpr;
-      const y    = (clientY - rect.top)  * dpr;
-      return {x,y,dpr};
-    }
-
-    // Ripples only fire when not on UI and not paused
-    document.addEventListener('pointerdown', e => {
-      if (window.__wormPaused) return;
-      if(isUIClick(e.target)) return;
-      const {x,y}=toCanvasXY(e.clientX, e.clientY);
-      for (let i = 0; i < 3; i++) addRipple(x, y);
-      dragging=true; lastX=x; lastYp=y; lastT=performance.now();
-    }, { passive: true, capture: true });
-
-    window.addEventListener('pointermove', e=>{
-      if(!dragging || window.__wormPaused) return;
-      const {x,y,dpr}=toCanvasXY(e.clientX, e.clientY);
-      const dx=x-lastX, dy=y-lastYp;
-      const dist=Math.hypot(dx,dy);
-      const step=8*dpr;
-      if(dist>=step){
-        const n=Math.min(24, Math.floor(dist/step));
-        for(let i=1;i<=n;i++){
-          const t=i/(n+1);
-          addRipple(lastX+dx*t, lastYp+dy*t);
-        }
-        const now=performance.now(), dt=(now-lastT)/1000;
-        if(dt>0){
-          const v=dist/dt; amp = Math.min(1, amp + Math.min(0.6, v/(1200*dpr))); lastT=now;
-        }
-        lastX=x; lastYp=y;
-      }
-    }, {passive:true});
-
-    window.addEventListener('pointerup', ()=>{dragging=false;}, {passive:true});
-    window.addEventListener('pointercancel', ()=>{dragging=false;}, {passive:true});
+      const x    = (e.clientX - rect.left) * dpr;
+      const y    = (e.clientY - rect.top)  * dpr;
+      for (let i = 0; i < 3; i++) addRipple(x, y); // bursty tap
+    }, { passive: true });
 
     // Zoom + Warp mapping
     let zoom=1.0; function setZoom(z){ zoom=Math.max(0.000000333, Math.min(333.0, z)); }
-    function warpFromSlider(v){const MIN=0.10, MAX=1000000.0; const K=Math.log(MAX/MIN); const t=v/100; return MIN*Math.exp(K*t);} 
+    function warpFromSlider(v){const MIN=0.10, MAX=1000000.0; const K=Math.log(MAX/MIN); const t=v/100; return MIN*Math.exp(K*t);}
     function sliderFromWarp(w){const MIN=0.10, MAX=1000000.0; const K=Math.log(MAX/MIN); const t=(Math.log(w/MIN))/K; return Math.max(0,Math.min(100,Math.round(t*100)));}
-
-    // Ripple gain: 0.5 in fullscreen, 1.0 otherwise
-    function setRippleGain(){ gl.uniform1f(uRippleGain, document.fullscreenElement ? 0.5 : 1.0); }
-    setRippleGain();
 
     // Animation loop
     window.__wormPaused=false;
+    window.__wormReset=function(){
+      travel=0; spin=0; amp=0; setZoom(1.0);
+      if (typeof updateZoomSliderToValue==='function') updateZoomSliderToValue(zoomSliderValueFor(1.0));
+      if (typeof updateWarpSliderToWarp==='function') updateWarpSliderToWarp(1.0);
+      setRippleSizeUI(50); setRippleIntensityUI(50);
+    };
 
     (function loop(){
+      const now=performance.now()*0.001;
+      const pauseFactor = window.__wormPaused ? 0.92 : 1.0;
       const base=0.35;
-      const step = 1/60;
+      const rate=base*(window.__wormWarp || 1)*pauseFactor;
+      travel += rate*(1/60);
+      spin   += 0.10*(1/60)*pauseFactor;
+      amp = Math.max(0, amp - (1/60)/2);
 
-      if (!window.__wormPaused){
-        const rate=base*(window.__wormWarp || 1);
-        travel += rate*step;
-        spin   += 0.10*step;
-        amp = Math.max(0, amp - step/2);
-        shaderTime += step;
+      gl.uniform1f(uTime,now); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
+      gl.uniform1i(uRippleCount, Math.min(ripples.length, MAX_RIPPLES));
+      const buf=new Float32Array(MAX_RIPPLES*3);
+      for(let i=0;i<ripples.length && i<MAX_RIPPLES;i++){
+        buf[i*3+0]=ripples[i].x; buf[i*3+1]=ripples[i].y; buf[i*3+2]=ripples[i].start;
       }
-
-      gl.uniform1f(uTime,shaderTime); 
-      gl.uniform1f(uSpin,spin); 
-      gl.uniform1f(uTravel,travel); 
-      gl.uniform1f(uAmp,amp); 
-      gl.uniform1f(uDir,dir);
-      gl.uniform1i(uRippleCount, Math.min(ripples.length, 256));
-      const buf=new Float32Array(256*3);
-      for(let i=0;i<ripples.length && i<256;i++){ buf[i*3+0]=ripples[i].x; buf[i*3+1]=ripples[i].y; buf[i*3+2]=ripples[i].start; }
       gl.uniform3fv(uRipples, buf);
       gl.uniform1f(uZoom, zoom);
       gl.uniform1f(uRippleSize,  window.__ripSize || 1.0);
@@ -1082,7 +993,7 @@
       requestAnimationFrame(loop);
     })();
 
-    /* --------- UI: sliders --------- */
+    /* --------- UI: sliders (top=max), deeper zoom range, defaults 1× --------- */
     (function(){
       const warpSlider=document.getElementById('warpSlider');
       const warpReadout=document.getElementById('warpReadout');
@@ -1111,7 +1022,7 @@
         return z.toFixed(7)+'×';
       }
 
-      // Zoom range
+      // New zoom range
       const Z_MIN=0.000000333, Z_MAX=333.0, ZK=Math.log(Z_MAX/Z_MIN);
       const sliderToZoom = v => Z_MIN*Math.exp(ZK*(v/100));
       const zoomSliderValueFor = z => Math.round(100 * Math.log(z/Z_MIN) / Math.log(Z_MAX/Z_MIN));
@@ -1124,26 +1035,24 @@
         const v = Math.min(max, Math.max(min, value));
         slider.dataset.value = v;
         slider.setAttribute('aria-valuenow', String(v));
-        const t = (v - min) / (max - min);
+        const t = (v - min) / (max - min); // 0..1
         thumb.style.top = ((1 - t)*100) + '%';
       }
 
       function getValueFromPointer(slider, clientY){
         const track=slider.querySelector('.track');
         const rect=track.getBoundingClientRect();
-        let t = (clientY - rect.top) / rect.height;
+        let t = (clientY - rect.top) / rect.height; // 0 top .. 1 bottom
         t = Math.max(0, Math.min(1, t));
-        t = 1 - t;
+        t = 1 - t; // invert so top = 1
         const min=parseFloat(slider.dataset.min||'0');
         const max=parseFloat(slider.dataset.max||'100');
         return Math.round(min + t*(max-min));
       }
 
       function bindSlider(slider, onChange){
-        if(!slider) return;
         const thumb=slider.querySelector('.thumb');
         const track=slider.querySelector('.track');
-        if(!thumb || !track) return;
         let dragging=false, pointerId=null;
 
         const updateFromY=(y)=>{
@@ -1156,7 +1065,6 @@
           dragging=true; pointerId=e.pointerId;
           slider.dataset.grabbing='1';
           slider.focus({preventScroll:true});
-          e.stopPropagation(); e.preventDefault();
           try { captureEl.setPointerCapture(pointerId); } catch {}
         };
         const endDrag = (e) => {
@@ -1167,16 +1075,18 @@
         };
 
         track.addEventListener('pointerdown',(e)=>{
+          e.preventDefault();
           updateFromY(e.clientY);
           beginDrag(e, track);
-        }, {passive:false});
+        });
         thumb.addEventListener('pointerdown',(e)=>{
+          e.preventDefault();
           beginDrag(e, thumb);
-        }, {passive:false});
+        });
 
         const onMove=(e)=>{
           if(!dragging || (pointerId!==null && e.pointerId!==pointerId)) return;
-          e.preventDefault(); e.stopPropagation();
+          e.preventDefault();
           updateFromY(e.clientY);
         };
         window.addEventListener('pointermove',onMove,{passive:false});
@@ -1194,10 +1104,10 @@
           else if(e.key==='ArrowDown'){ v=Math.max(min, v- step);}
           else if(e.key==='PageUp'){ v=Math.min(max, v+ big); }
           else if(e.key==='PageDown'){ v=Math.max(min, v- big); }
-          else if(e.key==='Home'){ v=max; }
-          else if(e.key==='End'){ v=min; }
+          else if(e.key==='Home'){ v=min; }
+          else if(e.key==='End'){ v=max; }
           else return;
-          e.preventDefault(); e.stopPropagation();
+          e.preventDefault();
           setThumbPosition(slider,v);
           onChange(v);
         });
@@ -1214,7 +1124,6 @@
         const v = sliderFromWarp(w);
         setThumbPosition(warpSlider, v);
         warpReadout.textContent = fmtWarp(w);
-        window.__wormWarp = w;
       }
       function updateZoomSliderToValue(v){
         setThumbPosition(zoomSlider, v);
@@ -1225,87 +1134,42 @@
       window.updateZoomSliderToValue = updateZoomSliderToValue;
       window.updateWarpSliderToWarp  = updateWarpSliderToWarp;
 
+      // NEW: Ripple size/intensity UI mappings (0..100 → scales)
       function setRippleSizeUI(v){
         setThumbPosition(rSizeSlider, v);
-        const scale = 0.25 + (v/100)*(4.0-0.25);
+        const scale = 0.25 + (v/100)*(4.0-0.25); // 0.25..4.0
         window.__ripSize = scale;
         rSizeReadout.textContent = scale.toFixed(2)+'×';
       }
       function setRippleIntensityUI(v){
         setThumbPosition(rIntSlider, v);
-        const scale = 0.2 + (v/100)*(6.0-0.2);
+        const scale = 0.2 + (v/100)*(6.0-0.2); // 0.2..6.0
         window.__ripInt = scale;
         rIntReadout.textContent = scale.toFixed(2)+'×';
       }
-
-      // RESET: full reset of state, sliders, ripples, time, and unpause
-      window.__wormReset = function(){
-        window.__wormPaused = false;
-        travel = 0;
-        spin = 0;
-        amp = 0;
-        shaderTime = 0.0;
-        ripples.length = 0;
-
-        updateWarpSliderToWarp(1.0);
-        updateZoomSliderToValue(zoomSliderValueFor(1.0));
-        setRippleSizeUI(50);
-        setRippleIntensityUI(50);
-      };
 
       bindSlider(warpSlider,(v)=>{ const w = warpFromSlider(v); window.__wormWarp = w; warpReadout.textContent = fmtWarp(w); });
       bindSlider(zoomSlider,(v)=>{ const z = sliderToZoom(v); setZoom(z); zoomReadout.textContent = fmtZoom(z); });
       bindSlider(rSizeSlider,(v)=> setRippleSizeUI(v));
       bindSlider(rIntSlider,(v)=> setRippleIntensityUI(v));
 
-
-      // Randomize initial warp speed (1–33×) and zoom (0.0008888–1.25) per session
-      (function(){
-        try{
-          const warpSlider = document.getElementById('warpSlider');
-          const zoomSlider = document.getElementById('zoomSlider');
-          if(warpSlider){
-            const wMin = 1.0, wMax = 33.0;
-            const wRand = wMin + Math.random()*(wMax - wMin);
-            const MIN = 0.10;
-            const MAX = 210000.0;
-            const K   = Math.log(MAX / MIN);
-            const t   = Math.log(wRand/MIN) / K;
-            const sliderVal = Math.round(t*100);
-            warpSlider.value = String(Math.max(0,Math.min(100,sliderVal)));
-          }
-          if(zoomSlider){
-            const zMin = 0.0008888, zMax = 1.25;
-            const zRand = zMin + Math.random()*(zMax - zMin);
-            const Z_MIN = 0.0008888;
-            const Z_MAX = 1.25;
-            const t = (zRand - Z_MIN) / (Z_MAX - Z_MIN);
-            const sliderVal = Math.round(Math.max(0,Math.min(100,t*100)));
-            zoomSlider.value = String(sliderVal);
-          }
-        }catch(e){ console.warn('randomize warp/zoom failed', e); }
-      })();
-      // Defaults
+      // Default values
       updateWarpSliderToWarp(1.0);
       updateZoomSliderToValue(zoomSliderValueFor(1.0));
       setRippleSizeUI(50);
       setRippleIntensityUI(50);
 
-      // Tiny buttons
+      // Tiny buttons: pause on left, reset on right
       function hookTinyButtons(scope){
         scope.querySelectorAll('.tiny-btn').forEach(btn=>{
           const action=btn.dataset.action;
           if(action==='pause'){
-            btn.addEventListener('click',(e)=>{
-              e.stopPropagation();
+            btn.addEventListener('click',()=>{
               window.__wormPaused = !window.__wormPaused;
               btn.classList.toggle('active', window.__wormPaused);
             });
           } else if(action==='reset'){
-            btn.addEventListener('click',(e)=>{ 
-              e.stopPropagation(); 
-              if (typeof window.__wormReset === 'function') window.__wormReset(); 
-            });
+            btn.addEventListener('click',()=>{ if (typeof window.__wormReset === 'function') window.__wormReset(); });
           }
         });
       }
@@ -1335,48 +1199,16 @@
         const outRamp = 0.22 * innerHeight;
         const fadeOut = clamp01(bottomDist / Math.max(1,outRamp));
 
-        const isFS = !!document.fullscreenElement;
-        const opacity = isFS ? 1 : clamp01(fadeIn * fadeOut);
+        const opacity = clamp01(fadeIn * fadeOut);
         controls.style.opacity = (opacity <= 0.001) ? '0' : String(opacity);
-        controls.style.pointerEvents = 'none';
+        controls.style.pointerEvents = opacity>0.02 ? 'auto' : 'none';
       }
 
       addEventListener('scroll',update,{passive:true});
       addEventListener('resize',update,{passive:true});
-      document.addEventListener('fullscreenchange',update);
       update();
     })();
 
-    /* ===== FULLSCREEN: enter/exit ===== */
-    (function(){
-      const enterBtn = document.getElementById('fsEnter');
-      const exitBtn  = document.getElementById('fsExit');
-      if(!enterBtn || !exitBtn) return;
-
-      function fsActive(){ return !!document.fullscreenElement; }
-      function updateEnter(){ enterBtn.textContent = 'ENTER FULL SCREEN'; }
-
-      enterBtn.addEventListener('click', async (e)=>{
-        e.stopPropagation(); e.preventDefault();
-        try{
-          if(!fsActive()){ await (wrap.requestFullscreen ? wrap.requestFullscreen({ navigationUI: "hide" }) : document.documentElement.requestFullscreen()); }
-          else{ await document.exitFullscreen(); }
-        }catch(err){ console.warn('Fullscreen error:', err); }
-        updateEnter(); setRippleGain();
-      });
-
-      exitBtn.addEventListener('click', async (e)=>{
-        e.stopPropagation(); e.preventDefault();
-        try{ if(fsActive()) await document.exitFullscreen(); }catch(err){ console.warn('Exit FS error:', err); }
-      });
-
-      // Block ripple from FS buttons
-      enterBtn.addEventListener('pointerdown', (e)=> e.stopPropagation());
-      exitBtn .addEventListener('pointerdown', (e)=> e.stopPropagation());
-
-      document.addEventListener('fullscreenchange', ()=>{ updateEnter(); setRippleGain(); });
-      updateEnter();
-    })();
   })();
   </script>
 
@@ -1486,6 +1318,15 @@
     else { document.documentElement.classList.add('fonts-ready'); }
     setTimeout(()=>{ if(target<0.25) setTarget(0.25); }, 250);
 
+    function waitFor(name, timeout=6000){
+      return new Promise(res=>{
+        let done=false;
+        const h=()=>{done=true; removeEventListener(name,h); res(true);};
+        addEventListener(name,h,{once:true});
+        setTimeout(()=>{ if(!done){ removeEventListener(name,h); res(false);} }, timeout);
+      });
+    }
+
     Promise.all([
       new Promise(r=>manager.onLoad=r),
       (document.fonts?document.fonts.ready:Promise.resolve()),
@@ -1495,9 +1336,7 @@
       setTarget(1.0);
       const siteHatch=document.getElementById('siteHatch');
       const revealWhenReady = () =>{
-        const span = document.querySelector('#loaderBar span');
-        const p = parseFloat(getComputedStyle(span).getPropertyValue('--p')) || 0;
-        if (Math.round(p*100) < 100) { requestAnimationFrame(revealWhenReady); return; }
+        if (Math.round((window.getComputedStyle(document.querySelector('#loaderBar span')).getPropertyValue('--p')||0)*100) < 100) { requestAnimationFrame(revealWhenReady); return; }
         siteHatch.classList.add('open');
         setTimeout(()=>{
           document.documentElement.classList.remove('loading');
@@ -1564,5 +1403,6 @@
     placeholders.forEach(ph=>io.observe(ph));
   })();
   </script>
+
 </body>
 </html>

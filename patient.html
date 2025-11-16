@@ -126,8 +126,12 @@
 
     /* layers + marquee */
     main{position:relative;z-index:2;flex:1}
-    #bgScene{position:fixed;left:0;right:0;bottom:0;top:var(--header);z-index:0;pointer-events:none}
-    html.at-bottom #bgScene, html.in-control #bgScene{pointer-events:auto;cursor:crosshair}
+    /* ========= WORMHOLE FULLSCREEN WRAP ========= */
+    #wormholeWrap{position:fixed;left:0;right:0;bottom:0;top:var(--header);z-index:1;pointer-events:auto}
+    :fullscreen #wormholeWrap{inset:0;top:0}
+    #bgScene{position:absolute;inset:0;z-index:0;pointer-events:none !important;}
+    html.at-bottom #wormholeWrap, html.in-control #wormholeWrap{pointer-events:auto;cursor:crosshair}
+
     #heroMarquee{position:fixed;inset:var(--header) 0 0 0;z-index:1;pointer-events:none;width:100vw;height:calc(100svh - var(--header));transition:opacity .2s ease}
     .heroSpacer{height:calc(100svh - var(--header));min-height:calc(100svh - var(--header));max-width:var(--maxw);margin:0 auto}
 
@@ -202,17 +206,18 @@
     .control-wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px;width:100%}
     .control-spacer{height:calc(100svh - var(--header));}
 
-    /* ===== FIXED SIDE CONTROLLERS ===== */
-    .sideControls{position:fixed;inset:var(--header) 0 0 0;pointer-events:none;z-index:5;opacity:0;transition:opacity .18s ease}
+    /* ===== FIXED SIDE CONTROLLERS (inside wormholeWrap) ===== */
+    .sideControls{position:absolute;inset:var(--header) 0 0 0;pointer-events:auto;z-index:4001;opacity:0;transition:opacity .18s ease}
+    :fullscreen .sideControls{inset:0; opacity:1 !important}
     .ctrlCol{position:absolute;top:50%;transform:translateY(-50%);width:70px;display:flex;flex-direction:column;align-items:center;gap:10px;pointer-events:none}
-    .ctrlCol .card{background:#000;border:1px solid var(--line);border-radius:14px;padding:10px;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:10pxwidth:64px;margin:0 auto;text-align:center;}
-    .ctrlCol .label{font-weight:800;font-size:0.7em;line-height:1.2;font-family:"Clash Display",system-ui,sans-serif;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;text-align:center;white-space:normal;}
+    .ctrlCol .card{background:#000;border:1px solid var(--line);border-radius:14px;padding:10px;pointer-events:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+    .ctrlCol .label{font:800 10px/1.1 "Clash Display",system-ui,sans-serif;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
     .ctrlCol .readout{font:800 11px/1.1 "Clash Display",system-ui,sans-serif;color:#eaecef}
     .ctrlCol.left{left:8px}
     .ctrlCol.right{right:8px}
 
     /* ===== CUSTOM VERTICAL SLIDERS ===== */
-    .vslider{position:relative;width:28px;height:220px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;cursor:default}
+    .vslider{position:relative;width:36px;height:220px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;cursor:default}
     .vslider .track{position:relative;width:8px;height:200px;border-radius:999px;background:linear-gradient(180deg,var(--accent),var(--accent2));box-shadow:inset 0 0 0 1px #141414;touch-action:none;cursor:default}
     .vslider .thumb{position:absolute;left:50%;width:22px;height:22px;transform:translate(-50%,-50%);border-radius:50%;background:#000;border:2px solid #111;box-shadow:0 2px 10px #0008;touch-action:none;will-change:transform;cursor:grab}
     .vslider[data-grabbing="1"] .thumb{box-shadow:0 6px 18px #000c;cursor:grabbing}
@@ -337,8 +342,8 @@
           </div>
         </div>
 
-        <div class="card" role="group" aria-label="Ripple Zest">
-          <div class="label">RIPPLE ZEST</div>
+        <div class="card" role="group" aria-label="Ripple Intensity">
+          <div class="label">RIPPLE INTENSITY</div>
           <div class="readout" id="rIntReadout">1.00×</div>
           <div class="vslider" id="rIntSlider" role="slider" aria-label="Ripple intensity"
             aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50"
@@ -423,7 +428,7 @@
       </div>
 
       <div class="grid" style="margin-top:22px;">
-        <article class="card col-12 video-card">
+        <article class="col-12 video-card">
           <div class="video-head"><h3 class="video-title">LATEST VIDEO</h3></div>
           <div class="video-wrap">
             <iframe src="https://www.youtube.com/embed/XBsp40jGAIk" title="our dream funeral — DEGH" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
@@ -626,7 +631,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.2+ - 2025</small>
+      <small>DAECLAN.COM v4 - 2025</small>
     </div>
   </footer>
 
@@ -648,55 +653,23 @@
   <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 
   <script>
-  
   /* Scrollspy */
-  (function(){
-    const secs=[...document.querySelectorAll('main section[id]')];
-    const links=[...document.querySelectorAll('header nav.primary a')];
-    const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
-
-    function setActiveById(id){
-      const link = map(id);
+  const secs=[...document.querySelectorAll('main section[id]')];
+  const links=[...document.querySelectorAll('header nav.primary a')];
+  const map=id=>links.find(a=>a.getAttribute('href')==='#'+id);
+  const io=new IntersectionObserver(es=>{
+    es.forEach(e=>{
+      const id=e.target.id, link=map(id);
       if(!link) return;
-      links.forEach(a=>a.classList.remove('active'));
-      link.classList.add('active');
-    }
-
-    const io=new IntersectionObserver(es=>{
-      es.forEach(e=>{
-        const id=e.target.id, link=map(id);
-        if(!link) return;
-        if(e.isIntersecting){
-          links.forEach(a=>a.classList.remove('active'));
-          link.classList.add('active');
-        }
-      });
-    },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
-    secs.forEach(s=>io.observe(s));
-
-    // Force CONTACT active near bottom of page
-    function checkBottom(){
-      const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
-      const vh = window.innerHeight || 1;
-      const docH = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const bottomThreshold = docH - vh*0.6;
-      if (scrollY + vh >= bottomThreshold){
-        setActiveById('contact');
+      if(e.isIntersecting){
+        links.forEach(a=>a.classList.remove('active'));
+        link.classList.add('active');
       }
-    }
-
-    window.addEventListener('scroll',checkBottom,{passive:true});
-    window.addEventListener('resize',checkBottom,{passive:true});
-
-    // Also when clicking CONTACT, immediately reflect in nav
-    links.forEach(a=>{
-      a.addEventListener('click',()=>{
-        const href=a.getAttribute('href')||'';
-        if(href==='#contact') setActiveById('contact');
-      });
     });
-  })();
-/* Mobile menu */
+  },{rootMargin:'-45% 0px -50% 0px',threshold:0.01});
+  secs.forEach(s=>io.observe(s));
+
+  /* Mobile menu */
   (function(){
     const btn=document.getElementById('menuToggle');
     const panel=document.getElementById('mobileNav');
@@ -972,21 +945,12 @@
     resize(); addEventListener('resize',resize,{passive:true}); document.addEventListener('fullscreenchange',()=>{ resize(); setRippleGain(); });
 
     let spin=0,travel=0,amp=0,dir=1,lastY=scrollY;
-    let shaderTime = 0.0;
-
-    addEventListener('scroll',()=>{ 
-      if (window.__wormPaused) return;
-      const y=scrollY,dy=y-lastY;lastY=y;
-      if(dy){
-        dir=dy<0?1:-1;
-        amp=Math.min(1,Math.min(.75,Math.abs(dy)*.005)+amp);
-      }
-    }, {passive:true});
+    addEventListener('scroll',()=>{const y=scrollY,dy=y-lastY;lastY=y;if(dy){dir=dy<0?1:-1;amp=Math.min(1,Math.min(.75,Math.abs(dy)*.005)+amp);}}, {passive:true});
 
     // Ripple buffer
     const ripples=[]; const MAX_R=256;
     function addRipple(px,py){
-      const now=shaderTime;
+      const now=performance.now()*0.001;
       ripples.push({x:Math.max(0,Math.min(px,gl.canvas.width)), y:Math.max(0,Math.min(gl.canvas.height - py, gl.canvas.height)), start:now});
       while(ripples.length>MAX_R) ripples.shift();
     }
@@ -1008,9 +972,8 @@
       return {x,y,dpr};
     }
 
-    // Ripples only fire when not on UI and not paused
+    // Ripples only fire when not on UI
     document.addEventListener('pointerdown', e => {
-      if (window.__wormPaused) return;
       if(isUIClick(e.target)) return;
       const {x,y}=toCanvasXY(e.clientX, e.clientY);
       for (let i = 0; i < 3; i++) addRipple(x, y);
@@ -1018,7 +981,7 @@
     }, { passive: true, capture: true });
 
     window.addEventListener('pointermove', e=>{
-      if(!dragging || window.__wormPaused) return;
+      if(!dragging) return;
       const {x,y,dpr}=toCanvasXY(e.clientX, e.clientY);
       const dx=x-lastX, dy=y-lastYp;
       const dist=Math.hypot(dx,dy);
@@ -1051,24 +1014,23 @@
 
     // Animation loop
     window.__wormPaused=false;
+    window.__wormReset=function(){
+      travel=0; spin=0; amp=0; setZoom(1.0);
+      if (typeof updateZoomSliderToValue==='function') updateZoomSliderToValue(zoomSliderValueFor(1.0));
+      if (typeof updateWarpSliderToWarp==='function') updateWarpSliderToWarp(1.0);
+      setRippleSizeUI(50); setRippleIntensityUI(50);
+    };
 
     (function loop(){
+      const now=performance.now()*0.001;
+      const pauseFactor = window.__wormPaused ? 0.92 : 1.0;
       const base=0.35;
-      const step = 1/60;
+      const rate=base*(window.__wormWarp || 1)*pauseFactor;
+      travel += rate*(1/60);
+      spin   += 0.10*(1/60)*pauseFactor;
+      amp = Math.max(0, amp - (1/60)/2);
 
-      if (!window.__wormPaused){
-        const rate=base*(window.__wormWarp || 1);
-        travel += rate*step;
-        spin   += 0.10*step;
-        amp = Math.max(0, amp - step/2);
-        shaderTime += step;
-      }
-
-      gl.uniform1f(uTime,shaderTime); 
-      gl.uniform1f(uSpin,spin); 
-      gl.uniform1f(uTravel,travel); 
-      gl.uniform1f(uAmp,amp); 
-      gl.uniform1f(uDir,dir);
+      gl.uniform1f(uTime,now); gl.uniform1f(uSpin,spin); gl.uniform1f(uTravel,travel); gl.uniform1f(uAmp,amp); gl.uniform1f(uDir,dir);
       gl.uniform1i(uRippleCount, Math.min(ripples.length, 256));
       const buf=new Float32Array(256*3);
       for(let i=0;i<ripples.length && i<256;i++){ buf[i*3+0]=ripples[i].x; buf[i*3+1]=ripples[i].y; buf[i*3+2]=ripples[i].start; }
@@ -1214,7 +1176,6 @@
         const v = sliderFromWarp(w);
         setThumbPosition(warpSlider, v);
         warpReadout.textContent = fmtWarp(w);
-        window.__wormWarp = w;
       }
       function updateZoomSliderToValue(v){
         setThumbPosition(zoomSlider, v);
@@ -1238,53 +1199,11 @@
         rIntReadout.textContent = scale.toFixed(2)+'×';
       }
 
-      // RESET: full reset of state, sliders, ripples, time, and unpause
-      window.__wormReset = function(){
-        window.__wormPaused = false;
-        travel = 0;
-        spin = 0;
-        amp = 0;
-        shaderTime = 0.0;
-        ripples.length = 0;
-
-        updateWarpSliderToWarp(1.0);
-        updateZoomSliderToValue(zoomSliderValueFor(1.0));
-        setRippleSizeUI(50);
-        setRippleIntensityUI(50);
-      };
-
       bindSlider(warpSlider,(v)=>{ const w = warpFromSlider(v); window.__wormWarp = w; warpReadout.textContent = fmtWarp(w); });
       bindSlider(zoomSlider,(v)=>{ const z = sliderToZoom(v); setZoom(z); zoomReadout.textContent = fmtZoom(z); });
       bindSlider(rSizeSlider,(v)=> setRippleSizeUI(v));
       bindSlider(rIntSlider,(v)=> setRippleIntensityUI(v));
 
-
-      // Randomize initial warp speed (1–33×) and zoom (0.0008888–1.25) per session
-      (function(){
-        try{
-          const warpSlider = document.getElementById('warpSlider');
-          const zoomSlider = document.getElementById('zoomSlider');
-          if(warpSlider){
-            const wMin = 1.0, wMax = 33.0;
-            const wRand = wMin + Math.random()*(wMax - wMin);
-            const MIN = 0.10;
-            const MAX = 210000.0;
-            const K   = Math.log(MAX / MIN);
-            const t   = Math.log(wRand/MIN) / K;
-            const sliderVal = Math.round(t*100);
-            warpSlider.value = String(Math.max(0,Math.min(100,sliderVal)));
-          }
-          if(zoomSlider){
-            const zMin = 0.0008888, zMax = 1.25;
-            const zRand = zMin + Math.random()*(zMax - zMin);
-            const Z_MIN = 0.0008888;
-            const Z_MAX = 1.25;
-            const t = (zRand - Z_MIN) / (Z_MAX - Z_MIN);
-            const sliderVal = Math.round(Math.max(0,Math.min(100,t*100)));
-            zoomSlider.value = String(sliderVal);
-          }
-        }catch(e){ console.warn('randomize warp/zoom failed', e); }
-      })();
       // Defaults
       updateWarpSliderToWarp(1.0);
       updateZoomSliderToValue(zoomSliderValueFor(1.0));
@@ -1302,10 +1221,7 @@
               btn.classList.toggle('active', window.__wormPaused);
             });
           } else if(action==='reset'){
-            btn.addEventListener('click',(e)=>{ 
-              e.stopPropagation(); 
-              if (typeof window.__wormReset === 'function') window.__wormReset(); 
-            });
+            btn.addEventListener('click',(e)=>{ e.stopPropagation(); if (typeof window.__wormReset === 'function') window.__wormReset(); });
           }
         });
       }
@@ -1335,10 +1251,9 @@
         const outRamp = 0.22 * innerHeight;
         const fadeOut = clamp01(bottomDist / Math.max(1,outRamp));
 
-        const isFS = !!document.fullscreenElement;
-        const opacity = isFS ? 1 : clamp01(fadeIn * fadeOut);
+        const opacity = clamp01(fadeIn * fadeOut);
         controls.style.opacity = (opacity <= 0.001) ? '0' : String(opacity);
-        controls.style.pointerEvents = 'none';
+        controls.style.pointerEvents = opacity>0.02 ? 'auto' : 'none';
       }
 
       addEventListener('scroll',update,{passive:true});
