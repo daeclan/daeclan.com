@@ -53,7 +53,8 @@
       font:700 28px/1.1 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
       color:#000; letter-spacing:.08em; text-transform:uppercase; animation:blink 2s steps(2,start) infinite}
     @keyframes blink{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
-    html.ui-ready .preload-msg{display:none}
+    /* keep LOADING... visible until loader is fully done */
+    html.loader-done .preload-msg{display:none}
     .loader-ui{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;opacity:0;transform:translateY(6px)}
     html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forwards}
     @keyframes uiIn{to{opacity:1;transform:none}}
@@ -320,7 +321,7 @@
         </div>
       </div>
 
-      <!-- Right: Zoom + RIPPLE INTENSITY -->
+      <!-- Right: Zoom + RIPPLE ZEST -->
       <div class="ctrlCol right">
         <div class="card" role="group" aria-label="Zoom">
           <div class="label">Zoom</div>
@@ -459,6 +460,11 @@
             <div class="mix-embed" data-mix-placeholder="15"></div>
           </div>
           <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
+          <p class="mixes-desc">
+            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener">
+              click here to stream all mixes in reverse chronological order
+            </a>
+          </p>
         </article>
       </div>
     </section>
@@ -626,7 +632,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.2+ - 2025</small>
+      <small>DAECLAN.COM v4.20+ - 2025</small>
     </div>
   </footer>
 
@@ -1525,7 +1531,7 @@
       "%2Fdegh%2Fchicago-summer-breeze-ss-18-mix%2F",
       "%2Fdegh%2Fwear-it-in-health-ss-17-mix%2F",
       "%2Fdegh%2Fwdtm-radio-volume-i%2F",
-      "%2Fdegh%2Fpure-imagination-early-summer-16%2F",
+      "%2Fdegh%2Fpure-imagination-early-summer-mix-16%2F",
       "%2Fdegh%2Fleap-of-faith-spring-16-mix%2F",
       "%2Fdegh%2Fno-meat-just-sauce-mardi-gras-mini-mix-2016%2F",
       "%2Fdegh%2Fthrow-the-book-winter-15-mini-mix%2F",
