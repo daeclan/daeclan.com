@@ -54,7 +54,7 @@
       color:#000; letter-spacing:.08em; text-transform:uppercase; animation:blink 2s steps(2,start) infinite}
     @keyframes blink{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
     /* keep LOADING... visible until loader is fully done */
-    html.loader-done .preload-msg{display:none}
+    html.fonts-ready .preload-msg{display:none}
     .loader-ui{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;opacity:0;transform:translateY(6px)}
     html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forwards}
     @keyframes uiIn{to{opacity:1;transform:none}}
@@ -461,7 +461,7 @@
           </div>
           <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
           <p class="mixes-desc">
-            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener">
+            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener" style="color:var(--accent);">
               click here to stream all mixes in reverse chronological order
             </a>
           </p>
@@ -477,7 +477,7 @@
           <div class="thumb"><img class="zoomable" loading="lazy" src="/assets/tree-of-slime.jpg" alt="THE TREE OF SLIME"><span class="tag">site</span></div>
           <div class="card-body">
             <h3 class="title-sm">slime.surf</h3>
-            <p class="desc">a 3d ysl soundboard built in three.js</p>
+            <p class="desc">a 3d ysl soundboard built for Young Thug & 300's SLIME LIFE 2 album, combining three.js & tone.js</p>
             <div class="actions left">
               <a class="btn" href="https://www.slime.surf/" target="_blank" rel="noopener">check it out</a>
               <a class="btn alt" href="https://www.reddit.com/r/YoungThug/comments/l764h9/i_was_tapped_by_300_entertainment_to_make_a/" target="_blank" rel="noopener">backstory (reddit)</a>
@@ -685,7 +685,7 @@
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const vh = window.innerHeight || 1;
       const docH = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const bottomThreshold = docH - vh*0.6;
+      const bottomThreshold = docH - 4;
       if (scrollY + vh >= bottomThreshold){
         setActiveById('contact');
       }
