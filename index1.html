@@ -51,11 +51,10 @@
     html.bg-ready #loaderGL{opacity:1}
     .preload-msg{position:absolute; z-index:3; inset:0; display:grid; place-items:center;
       font:700 28px/1.1 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-      color:#000; letter-spacing:.08em; text-transform:uppercase; animation:loaderBlink 2s steps(1,end) infinite}
-    @keyframes loaderBlink{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
-    /* LOADING... blinks until marquee font is ready, then disappears */
+      color:#000; letter-spacing:.08em; text-transform:uppercase; animation:blink 2s steps(2,start) infinite}
+    @keyframes blink{0%{opacity:1}50%{opacity:0}100%{opacity:1}}
+    /* keep LOADING... visible until loader is fully done */
     html.fonts-ready .preload-msg{display:none}
-    html.loader-done .preload-msg{display:none}
     .loader-ui{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:24px;opacity:0;transform:translateY(6px)}
     html.fonts-ready .loader-ui{animation:uiIn .28s cubic-bezier(.22,.61,.36,1) forwards}
     @keyframes uiIn{to{opacity:1;transform:none}}
@@ -232,6 +231,10 @@
     /* ===== FS controls (enter/exit) ===== */
     .fs-btn{appearance:none;border:1px solid var(--line);background:#0b0c10;color:var(--accent);
       padding:10px 14px;border-radius:10px;font-weight:800;font-family:"Clash Display",system-ui,sans-serif;pointer-events:auto}
+
+    @media (max-width: 600px){
+      #fsEnter{display:none !important;}
+    }
     #fsExit{position:fixed;top:12px;right:12px;z-index:4500;display:none}
     :fullscreen #fsExit{display:inline-flex}
   </style>
@@ -462,7 +465,7 @@
           </div>
           <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
           <p class="mixes-desc">
-            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener">
+            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener" style="color:var(--accent);">
               click here to stream all mixes in reverse chronological order
             </a>
           </p>
@@ -478,7 +481,7 @@
           <div class="thumb"><img class="zoomable" loading="lazy" src="/assets/tree-of-slime.jpg" alt="THE TREE OF SLIME"><span class="tag">site</span></div>
           <div class="card-body">
             <h3 class="title-sm">slime.surf</h3>
-            <p class="desc">a 3d ysl soundboard built in three.js</p>
+            <p class="desc">a 3d ysl soundboard built for Young Thug & 300's SLIME LIFE 2 album, combining three.js & tone.js</p>
             <div class="actions left">
               <a class="btn" href="https://www.slime.surf/" target="_blank" rel="noopener">check it out</a>
               <a class="btn alt" href="https://www.reddit.com/r/YoungThug/comments/l764h9/i_was_tapped_by_300_entertainment_to_make_a/" target="_blank" rel="noopener">backstory (reddit)</a>
@@ -633,7 +636,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.4 - 2025</small>
+      <small>DAECLAN.COM v4.20+ - 2025</small>
     </div>
   </footer>
 
@@ -686,7 +689,7 @@
       const scrollY = window.scrollY || document.documentElement.scrollTop || 0;
       const vh = window.innerHeight || 1;
       const docH = document.documentElement.scrollHeight || document.body.scrollHeight || 0;
-      const bottomThreshold = docH - vh*0.6;
+      const bottomThreshold = docH - 4;
       if (scrollY + vh >= bottomThreshold){
         setActiveById('contact');
       }
@@ -845,19 +848,23 @@
     function draw(tms){
       const t=tms*.001; ctx.clearRect(0,0,W,H);
       const s = fadeProgress();
-      const isM = innerWidth<=600;
-      const mobileK = isM ? 0.0 : 1.25;
-    
       const fade = Math.max(0, 1 - s*1.15);
-      
-      const k = mobileK;
+      const isM = innerWidth<=560;
+      const k = isM ? 3.0 : 1.25;
 
       const center={x:W/2,y:H/2};
       for(const g of glyphs){
-        const buoy = isM ? 0.0 : Math.sin(t*1.2+g.phase)*(g.amp);
-        const dx=g.x-center.x, dy=g.y-center.y;
-        const px=g.x + dx*k*s;
-        const py=g.y + dy*k*s + buoy;
+        let px, py;
+        if (isM){
+          // Mobile: keep characters mostly static, just fade with scroll.
+          px = g.x;
+          py = g.y;
+        } else {
+          const buoy=Math.sin(t*1.2+g.phase)*(g.amp);
+          const dx=g.x-center.x, dy=g.y-center.y;
+          px=g.x + dx*k*s;
+          py=g.y + dy*k*s + buoy;
+        }
 
         ctx.save();
         ctx.translate(px,py);
@@ -975,7 +982,9 @@
       const isFS = !!document.fullscreenElement;
       const topPad = isFS ? 0 : header;
       const vh=Math.max(innerHeight,window.visualViewport?visualViewport.height:innerHeight);
-      const w=innerWidth, h=Math.max(1,vh-topPad); let d=Math.min(Math.max(1,devicePixelRatio||1),2.5);
+      const w=innerWidth, h=Math.max(1,vh-topPad);
+      let d = Math.min(Math.max(1,devicePixelRatio||1),2.5);
+      // On small screens (phones), cap DPR a bit lower for smoother performance
       if (w <= 600) d = Math.min(d, 1.2);
       canvas.width=w*d; canvas.height=h*d; canvas.style.width=w+'px'; canvas.style.height=h+'px';
       gl.viewport(0,0,canvas.width,canvas.height); gl.uniform2f(uRes,canvas.width,canvas.height);
