@@ -140,20 +140,6 @@
     .section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 12px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
     .title{font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
     .subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#e8e9ff;text-align:center;text-transform:lowercase;letter-spacing:.02em}
-    .rainbow-subtitle{
-      position:relative;
-      display:inline-block;
-      background-image:linear-gradient(90deg,#ff6b6b,#fddb92,#6bffb5,#6bc5ff,#d66bff,#ff6b6b);
-      background-size:200% 100%;
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-      animation:rainbowSweep 6s linear infinite alternate;
-    }
-    @keyframes rainbowSweep{
-      0%{background-position:0% 50%;}
-      100%{background-position:100% 50%;}
-    }
 
     /* grid + cards etc. */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
@@ -200,6 +186,7 @@
     .mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
     .mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
     .mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}
+    .mixes-desc a{color:var(--accent);text-decoration:none}
     .mix-rail{display:flex;gap:12px;overflow-x:auto;padding:14px 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity;touch-action:pan-x}
     .mix-rail::-webkit-scrollbar{display:none}
     .mix-embed{flex:0 0 320px;height:360px;border:0;border-radius:12px;overflow:hidden;background:#0e0f12;scroll-snap-align:start;pointer-events:auto;position:relative;z-index:6}
@@ -611,7 +598,7 @@
     <section id="control" class="section">
       <div class="section-head">
         <h2 class="title">WORMHOLE CONTROL ↓</h2>
-        <p class="subtitle"><span class="rainbow-subtitle">there's no earthly way of knowing…</span></p>
+        <p class="subtitle">there's no earthly way of knowing…</p>
         <div class="center-wrap" style="margin-top:10px">
           <button class="fs-btn" id="fsEnter" type="button" aria-pressed="false" title="Fullscreen wormhole">ENTER FULL SCREEN</button>
         </div>
@@ -647,7 +634,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.52 - 2025</small>
+      <small>DAECLAN.COM v4.53 - 2025</small>
     </div>
   </footer>
 
@@ -857,36 +844,41 @@
     }
 
     function draw(tms){
-      const t=tms*.001; ctx.clearRect(0,0,W,H);
+      const t=tms*.001; 
+      ctx.clearRect(0,0,W,H);
+
+      // Scroll-based fade + mobile bobbing control
       const rawS = fadeProgress();
       const s = Math.max(0, Math.min(1, rawS));
-      const fade = Math.max(0, 1 - rawS*1.15);
-      const isM = innerWidth<=900;
-      const k = isM ? 2.0 : 1.25;
-
-      let bobFactor = 1;
-      if (isM) {
-        if (s <= 0.02) {
-          bobFactor = 1;
-        } else if (s >= 0.20) {
-          bobFactor = 0;
-        } else {
-          const tNorm = (s - 0.02) / 0.18;
-          bobFactor = 1 - tNorm;
-        }
-      }
+      const fade = Math.max(0, 1 - s*1.15);
+      const isMobile = innerWidth <= 900; // iPhone + iPad-ish
+      const isSmallMobile = innerWidth <= 560;
+      const k = isSmallMobile ? 3.0 : 1.25;
 
       const center={x:W/2,y:H/2};
+
+      // On mobile, ONLY animate when hero is at the very top (fixed position).
+      const atTop = s < 0.001;
+      const allowMotion = !isMobile || atTop;
+
       for(const g of glyphs){
-        const buoyBase=Math.sin(t*1.2+g.phase)*(g.amp);
-        const buoy=buoyBase*bobFactor;
-        const dx=g.x-center.x, dy=g.y-center.y;
-        const px=g.x + dx*k*s;
-        const py=g.y + dy*k*s + buoy;
+        const dx=g.x-center.x;
+        const dy=g.y-center.y;
+
+        let px=g.x;
+        let py=g.y;
+        let buoy=0;
+
+        if (allowMotion){
+          buoy = Math.sin(t*1.2+g.phase)*(g.amp);
+          px = g.x + dx*k*s;
+          py = g.y + dy*k*s + buoy;
+        }
 
         ctx.save();
+        const bobTilt = allowMotion ? Math.sin(t*.5+g.phase)*0.015 : 0;
         ctx.translate(px,py);
-        ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015*bobFactor);
+        ctx.rotate(g.tilt + bobTilt);
         ctx.globalAlpha=fade;
 
         ctx.font=`900 ${g.size}px "Clash Display",system-ui,sans-serif`;
