@@ -140,6 +140,20 @@
     .section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 12px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
     .title{font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
     .subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#e8e9ff;text-align:center;text-transform:lowercase;letter-spacing:.02em}
+    .rainbow-subtitle{
+      position:relative;
+      display:inline-block;
+      background-image:linear-gradient(90deg,#ff6b6b,#fddb92,#6bffb5,#6bc5ff,#d66bff,#ff6b6b);
+      background-size:200% 100%;
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      animation:rainbowSweep 6s linear infinite alternate;
+    }
+    @keyframes rainbowSweep{
+      0%{background-position:0% 50%;}
+      100%{background-position:100% 50%;}
+    }
 
     /* grid + cards etc. */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
@@ -460,9 +474,9 @@
             <div class="mix-embed" data-mix-placeholder="14"></div>
             <div class="mix-embed" data-mix-placeholder="15"></div>
           </div>
-          <p class="mixes-desc">annual sonic collections, time-capsules of my favey waveys</p>
+          <p class="mixes-desc">annual (and sometimes semi-annual) sonic collections, time-capsules of my favey waveys</p>
           <p class="mixes-desc">
-            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener" style="color: #ff7a18">
+            <a href="https://www.mixcloud.com/degh-ii/stream/" target="_blank" rel="noopener">
               click here to stream all mixes in reverse chronological order
             </a>
           </p>
@@ -573,7 +587,7 @@
           <div class="card-body">
             <div class="meta"><span>2022</span></div>
             <h3 class="title-sm">my experience at the chance the rapper / savemoney reunion show</h3>
-            <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">read</a></div>
+            <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90k/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">read</a></div>
           </div>
         </article>
       </div>
@@ -597,7 +611,7 @@
     <section id="control" class="section">
       <div class="section-head">
         <h2 class="title">WORMHOLE CONTROL ↓</h2>
-        <p class="subtitle">there's no earthly way of knowing…</p>
+        <p class="subtitle"><span class="rainbow-subtitle">there's no earthly way of knowing…</span></p>
         <div class="center-wrap" style="margin-top:10px">
           <button class="fs-btn" id="fsEnter" type="button" aria-pressed="false" title="Fullscreen wormhole">ENTER FULL SCREEN</button>
         </div>
@@ -633,7 +647,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.51 - 2025</small>
+      <small>DAECLAN.COM v4.52 - 2025</small>
     </div>
   </footer>
 
@@ -845,25 +859,19 @@
     function draw(tms){
       const t=tms*.001; ctx.clearRect(0,0,W,H);
       const rawS = fadeProgress();
-      const fade = Math.max(0, 1 - rawS*1.15);
-      const isM = innerWidth<=560;
-
-      // Clamp scroll progress for stability, especially on iOS rubber‑banding
       const s = Math.max(0, Math.min(1, rawS));
-
-      // Slightly softer warp on mobile to reduce harsh jitter
+      const fade = Math.max(0, 1 - rawS*1.15);
+      const isM = innerWidth<=900;
       const k = isM ? 2.0 : 1.25;
 
-      // On mobile, only let the bobbing run when we're essentially at the top.
-      // As soon as the user scrolls down a bit, we smoothly damp the bob to 0.
       let bobFactor = 1;
       if (isM) {
         if (s <= 0.02) {
           bobFactor = 1;
-        } else if (s >= 0.12) {
+        } else if (s >= 0.20) {
           bobFactor = 0;
         } else {
-          const tNorm = (s - 0.02) / 0.10;
+          const tNorm = (s - 0.02) / 0.18;
           bobFactor = 1 - tNorm;
         }
       }
@@ -871,14 +879,14 @@
       const center={x:W/2,y:H/2};
       for(const g of glyphs){
         const buoyBase=Math.sin(t*1.2+g.phase)*(g.amp);
-        const buoy = buoyBase * bobFactor;
+        const buoy=buoyBase*bobFactor;
         const dx=g.x-center.x, dy=g.y-center.y;
         const px=g.x + dx*k*s;
         const py=g.y + dy*k*s + buoy;
 
         ctx.save();
         ctx.translate(px,py);
-        ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015);
+        ctx.rotate(g.tilt+Math.sin(t*.5+g.phase)*0.015*bobFactor);
         ctx.globalAlpha=fade;
 
         ctx.font=`900 ${g.size}px "Clash Display",system-ui,sans-serif`;
@@ -898,8 +906,6 @@
         ctx.globalCompositeOperation='source-over';
         ctx.restore();
       }
-
-      // Smoothly fade the entire marquee canvas instead of popping on/off.
       const vis = fade <= 0.001 ? 0 : fade;
       canvas.style.opacity = String(vis);
       requestAnimationFrame(draw);
@@ -1605,32 +1611,6 @@
 
     placeholders.forEach(ph=>io.observe(ph));
   })();
-  </script>
-
-   <script>
-    // Hide ENTER FULL SCREEN button on iPhone only (keep iPad + desktop)
-    (function() {
-      try {
-        var ua = navigator.userAgent || navigator.vendor || "";
-        var isIPhone = /iPhone/i.test(ua);
-        if (!isIPhone) return;
-
-        function hideFsEnter() {
-          var btn = document.getElementById('fsEnter');
-          if (btn) {
-            btn.style.display = 'none';
-          }
-        }
-
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', hideFsEnter, { once: true });
-        } else {
-          hideFsEnter();
-        }
-      } catch (e) {
-        // fail silently, do nothing
-      }
-    })();
   </script>
 </body>
 </html>
