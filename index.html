@@ -186,7 +186,6 @@
     .mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
     .mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
     .mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}.mixes-desc a{color:var(--accent);text-decoration:none}
-    
     .mix-rail{display:flex;gap:12px;overflow-x:auto;padding:14px 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity;touch-action:pan-x}
     .mix-rail::-webkit-scrollbar{display:none}
     .mix-embed{flex:0 0 320px;height:360px;border:0;border-radius:12px;overflow:hidden;background:#0e0f12;scroll-snap-align:start;pointer-events:auto;position:relative;z-index:6}
@@ -634,7 +633,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.56 - 2025</small>
+      <small>DAECLAN.COM v4.57 - 2025</small>
     </div>
   </footer>
 
@@ -788,14 +787,42 @@
     const ctx=canvas.getContext('2d',{alpha:true});
     const DPR=Math.min(devicePixelRatio||1,2);
     const LINE1='WELCOME TO', LINE2='DAECLAN . COM', ORANGE='#ff7a18';
-    let W=1,H=1,glyphs=[],center={x:0,y:0},marqueeTouched=false,marqueeMobileS=0;
+    let W=1,H=1,glyphs=[],center={x:0,y:0};
+    let marqueeFingerDown=false;
+    let marqueeLocked=false;
+    let marqueeLockS=0;
 
-    function markMarqueeTouched(){
-      marqueeTouched=true;
+    function clearMarqueeLocks(){
+      for(const g of glyphs){
+        delete g.lockX;
+        delete g.lockY;
+      }
+    }
+    function lockMarqueeGlyphs(t, s, isSmall){
+      const k = isSmall ? 3.0 : 1.25;
+      const c = center;
+      for(const g of glyphs){
+        const dx=g.x-c.x;
+        const dy=g.y-c.y;
+        const px=g.x + dx*k*s;
+        const baseY=g.y + dy*k*s;
+        const buoy=Math.sin(t*1.2+g.phase)*(g.amp);
+        g.lockX=px;
+        g.lockY=baseY+buoy;
+      }
+    }
+    function marqueeHandleDown(){
+      marqueeFingerDown=true;
+    }
+    function marqueeHandleUp(){
+      marqueeFingerDown=false;
     }
     if(('ontouchstart' in window) || ((navigator.maxTouchPoints||0)>0)){
-      window.addEventListener('touchstart',markMarqueeTouched,{passive:true});
-      window.addEventListener('pointerdown',markMarqueeTouched,{passive:true});
+      window.addEventListener('touchstart',marqueeHandleDown,{passive:true});
+      window.addEventListener('pointerdown',marqueeHandleDown,{passive:true});
+      window.addEventListener('touchend',marqueeHandleUp,{passive:true});
+      window.addEventListener('pointerup',marqueeHandleUp,{passive:true});
+      window.addEventListener('touchcancel',marqueeHandleUp,{passive:true});
     }
 
     function headerH(){return parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||68;}
@@ -858,35 +885,64 @@
       const rawS = fadeProgress();
       const isMobile = ((window.matchMedia && matchMedia('(pointer: coarse)').matches) || innerWidth<=900);
       const isSmallMobile = innerWidth<=560;
+      const eps = 0.001;
+      const atTop = rawS <= eps;
 
-      let s = rawS;
+      // Update center for current frame
+      center = {x:W/2,y:H/2};
+
+      // Mobile lock / unlock logic
       if(isMobile){
-        if(!marqueeTouched){
-          s = rawS;
-        }else{
-          if(rawS<=0.001){
-            marqueeMobileS = 0;
-            s = 0;
-          }else{
-            const prev = marqueeMobileS || 0;
-            const next = Math.max(prev, rawS);
-            marqueeMobileS = next;
-            s = next;
+        // If we've returned to the very top and no finger is down, unlock and re-enable animation
+        if(atTop && !marqueeFingerDown && marqueeLocked){
+          marqueeLocked=false;
+          marqueeLockS=0;
+          clearMarqueeLocks();
+        }
+
+        let justLocked=false;
+        if(!marqueeLocked){
+          // Lock if user is touching at the top, or when we first leave the top due to scroll
+          if((marqueeFingerDown && atTop) || (!atTop)){
+            marqueeLocked=true;
+            marqueeLockS=rawS;
+            justLocked=true;
           }
+        }
+        if(justLocked){
+          lockMarqueeGlyphs(t, rawS, isSmallMobile);
+        }
+      }else{
+        // Desktop: ensure we are not stuck in a locked state
+        if(marqueeLocked){
+          marqueeLocked=false;
+          marqueeLockS=0;
+          clearMarqueeLocks();
         }
       }
 
+      const s = rawS;
       const fade = Math.max(0, 1 - s*1.15);
       const k = isSmallMobile ? 3.0 : 1.25;
 
-      const center={x:W/2,y:H/2};
-      const atTop = s<=0.001;
-      const allowBobbing = !isMobile || (!marqueeTouched && atTop);
+      const allowBobbing = !isMobile || (!marqueeLocked && atTop);
 
       for(const g of glyphs){
-        const dx=g.x-center.x, dy=g.y-center.y;
-        const px=g.x + dx*k*s;
-        const baseY=g.y + dy*k*s;
+        let px, baseY;
+
+        if(isMobile && marqueeLocked && g.lockX!=null && g.lockY!=null){
+          const dxLock = g.lockX - center.x;
+          const dyLock = g.lockY - center.y;
+          const extra = Math.max(0, s - marqueeLockS);
+          px = g.lockX + dxLock * k * extra;
+          baseY = g.lockY + dyLock * k * extra;
+        }else{
+          const dx=g.x-center.x;
+          const dy=g.y-center.y;
+          px=g.x + dx*k*s;
+          baseY=g.y + dy*k*s;
+        }
+
         const buoy = allowBobbing ? Math.sin(t*1.2+g.phase)*(g.amp) : 0;
         const py = baseY + buoy;
 
@@ -909,13 +965,11 @@
         hl.addColorStop(0,'rgba(255,255,255,0)');
         hl.addColorStop(.5,'rgba(255,255,255,.30)');
         hl.addColorStop(1,'rgba(255,255,255,0)');
-        ctx.fillStyle=hl;
-        ctx.fillText(g.ch,0,-g.size*.03);
+        ctx.fillStyle=hl; ctx.fillText(g.ch,0,-g.size*.03);
         ctx.globalCompositeOperation='source-over';
         ctx.restore();
       }
-      const vis = fade<=0.001 ? 0 : fade;
-      canvas.style.opacity=String(vis);
+      canvas.style.opacity = fade <= 0.001 ? '0' : String(fade);
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
