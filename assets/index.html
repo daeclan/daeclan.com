@@ -43,7 +43,7 @@
     a{text-decoration:none;color:inherit}
 
     /* ===== FULLSCREEN LOADER ===== */
-    html.loading body{overflow:hidden;}
+    html.loading body{overflow:hidden;height:100svh;min-height:100vh}
     #loader{position:fixed;inset:0;background:#000;z-index:400000;display:grid;place-items:center;pointer-events:auto;opacity:1;transition:opacity .45s ease}
     html.loader-done #loader{opacity:0;pointer-events:none}
     #loaderStage{position:relative;width:100vw;height:100svh;min-height:100vh;display:grid;place-items:center}
@@ -140,13 +140,6 @@
     .section-head{width:calc(var(--tight)*100%);max-width:min(calc(var(--tight)*var(--maxw)),720px);margin:0 auto 12px;background:#000;border-radius:12px;padding:10px 16px;position:relative;z-index:2}
     .title{font-size:clamp(24px,3.8vw,34px);line-height:1.1;margin:.2rem 0 .25rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;text-align:center;color:var(--accent)}
     .subtitle{font-size:clamp(13px,2vw,16px);margin:0 auto 8px;color:#e8e9ff;text-align:center;text-transform:lowercase;letter-spacing:.02em}
-    #control .subtitle{
-      background:linear-gradient(90deg,#ff7a18,#ff3b6a,#8a3bff,#24d3ff,#ffea00);
-      -webkit-background-clip:text;
-      background-clip:text;
-      color:transparent;
-    }
-
 
     /* grid + cards etc. */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
@@ -192,7 +185,7 @@
     .mixes-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;z-index:5}
     .mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
     .mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
-    .mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}
+    .mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}.mixes-desc a{color:var(--accent);text-decoration:none}
     .mix-rail{display:flex;gap:12px;overflow-x:auto;padding:14px 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity;touch-action:pan-x}
     .mix-rail::-webkit-scrollbar{display:none}
     .mix-embed{flex:0 0 320px;height:360px;border:0;border-radius:12px;overflow:hidden;background:#0e0f12;scroll-snap-align:start;pointer-events:auto;position:relative;z-index:6}
@@ -239,8 +232,6 @@
     /* ===== FS controls (enter/exit) ===== */
     .fs-btn{appearance:none;border:1px solid var(--line);background:#0b0c10;color:var(--accent);
       padding:10px 14px;border-radius:10px;font-weight:800;font-family:"Clash Display",system-ui,sans-serif;pointer-events:auto}
-    @media (max-width: 767px){#fsEnter{display:none}}
-
     #fsExit{position:fixed;top:12px;right:12px;z-index:4500;display:none}
     :fullscreen #fsExit{display:inline-flex}
   </style>
@@ -582,7 +573,7 @@
           <div class="card-body">
             <div class="meta"><span>2022</span></div>
             <h3 class="title-sm">my experience at the chance the rapper / savemoney reunion show</h3>
-            <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz9c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">read</a></div>
+            <div class="actions left"><a class="btn" href="https://www.reddit.com/r/hiphopheads/comments/wgz90c/my_experience_at_the_chance_the_rapper_savemoney/" target="_blank">read</a></div>
           </div>
         </article>
       </div>
@@ -642,7 +633,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.58 - 2025</small>
+      <small>DAECLAN.COM v4.57 - 2025</small>
     </div>
   </footer>
 
@@ -795,7 +786,6 @@
     if(!canvas) return;
     const ctx=canvas.getContext('2d',{alpha:true});
     const DPR=Math.min(devicePixelRatio||1,2);
-    
     const LINE1='WELCOME TO', LINE2='DAECLAN . COM', ORANGE='#ff7a18';
     let W=1,H=1,glyphs=[],center={x:0,y:0};
     let marqueeFingerDown=false;
@@ -870,7 +860,7 @@
         let x=(W-totalW)/2;
         for(const ch of text){
           const w=ctx.measureText(ch).width;
-          glyphs.push({ch,x:x+w/2,y,size,phase:Math.random()*Math.PI*2,amp:(Math.random()*8)*DPR*.6,tilt:(Math.random()*0.04-0.02),color:ORANGE});
+          glyphs.push({ch,x:x+w/2,y,size,phase:Math.random()*Math.PI*2,amp:(5+Math.random()*8)*DPR*.6,tilt:(Math.random()*0.04-0.02),color:ORANGE});
           x+=w+spacing
         }
       }
@@ -898,9 +888,12 @@
       const eps = 0.001;
       const atTop = rawS <= eps;
 
+      // Update center for current frame
       center = {x:W/2,y:H/2};
 
+      // Mobile lock / unlock logic
       if(isMobile){
+        // If we've returned to the very top and no finger is down, unlock and re-enable animation
         if(atTop && !marqueeFingerDown && marqueeLocked){
           marqueeLocked=false;
           marqueeLockS=0;
@@ -909,6 +902,7 @@
 
         let justLocked=false;
         if(!marqueeLocked){
+          // Lock if user is touching at the top, or when we first leave the top due to scroll
           if((marqueeFingerDown && atTop) || (!atTop)){
             marqueeLocked=true;
             marqueeLockS=rawS;
@@ -919,6 +913,7 @@
           lockMarqueeGlyphs(t, rawS, isSmallMobile);
         }
       }else{
+        // Desktop: ensure we are not stuck in a locked state
         if(marqueeLocked){
           marqueeLocked=false;
           marqueeLockS=0;
@@ -974,13 +969,12 @@
         ctx.globalCompositeOperation='source-over';
         ctx.restore();
       }
-      canvas.style.opacity = fade <= 0.001 ? 0 : String(fade);
+      canvas.style.opacity = fade <= 0.001 ? '0' : String(fade);
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
   })();
   </script>
-
 
   <script>
   /* Wormhole shader + controls */
@@ -1122,17 +1116,15 @@
 
       const isTouchPointer = (e.pointerType === 'touch' || e.pointerType === 'pen' || IS_TOUCH_DEVICE);
       if(isTouchPointer){
-        // On touch devices (phones/tablets), do an initial ripple and enable drag trails.
+        // On touch devices (phones/tablets), just do a single, lighter ripple and skip drag trails.
         addRipple(x, y);
-        dragging = true;
-        lastX = x;
-        lastYp = y;
-        lastT = performance.now();
-      } else {
-        // Desktop: allow dense burst + drag trails.
-        for (let i = 0; i < 3; i++) addRipple(x, y);
-        dragging=true; lastX=x; lastYp=y; lastT=performance.now();
+        dragging = false;
+        return;
       }
+
+      // Desktop: allow dense burst + drag trails.
+      for (let i = 0; i < 3; i++) addRipple(x, y);
+      dragging=true; lastX=x; lastYp=y; lastT=performance.now();
     }, { passive: true, capture: true });
 
     window.addEventListener('pointermove', e=>{
