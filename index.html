@@ -370,6 +370,47 @@
   <div class="heroSpacer" aria-hidden="true"></div>
 
   <main id="main">
+
+    <!-- LATEST CREATION -->
+   <section id="latest-creation" class="section container">
+  <div class="section-head">
+    <h2 class="title">THE LATEST</h2>
+    <p class="subtitle">freshly whipped treats &amp; tricks</p>
+  </div>
+
+  <div class="grid" style="margin-top:18px;">
+    <article class="col-12 mixes-card">
+      <div class="mixes-head">
+        <div class="meta"><span>DEGH</span></div>
+        <h3 class="mixes-title">FLESH, BONE, AND DARK MATTER (fall ’25 mix)</h3>
+      </div>
+
+      <div style="padding:14px 16px 0;">
+        <div style="width:100%;max-width:420px;margin:0 auto;">
+          <div style="width:100%;height:360px;border-radius:12px;overflow:hidden;background:#0e0f12;">
+            <iframe
+              class="latest-mix-embed"
+              loading="lazy"
+              scrolling="no"
+              allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+              src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fflesh-bone-and-dark-matter-fall-25-mix%2F"
+              title="Flesh Bone and Dark Matter (fall '25 mix)"
+              style="border:0;width:100%;height:100%;"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+      <p class="mixes-desc" style="padding:12px 16px 16px;">
+        ft. unreleased kendrick (and vince staples &amp; alchemist), rare gems, and solid gold oldies. enjoy :)
+        <br />
+        <br />
+        released 11.24.25
+      </p>
+    </article>
+  </div>
+</section>
+
+
     <!-- MUSIC -->
     <section id="music" class="section container">
       <div class="section-head"><h2 class="title">MUSIC</h2><p class="subtitle">releases by degh</p></div>
@@ -447,6 +488,9 @@
         <article class="col-12 mixes-card">
           <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
           <div class="mix-rail" id="mixRail" data-mixcount="20">
+
+            <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fflesh-bone-and-dark-matter-fall-25-mix%2F" title="FLESH BONE AND DARK MATTER (fall '25 mix)"></iframe>
+
             <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fits-all-illusions-winter-24-mix%2F" title="IT'S ALL ILLUSIONS (winter '24 mix)"></iframe>
             <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fdegh-vs-the-unblinking-giants-summer-23-mix%2F" title="DEGH vs the Unblinking Giants (summer '23)"></iframe>
             <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-absurd-spring-22-mini-mix%2F" title="it's absurd (spring '22)"></iframe>
@@ -643,7 +687,7 @@
 
   <footer role="contentinfo">
     <div class="footer-inner">
-      <small>DAECLAN.COM v4.59 - 2025</small>
+      <small>DAECLAN.COM v4.6 - 2025</small>
     </div>
   </footer>
 
@@ -796,6 +840,7 @@
     if(!canvas) return;
     const ctx=canvas.getContext('2d',{alpha:true});
     const DPR=Math.min(devicePixelRatio||1,2);
+    const isIPad = /iPad|Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1;
     
     const LINE1='WELCOME TO', LINE2='DAECLAN . COM', ORANGE='#ff7a18';
     let W=1,H=1,glyphs=[],center={x:0,y:0};
@@ -894,7 +939,7 @@
       ctx.clearRect(0,0,W,H);
 
       const rawS = fadeProgress();
-      const isMobile = ((window.matchMedia && matchMedia('(pointer: coarse)').matches) || innerWidth<=900);
+      const isMobile = (isIPad || ((window.matchMedia && matchMedia('(pointer: coarse)').matches) || innerWidth<=900));
       const isSmallMobile = innerWidth<=560;
       const eps = 0.001;
       const atTop = rawS <= eps;

@@ -46,7 +46,7 @@
     html.loading body{overflow:hidden;}
     #loader{position:fixed;inset:0;background:#000;z-index:400000;display:grid;place-items:center;pointer-events:auto;opacity:1;transition:opacity .45s ease}
     html.loader-done #loader{opacity:0;pointer-events:none}
-    #loaderStage{position:relative;width:100vw;height:100svh;min-height:100vh;display:grid;place-items:center}
+    #loaderStage{position:relative;width:100%;height:100%;display:grid;place-items:center}
     #loaderGL{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .6s ease}
     html.bg-ready #loaderGL{opacity:1}
     .preload-msg{position:absolute; z-index:3; inset:0; display:grid; place-items:center;
@@ -193,6 +193,7 @@
     .mixes-head{padding:14px 16px;border-bottom:1px solid var(--line)}
     .mixes-title{margin:0;font-size:18px;font-weight:800;color:var(--accent)}
     .mixes-desc{padding:0 16px 16px;color:#d7d9df;font-size:14px}
+  .mixes-desc a{color:var(--accent);text-decoration:none}
     .mix-rail{display:flex;gap:12px;overflow-x:auto;padding:14px 16px 16px;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scroll-snap-type:x proximity;touch-action:pan-x}
     .mix-rail::-webkit-scrollbar{display:none}
     .mix-embed{flex:0 0 320px;height:360px;border:0;border-radius:12px;overflow:hidden;background:#0e0f12;scroll-snap-align:start;pointer-events:auto;position:relative;z-index:6}
@@ -369,6 +370,38 @@
   <div class="heroSpacer" aria-hidden="true"></div>
 
   <main id="main">
+
+    <!-- LATEST CREATION -->
+    <section id="latest-creation" class="section container">
+      <div class="section-head">
+        <h2 class="title">THE LATEST</h2>
+        <p class="subtitle">freshly whipped treats & tricks</p>
+      </div>
+
+      <div class="grid" style="margin-top:18px;">
+        <article class="col-12 mixes-card">
+          <div class="mixes-head">
+            <h3 class="mixes-title">FLESH BONE AND DARK MATTER — FALL 25 MIX</h3>
+          </div>
+          <div style="padding:14px 16px 16px;">
+            <div style="width:100%;max-width:420px;margin:0 auto;">
+              <div style="width:100%;height:360px;border-radius:12px;overflow:hidden;background:#0e0f12;">
+                <iframe
+                  class="latest-mix-embed"
+                  loading="lazy"
+                  scrolling="no"
+                  allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+                  src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fflesh-bone-and-dark-matter-fall-25-mix%2F"
+                  title="Flesh Bone and Dark Matter (fall '25 mix)"
+                  style="border:0;width:100%;height:100%;"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <!-- MUSIC -->
     <section id="music" class="section container">
       <div class="section-head"><h2 class="title">MUSIC</h2><p class="subtitle">releases by degh</p></div>
@@ -446,6 +479,9 @@
         <article class="col-12 mixes-card">
           <div class="mixes-head"><h3 class="mixes-title">MIXES</h3></div>
           <div class="mix-rail" id="mixRail" data-mixcount="20">
+
+            <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fflesh-bone-and-dark-matter-fall-25-mix%2F" title="FLESH BONE AND DARK MATTER (fall '25 mix)"></iframe>
+
             <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fits-all-illusions-winter-24-mix%2F" title="IT'S ALL ILLUSIONS (winter '24 mix)"></iframe>
             <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fdegh-vs-the-unblinking-giants-summer-23-mix%2F" title="DEGH vs the Unblinking Giants (summer '23)"></iframe>
             <iframe class="mix-embed" loading="lazy" scrolling="no" allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture" src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh%2Fits-absurd-spring-22-mini-mix%2F" title="it's absurd (spring '22)"></iframe>
