@@ -84,6 +84,7 @@
       line-height:var(--lh);
       font-size:var(--p);
       letter-spacing:.01em;
+      overflow-x: hidden;
     }
 
     a{ color:var(--link); text-decoration:none; }
@@ -100,12 +101,18 @@
     .shell{ display:grid; grid-template-columns:290px minmax(0,1fr); min-height:100vh; }
     @media (max-width:980px){ .shell{ grid-template-columns:1fr; } }
 
-    header.site{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-      background: color-mix(in oklab, var(--bg) 78%, transparent);
-      border-bottom:1px solid var(--rule);
-    }
+ header.site{
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 999; /* was 50 */
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  background: color-mix(in oklab, var(--bg) 78%, transparent);
+  border-bottom: 1px solid var(--rule);
+}
     .site__inner{
       max-width: calc(var(--max) + (var(--gutter) * 2) + 290px);
       margin:0 auto; padding:14px var(--gutter);
@@ -192,12 +199,27 @@
       background: color-mix(in oklab, var(--bg) 86%, transparent);
       backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
     }
-    @media (max-width:980px){ .mobile-toc{ display:block; } }
-    .mobile-toc__inner{
-      max-width: calc(var(--max) + (var(--gutter) * 2));
-      margin:0 auto; padding:10px var(--gutter);
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-    }
+   @media (max-width:980px){
+  .mobile-toc{
+    display:block !important;
+
+    position: sticky !important;
+    top: var(--header-h) !important;
+    left: auto !important;
+    right: auto !important;
+
+    z-index: 9998 !important;
+
+    transform: none !important;
+    will-change: auto !important;
+
+    background: color-mix(in oklab, var(--bg) 86%, transparent);
+    border-bottom:1px solid var(--rule);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}
+
     .mobile-toc__btn{
       appearance:none; border:1px solid var(--rule);
       background: color-mix(in oklab, var(--bg-elev) 86%, transparent);
@@ -440,7 +462,23 @@
 .examples__list a{
   font-family:var(--font-head);
 }
+@media (max-width:980px){
+  .mobile-toc{
+    position:fixed;
+    top:var(--header-h);
+    left:0;
+    right:0;
+    z-index:40;
 
+    transition:opacity .35s ease, transform .35s ease;
+  }
+
+  .mobile-toc.is-hidden{
+    opacity:0;
+    transform:translateY(-6px);
+    pointer-events:none;
+  }
+}
   </style>
 </head>
 
@@ -1123,7 +1161,33 @@
           });
         });
       }
-    })();
+    })();// Mobile TOC fade-out on scroll
+(function(){
+  const mq = window.matchMedia('(max-width:980px)');
+  const toc = document.getElementById('mobileToc');
+  if(!toc) return;
+
+  let lastScroll = 0;
+  const FADE_AT = 64; // px — tweak this
+
+  function onScroll(){
+    if(!mq.matches) return;
+
+    const y = window.scrollY || document.documentElement.scrollTop;
+
+    if(y > FADE_AT){
+      toc.classList.add('is-hidden');
+    }else{
+      toc.classList.remove('is-hidden');
+    }
+
+    lastScroll = y;
+  }
+
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+})();
   </script>
 </body>
 </html>
