@@ -64,6 +64,8 @@
     #loaderPct{font-size:clamp(120px,22vw,360px);font-weight:900;line-height:.9;letter-spacing:-.01em;color:var(--accent);display:block;text-align:center;font-variant-numeric:tabular-nums;-webkit-text-stroke:1px rgba(0,0,0,.45);text-shadow:0 0 6px rgba(255,122,24,.55),0 0 20px rgba(255,122,24,.55),0 0 60px rgba(255,122,24,.45),0 0 100px rgba(255,180,100,.35);animation:pctGlow 3.4s ease-in-out infinite alternate;font-family:"Clash Display",system-ui,sans-serif;}
     @keyframes pctGlow{0%{text-shadow:0 0 4px rgba(255,122,24,.3),0 0 10px rgba(255,122,24,.3),0 0 30px rgba(255,122,24,.25),0 0 60px rgba(255,180,100,.2);}100%{text-shadow:0 0 8px rgba(255,122,24,.9),0 0 26px rgba(255,122,24,.9),0 0 70px rgba(255,122,24,.7),0 0 120px rgba(255,180,100,.6);}}
 
+    
+
     #loaderBar{--p:0;position:relative;width:min(560px,80vw);height:12px;border-radius:999px;background:#000;border:1px solid #222;overflow:hidden;box-shadow:inset 0 0 0 1px #141414, 0 8px 28px rgba(255,122,24,.08);opacity:0;transform:translateY(4px)}
     html.fonts-ready #loaderBar{animation:barIn .28s .05s cubic-bezier(.22,.61,.36,1) forwards}
     @keyframes barIn{to{opacity:1;transform:none}}
@@ -146,8 +148,47 @@
       background-clip:text;
       color:transparent;
     }
+    /* make the two cards behave like a clean row */
+.latest-grid{
+  display:flex;
+  gap:24px;
+  justify-content:center;
+  align-items:stretch;
+  flex-wrap:wrap;
+}
 
+.latest-grid .card{
+  flex:1 1 380px;   /* grows, but wraps nicely */
+  max-width:520px;  /* prevents the mix card from becoming a billboard */
+}
 
+/* iframe becomes the "image" */
+.thumb--embed{
+  position:relative;
+  padding:0;
+  overflow:hidden;
+  border-radius:16px; /* match your card radius vibe */
+  background:#0e0f12;
+  aspect-ratio: 1 / 1;  /* square like the essay image */
+}
+
+/* let the player fill the thumb */
+.thumb--embed iframe{
+  width:100%;
+  height:100%;
+  border:0;
+  display:block;
+}
+
+/* keep your tag pinned */
+.thumb--embed .tag{
+  position:absolute;
+  top:12px;
+  left:12px;
+  z-index:2;
+}
+
+    
     /* grid + cards etc. */
     .grid{display:grid;gap:18px;grid-template-columns:repeat(12,1fr)}
     .col-3{grid-column:span 3}.col-4{grid-column:span 4}.col-6{grid-column:span 6}.col-12{grid-column:span 12}
@@ -371,44 +412,89 @@
 
   <main id="main">
 
-    <!-- LATEST CREATION -->
-   <section id="latest-creation" class="section container">
+   <!-- LATEST CREATION -->
+<section id="latest-creation" class="section container">
   <div class="section-head">
     <h2 class="title">THE LATEST</h2>
     <p class="subtitle">freshly whipped treats &amp; tricks</p>
   </div>
 
-  <div class="grid" style="margin-top:18px;">
-    <article class="col-12 mixes-card">
-      <div class="mixes-head">
-        <div class="meta"><span>DEGH</span></div>
-        <h3 class="mixes-title">FLESH, BONE, AND DARK MATTER (fall ’25 mix)</h3>
+  <div class="latest-grid">
+    <!-- LEFT: ESSAY CARD -->
+    <article class="card max-380">
+      <div class="thumb">
+        <img
+          class="zoomable"
+          loading="lazy"
+          src="./k-hole/of-knights-and-men/img/conjuring_stanley.jpg"
+          alt="Kubrick essay art"
+        />
+        <span class="tag">essay</span>
       </div>
-
-      <div style="padding:14px 16px 0;">
-        <div style="width:100%;max-width:420px;margin:0 auto;">
-          <div style="width:100%;height:360px;border-radius:12px;overflow:hidden;background:#0e0f12;">
-            <iframe
-              class="latest-mix-embed"
-              loading="lazy"
-              scrolling="no"
-              allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
-              src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fflesh-bone-and-dark-matter-fall-25-mix%2F"
-              title="Flesh Bone and Dark Matter (fall '25 mix)"
-              style="border:0;width:100%;height:100%;"
-            ></iframe>
-          </div>
+      <div class="card-body">
+        <div class="meta"><span>2025</span></div>
+        <h3 class="title-sm">
+          of knights and men:<br />
+          chess and myth in kubrick’s body
+        </h3>
+        <p class="desc">
+          the hidden visual language of horses, knights, strategy, and failure in eyes wide shut
+        </p>
+        <div class="actions left">
+          <a
+            class="btn"
+            href="https://daeclan.com/k-hole/of-knights-and-men/"
+            target="_blank"
+            rel="noopener"
+          >
+            read
+          </a>
         </div>
       </div>
-      <p class="mixes-desc" style="padding:12px 16px 16px;">
-        ft. unreleased kendrick (and vince staples &amp; alchemist), rare gems, and solid gold oldies. enjoy :)
-        <br />
-        <br />
-        released 11.24.25
-      </p>
     </article>
+
+   <article class="card max-380 card--mix">
+  <div class="thumb thumb--embed">
+    <span class="tag">mix</span>
+
+    <iframe
+      class="latest-mix-embed"
+      loading="lazy"
+      scrolling="no"
+      allow="autoplay; encrypted-media; fullscreen; clipboard-write; picture-in-picture"
+      src="https://www.mixcloud.com/widget/iframe/?hide_cover=0&light=0&feed=%2Fdegh-ii%2Fflesh-bone-and-dark-matter-fall-25-mix%2F"
+      title="Flesh Bone and Dark Matter (fall '25 mix)"
+    ></iframe>
+  </div>
+
+  <div class="card-body">
+    <div class="meta"><span>released 11.24.25</span></div>
+
+    <h3 class="title-sm">
+      flesh, bone, and dark matter<br />
+      (fall ’25 mix)
+    </h3>
+
+    <p class="desc">
+      ft. unreleased kendrick (and vince staples &amp; alchemist), rare gems,
+      and solid gold oldies. enjoy :)
+    </p>
+
+    <div class="actions left">
+      <a
+        class="btn"
+        href="https://www.mixcloud.com/degh-ii/flesh-bone-and-dark-matter-fall-25-mix/"
+        target="_blank"
+        rel="noopener"
+      >listen</a>
+    </div>
+  </div>
+</article>
+
+
   </div>
 </section>
+
 
 
     <!-- MUSIC -->
@@ -622,12 +708,12 @@
         <article class="card max-380">
           <div class="thumb">
             <img class="zoomable" loading="lazy" src="./k-hole/of-knights-and-men/img/conjuring_stanley.jpg" alt="Kubrick essay art">
-            <span class="tag">review</span>
+            <span class="tag">essay</span>
           </div>
           <div class="card-body">
             <div class="meta"><span>2025</span></div>
-            <h3 class="title-sm">of knights and men: chess and myth in kubrick’s body</h3>
-            <h1>the hidden visual language of horses, knights, strategy, and failure in eyes wide shut</h1>
+            <h3 class="title-sm">of knights and men: <br /> chess and myth in kubrick’s body</h3>
+            <p class="desc">the hidden visual language of horses, knights,<br /> strategy, and failure in eyes wide shut</p>
             <div class="actions left"><a class="btn" href="https://daeclan.com/k-hole/of-knights-and-men/" target="_blank">read</a></div>
           </div>
         </article>
